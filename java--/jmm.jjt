@@ -1,0 +1,174 @@
+options {
+    LOOKAHEAD=3;
+    MULTI=true;
+}
+
+PARSER_BEGIN(jmm)
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+
+
+public class jmm{
+    public static void main(String args []) throws ParseException, IOException{
+        jmm parser = new jmm(System.in);
+        parser.Program();
+    }
+}
+
+PARSER_END(jmm)
+
+SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+    /* Comments */
+    | < "//" (~["\r", "\n"])* >
+    | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
+}
+
+TOKEN :
+{
+  < OP :
+      "&&"
+    | "<"
+    | "+"
+    | "-"
+    | "*"
+    | "/" >
+| < NOT_OP : "!" >
+| < WHILE : "while" >
+| < IF : "if" >
+| < ELSE : "else" > 
+| < ASSIGN : "=" >
+| < ASPA : "\"" >
+| < LPAR : "(" >
+| < RPAR : ")" >
+| < DOT : "." >
+| < LENGTH : "length" >
+| < VIRG : "," >
+| < PVIRG : ";" >
+| < LCHAVETA : "{" >
+| < RCHAVETA : "}" >
+| < LPARRETO : "[" >
+| < RPARRETO : "]" >
+| < EXTENDS : "extends" >
+| < CLASS : "class" >
+| < PUBLIC : "public" >
+| < STATIC : "static" >
+| < VOID : "void" >
+| < MAIN : "main" >
+| < INT : "int" >
+| < BOOLEAN : "boolean" >
+| < TRUE : "true" >
+| < FALSE : "false" >
+| < RETURN : "return" >
+| < THIS : "this" >
+| < NEW : "new" >
+| < STRING : "String" >
+}
+
+TOKEN :
+{
+  < INTEGER : (<DIGIT>)+ >
+| < IDENTIFIER : <LETTER> (<ALPHANUM>)* >
+
+| < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
+| < #DIGIT : [ "0"-"9" ] >
+| < #ALPHANUM : <LETTER> | <DIGIT> >
+| < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
+}
+
+
+
+SimpleNode Program() : {}
+{
+    ClassDeclaration(){
+        return jjtThis;
+    }
+}
+
+void ClassDeclaration() : {}
+{
+    <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LCHAVETA> (
+        VarDeclaration()
+    )* (
+        MainDeclaration()
+        | MethodDeclaration()
+    )* <RCHAVETA>
+}
+
+void VarDeclaration() : {}
+{
+    Type() <IDENTIFIER> <PVIRG>
+}
+
+void MainDeclaration() : {}
+{
+    <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER>
+    <RPAR> <LCHAVETA> (VarDeclaration())* (Statement())* <RCHAVETA>
+}
+
+void MethodDeclaration() : {}
+{
+    <PUBLIC> Type() <IDENTIFIER> <LPAR> (
+        Type() <IDENTIFIER> (
+            <VIRG> Type() <IDENTIFIER>
+        )*
+    )? <RPAR> <LCHAVETA> (
+        VarDeclaration()
+    )* (
+        Statement()
+    )* <RETURN> Expression() <PVIRG> <RCHAVETA>
+}
+
+void Type() : {}
+{
+    (<INT> <LCHAVETA> <RCHAVETA>)
+    | <BOOLEAN>
+    | <INT>
+    | <IDENTIFIER>
+}
+
+void Statement() : {}
+{
+    <LCHAVETA> (Statement())* <RCHAVETA>
+    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    | <WHILE> <LPAR> Expression() <RPAR> Statement()
+    | Expression() <PVIRG>
+    | <IDENTIFIER> <ASSIGN> Expression() <PVIRG>
+    | <IDENTIFIER> <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>
+}
+
+void Expression() : {}
+{
+    Expression1() (Expression2())?
+}
+
+void Expression1() : {}
+{
+    <INTEGER>
+    | <TRUE>
+    | <FALSE>
+    | <IDENTIFIER>
+    | <THIS>
+    | <NEW> <INT> <LPARRETO> Expression() <RPARRETO>
+    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
+    | <NOT_OP> Expression()
+    | <LPAR> Expression() <RPAR>
+}
+
+void Expression2() : {}
+{
+    <OP> Expression()
+    | <LPARRETO> Expression() <RPARRETO>
+    | <DOT> <LENGTH>
+    | <DOT> <IDENTIFIER> <LPAR> (
+        Expression() (
+            <VIRG> Expression()
+        )*
+    )? <RPAR>
+}
