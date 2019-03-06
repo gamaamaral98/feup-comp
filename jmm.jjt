@@ -1,0 +1,113 @@
+options {
+    LOOKAHEAD = 1;
+    MULTI = true;
+}
+
+PARSER_BEGIN(Jmm)
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+
+
+public class Jmm{
+    public static void main(String args []) throws ParseException, IOException{
+        Jmm parser = new Jmm(System.in);
+        parser.Program();
+    }
+}
+
+PARSER_END(Jmm)
+
+< DEFAULT >
+SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+< DEFAULT >
+TOKEN :
+{
+    < ARITH_OP :
+        "+"
+    | "&&"
+    | "<"
+    | "-"
+    | "*"
+    | "/" >
+| < NOT_OP : "!" >
+| < WHILE : "while" >
+| < IF : "if" >
+| < ELSE : "else" > 
+| < ASSIGN : "=" >
+| < ASPA : "\"" >
+| < LPAR : "(" >
+| < RPAR : ")" >
+| < DOT : "." >
+| < LENGTH : "length" >
+| < VIRG : "," >
+| < PVIRG : ";" >
+| < LCHAVETA : "{" >
+| < RCHAVETA : "}" >
+| < LCHAVETARETA : "[" >
+| < RCHAVETARETA : "]" >
+| < EXTENDS : "extends" >
+| < CLASS : "class" >
+| < PUBLIC : "public" >
+| < STATIC : "static" >
+| < VOID : "void" >
+| < MAIN : "main" >
+| < INT : "int" >
+| < BOOLEAN : "boolean" >
+| < BOOLEAN_TYPES : 
+        "true" 
+    | "false" >
+| < STRING : "String" >
+| < RETURN : "return" >
+| < THIS : "this" >
+| < NEW : "new" >
+| < STRING : "String" >
+}
+
+< DEFAULT >
+TOKEN :
+{
+    < INTEGER : (< DIGIT >)+ >
+| < IDENTIFIER :
+        < LETTER >
+        (
+            < LETTER >
+        | < DIGIT >
+        )* >
+| < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
+| < #DIGIT : [ "0"-"9" ] >
+| < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
+}
+
+
+
+SimpleNode Program() : {}
+{
+    ClassDeclaration(){
+        return jjtThis;
+    }
+}
+
+void ClassDeclaration() : {Token t1, t2;}
+{
+
+}
+
+void Aritm() : {Token t1, t2;}
+{
+    t1=<INTEGER> {
+    System.out.println("Integer = "+t1.image);
+    }
+    ( ("+" | "-") t2=<INTEGER> {
+    System.out.println("Integer = "+t2.image);
+    }
+    )? (<LF>)
+}
