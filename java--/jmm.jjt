@@ -1,6 +1,7 @@
 options {
     LOOKAHEAD=3;
     MULTI=true;
+    FORCE_LA_CHECK=true;
 }
 
 PARSER_BEGIN(jmm)
@@ -16,7 +17,8 @@ import java.util.Arrays;
 public class jmm{
     public static void main(String args []) throws ParseException, IOException{
         jmm parser = new jmm(System.in);
-        parser.Program();
+        SimpleNode node = parser.Program();
+        node.dump("");
     }
 }
 
@@ -42,7 +44,7 @@ TOKEN :
 | < NOT_OP : "!" >
 | < WHILE : "while" >
 | < IF : "if" >
-| < ELSE : "else" > 
+| < ELSE : "else" >
 | < ASSIGN : "=" >
 | < ASPA : "\"" >
 | < LPAR : "(" >
