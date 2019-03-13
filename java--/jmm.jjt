@@ -22,14 +22,6 @@ public class jmm{
 
     public static void main(String args []) throws ParseException, IOException{
 
-
-        // FileInputStream fileStream = openFile(args[0]);
-        // if(fileStream == null){
-        //     System.out.println("File not found!");
-        //     return;
-        // }
-
-        // jmm parser = new jmm(fileStream);
         if(readArgs(args) == false){
             return;
         }
@@ -81,6 +73,11 @@ public class jmm{
                 return false;
             }
             optO = true;
+        }
+        else if(arg.length() < 3){
+            System.out.println("Error: Non valid argument");
+            System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+            return false;
         }
         else if(arg.substring(0, 3).equals("-r=")) {
             if(optRN >= 0) {
