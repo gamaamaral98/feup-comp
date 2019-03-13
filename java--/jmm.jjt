@@ -13,17 +13,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-
 public class jmm{
+
+    private static jmm parser;
+    private static int optRN = -1;
+    private static boolean optO = false;
+    
+
     public static void main(String args []) throws ParseException, IOException{
-        
-        FileInputStream fileStream = openFile(args[0]);
-        if(fileStream == null){
-            System.out.println("File not found!");
+
+
+        // FileInputStream fileStream = openFile(args[0]);
+        // if(fileStream == null){
+        //     System.out.println("File not found!");
+        //     return;
+        // }
+
+        // jmm parser = new jmm(fileStream);
+        if(readArgs(args) == false){
             return;
         }
 
-        jmm parser = new jmm(fileStream);
         SimpleNode node = parser.Program();
         node.dump("");
     }
@@ -31,20 +41,73 @@ public class jmm{
     public static FileInputStream openFile(String filename){
         File file = new File(filename);
             
-        if(file.exists()){
-            FileInputStream fileStream;
-            try {
-                fileStream = new FileInputStream(file);
-                return fileStream;
-            } catch (FileNotFoundException e) {
-                System.out.println("Error in file stream constructor: ");
-                System.out.println("Usage: java jmm filePath [-r=<n>] [-o]");
-                e.printStackTrace();
-                return null;
-            }
-        }		
-        else
+        FileInputStream fileStream;
+        try {
+            fileStream = new FileInputStream(file);
+            return fileStream;
+        } catch (FileNotFoundException e) {
+            System.out.println("Error in file stream constructor: ");
+            System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+            e.printStackTrace();
             return null;
+        }
+    }
+
+    public static boolean readArgs(String args[]){
+        if(args.length < 1){
+            System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+            return false;
+        }
+
+        FileInputStream fileStream = openFile(args[0]);
+        if(fileStream == null){
+            System.out.println("File not found!");
+            return false;
+        }
+        parser = new jmm(fileStream);
+
+        for(int i = 1; i < args.length; i++){
+            if(validArgs(args[i]) == false)
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean validArgs(String arg){
+        if(arg.equals("-o")) { 
+            if(optO) {
+                System.out.println("Error: Option O has already been defined.");
+                System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+                return false;
+            }
+            optO = true;
+        }
+        else if(arg.substring(0, 3).equals("-r=")) {
+            if(optRN >= 0) {
+                System.out.println("Error: Option R has already been defined.");
+                System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+                return false;
+            }
+            if(arg.substring(3).matches("[0-9]+")) {
+                optRN = Integer.parseInt(arg.substring(3));
+                if(optRN < 0) {
+                    System.out.println("Error: The number in option R must be an integer greater or equal to 0.");
+                    System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+                    return false;
+                }
+            }
+            else {
+                System.out.println("Error: The number in option R must be an integer.");
+                System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+                return false;
+            }
+        }
+        else {
+            System.out.println("Error: Non valid argument");
+            System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
+            return false;
+        }
+        return true;	
     }
 }
 
