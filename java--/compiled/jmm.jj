@@ -20,9 +20,34 @@ public class jmm/*@bgen(jjtree)*/implements jmmTreeConstants/*@egen*/{/*@bgen(jj
 
 /*@egen*/
     public static void main(String args []) throws ParseException, IOException{
-        jmm parser = new jmm(System.in);
+        //jmm parser = new jmm(System.in);
+        FileInputStream fileStream = openFile(args[0]);
+        if(fileStream == null){
+            System.out.println("File not found!");
+            return;
+        }
+        jmm parser = new jmm(fileStream);
         SimpleNode node = parser.Program();
         node.dump("");
+    }
+
+    public static FileInputStream openFile(String filename){
+        File file = new File(filename);
+            
+        if(file.exists()){
+            FileInputStream fileStream;
+            try {
+                fileStream = new FileInputStream(file);
+                return fileStream;
+            } catch (FileNotFoundException e) {
+                System.out.println("Error in file stream constructor: ");
+                System.out.println("Usage: java jmm filePath [-r=<n>] [-o]");
+                e.printStackTrace();
+                return null;
+            }
+        }		
+        else
+            return null;
     }
 }
 
