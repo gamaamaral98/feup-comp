@@ -1,5 +1,5 @@
 options {
-    LOOKAHEAD=3;
+    LOOKAHEAD=1;
     MULTI=true;
     FORCE_LA_CHECK=true;
 }
@@ -183,9 +183,10 @@ void ClassDeclaration() : {}
 {
     <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LCHAVETA> (
         VarDeclaration()
-    )* (
+    )* (<PUBLIC> (
         MainDeclaration()
         | MethodDeclaration()
+        )
     )* <RCHAVETA>
 }
 
@@ -196,13 +197,13 @@ void VarDeclaration() : {}
 
 void MainDeclaration() : {}
 {
-    <PUBLIC> <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER>
+    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER>
     <RPAR> <LCHAVETA> (VarDeclaration())* (Statement())* <RCHAVETA>
 }
 
 void MethodDeclaration() : {}
 {
-    <PUBLIC> Type() <IDENTIFIER> <LPAR> (
+    Type() <IDENTIFIER> <LPAR> (
         Type() <IDENTIFIER> (
             <VIRG> Type() <IDENTIFIER>
         )*
@@ -215,9 +216,8 @@ void MethodDeclaration() : {}
 
 void Type() : {}
 {
-    (<INT> <LCHAVETA> <RCHAVETA>)
+    <INT> (<LPARRETO> <RPARRETO>)?
     | <BOOLEAN>
-    | <INT>
     | <IDENTIFIER>
 }
 
@@ -227,8 +227,7 @@ void Statement() : {}
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR> Expression() <RPAR> Statement()
     | Expression() <PVIRG>
-    | <IDENTIFIER> <ASSIGN> Expression() <PVIRG>
-    | <IDENTIFIER> <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>
+    | <IDENTIFIER> (<ASSIGN> Expression() <PVIRG> | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>)
 }
 
 void Expression() : {}
@@ -243,8 +242,7 @@ void Expression1() : {}
     | <FALSE>
     | <IDENTIFIER>
     | <THIS>
-    | <NEW> <INT> <LPARRETO> Expression() <RPARRETO>
-    | <NEW> <IDENTIFIER> <LPAR> <RPAR>
+    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>)
     | <NOT_OP> Expression()
     | <LPAR> Expression() <RPAR>
 }
@@ -253,10 +251,9 @@ void Expression2() : {}
 {
     <OP> Expression()
     | <LPARRETO> Expression() <RPARRETO>
-    | <DOT> <LENGTH>
-    | <DOT> <IDENTIFIER> <LPAR> (
+    | <DOT> (<LENGTH> | <IDENTIFIER> <LPAR> (
         Expression() (
             <VIRG> Expression()
         )*
-    )? <RPAR>
+    )? <RPAR>)
 }
