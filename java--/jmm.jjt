@@ -236,54 +236,58 @@ void Statement() : {}
     | <IDENTIFIER> (<ASSIGN> Expression() <PVIRG> | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>)
 }
 
-void Expression() : {}
+void Expression() #void : {}
 {
-    Expression1() (Expression2())?
+    Term1() (Operator_1())*
 }
 
-void Expression1() : {}
+void Term1() #void : {}
 {
-    <INTEGER>
-    | <TRUE>
-    | <FALSE>
-    | <IDENTIFIER>
-    | <THIS>
-    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>)
-    | <NOT_OP> Expression()
+    Term2() (Operator_2())*
+}
+
+void Term2() #void : {}
+{
+    Term3() (Operator_3())*
+}
+
+void Term3() #void : {}
+{
+    Term4() (Operator_4())*
+}
+
+void Term4() #void : {}
+{
+    <INTEGER> #INT
+    | <TRUE> #TRUE
+    | <FALSE> #FALSE
+    | <IDENTIFIER> #IDENTIFIER
+    | <THIS> #THIS
+    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>) #NEW
+    | <NOT_OP> Expression() #NOT
     | <LPAR> Expression() <RPAR>
 }
 
-void Expression2() : {}
+void Operator_1() #void : {}
 {
-    Expression3() (<AND_OP>  Expression2())?
-    // <OP> Expression()
-    // | <LPARRETO> Expression() <RPARRETO>
-    // | <DOT> (<LENGTH> | <IDENTIFIER> <LPAR> (
-    //     Expression() (
-    //         <VIRG> Expression()
-    //     )*
-    // )? <RPAR>)
+    <AND_OP> Term1() #AND(2)
 }
 
-void Expression3() : {}
+void Operator_2() #void : {}
 {
-    Expression4() (<LT_OP> Expression3())?
+    <LT_OP> Term2() #LT(2)
 }
 
-void Expression4() : {}
+void Operator_3() #void : {}
 {
-    Expression5() (
-        (<TIMES_OP> | <DIVIDE_OP>)
-        Expression4()
-    )?
+    <PLUS_OP> Term3() #ADD(2)
+    | <MINUS_OP> Term3() #SUB(2)
 }
 
-void Expression5() : {}
+void Operator_4() #void : {}
 {
-    Expression6() (
-        (<PLUS_OP> | <MINUS_OP>)
-        Expression5()
-    )?
+    <TIMES_OP> Term4() #MUL(2)
+    | <DIVIDE_OP> Term4() #DIV(2)
 }
 
 void Expression6() : {}
