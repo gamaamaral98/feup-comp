@@ -4,14 +4,16 @@ class Fac {
         if (num < 1)
             num_aux = 1;
         else
-            num_aux = num * false.ComputeFac(num-1).a().length;
+            num_aux = num * false.ComputeFac(num-1)[12 + 1].a().length;
             num_aux = 1+4*2 && !2 + 2;
             num_aux = 0;
+            a = new ABC();
         return num_aux;
     }
 
-    // public static void main(String[] a){
-    //     io.println(new Fac().ComputeFac(10)); //assuming the existence
-    //                                           // of the classfile io.class
-    // }
+    public static void main(String[] a){
+        io.println(new Fac().ComputeFac(10)); 
+    }
 }
+
+// new int[2-3*4].length.a(a,a,a)

@@ -180,13 +180,16 @@ SimpleNode Program() : {}
 
 void ClassDeclaration() : {}
 {
-    <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LCHAVETA> (
-        VarDeclaration()
-    )* (<PUBLIC> (
-        MainDeclaration()
-        | MethodDeclaration()
-        )
-    )* <RCHAVETA>
+    <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LCHAVETA>
+    ( VarDeclaration() )*
+    ( <PUBLIC> ClassDeclaration_1() )*
+    <RCHAVETA>
+}
+
+void ClassDeclaration_1() : {}
+{
+    MainDeclaration()
+    | MethodDeclaration()
 }
 
 void VarDeclaration() : {}
@@ -202,15 +205,14 @@ void MainDeclaration() : {}
 
 void MethodDeclaration() : {}
 {
-    Type() <IDENTIFIER> <LPAR> (
-        Type() <IDENTIFIER> (
-            <VIRG> Type() <IDENTIFIER>
-        )*
-    )? <RPAR> <LCHAVETA> (
-        VarDeclaration()
-    )* (
-        Statement()
-    )* <RETURN> Expression() <PVIRG> <RCHAVETA>
+    Type() <IDENTIFIER> <LPAR>
+    (Type() <IDENTIFIER> 
+        ( <VIRG> Type() <IDENTIFIER> )*
+    )?
+    <RPAR> <LCHAVETA>
+    ( VarDeclaration() )*
+    ( Statement() )*
+    <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 
 void Type() : {}
@@ -225,19 +227,32 @@ void Statement() : {}
     <LCHAVETA> (Statement())* <RCHAVETA>
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR> Expression() <RPAR> Statement()
-    | Expression() <PVIRG>
-    // | <IDENTIFIER> Statement1()
+    // | Expression() <PVIRG>
+    // | <IDENTIFIER> Statement1() <PVIRG>
+
+    | <IDENTIFIER> Statement1() <PVIRG>
 }
 
 void Statement1() : {}
 {
-    <ASSIGN> Expression() <PVIRG>
-    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>
+    Expression_No_Identifier()
+    | Statement2()
+}
+
+void Statement2() : {}
+{
+    <ASSIGN> Expression() #ASSIGN(2)
+    | <LPARRETO> Expression() <RPARRETO> #ACCESS_ARRAY(1) <ASSIGN> Expression() #ASSIGN(3)
 }
 
 void Expression() #void : {}
 {
     Expression1() (Operator_1())*
+}
+
+void Expression_No_Identifier() #void : {}
+{
+    Term_Literal() (Operator_1())* (Operator_2())* (Operator_3())* (Operator_4())*
 }
 
 void Expression1() #void : {}
@@ -257,27 +272,40 @@ void Expression3() #void : {}
 
 void Term() #void : {}
 {
-    <INTEGER> #INT(0) (Operator_5())*
+    Term_Literal()
+    | Term_Identifier()
+}
+
+void Term_Literal() #void : {}
+{
+     <INTEGER> #INT(0) (Operator_5())*
     | <TRUE> #TRUE(0) (Operator_5())*
     | <FALSE> #FALSE(0) (Operator_5())*
     | <THIS> #THIS(0) (Operator_5())*
-    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>) #NEW(0) (Operator_5())*
     | <LPAR> Expression() <RPAR> (Operator_5())*
+    | Term_NEW() (Operator_5())*
     | Term_NOT()
-    
-    //TODO
-    |<IDENTIFIER> #IDENTIFIER(0) (Term_1())? (Operator_5())*
 }
 
-void Term_1() #void : {}
+void Term_Identifier() #void : {}
 {
-    <ASSIGN> Expression()
-    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression()
+    <IDENTIFIER> #IDENTIFIER(0) (Operator_5())*
 }
 
 void Term_NOT() #void : {}
 {
     <NOT_OP> Term() #NOT(1)
+}
+
+void Term_NEW() #void : {}
+{
+    <NEW> Term_NEW_1()
+}
+
+void Term_NEW_1() #void : {}
+{
+    <INT> <LPARRETO> Expression() <RPARRETO> #NEW_INT_ARRAY(1)
+    | <IDENTIFIER> #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
 void Operator_1() #void : {}
@@ -304,13 +332,13 @@ void Operator_4() #void : {}
 
 void Operator_5() #void : {}
 {
-    <LPARRETO> Expression() <RPARRETO> #ARRAY(1)
+    <LPARRETO> Expression() <RPARRETO> #ARRAY(2)
     | <DOT> Operator_5_DOT()
 }
 
 void Operator_5_DOT() #void : {} {
     <LENGTH> #LENGTH(1)
-    | <IDENTIFIER> #FUNCTION <LPAR> Args() <RPAR> #DOT(3)
+    | <IDENTIFIER> #FUNCTION <LPAR> Args() <RPAR> #CALL_FUNCTION(3)
 }
 
 void Args() #Args : {} {
