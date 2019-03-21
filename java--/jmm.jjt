@@ -120,13 +120,6 @@ SKIP :
 
 TOKEN :
 {
-//   < OP :
-//       "&&"
-//     | "<"
-//     | "+"
-//     | "-"
-//     | "*"
-//     | "/" >
 < AND_OP : "&&" >
 | < LT_OP : "<" >
 | < PLUS_OP : "+" >
@@ -233,69 +226,97 @@ void Statement() : {}
     | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
     | <WHILE> <LPAR> Expression() <RPAR> Statement()
     | Expression() <PVIRG>
-    | <IDENTIFIER> (<ASSIGN> Expression() <PVIRG> | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>)
+    // | <IDENTIFIER> Statement1()
+}
+
+void Statement1() : {}
+{
+    <ASSIGN> Expression() <PVIRG>
+    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() <PVIRG>
 }
 
 void Expression() #void : {}
 {
-    Term1() (Operator_1())*
+    Expression1() (Operator_1())*
 }
 
-void Term1() #void : {}
+void Expression1() #void : {}
 {
-    Term2() (Operator_2())*
+    Expression2() (Operator_2())*
 }
 
-void Term2() #void : {}
+void Expression2() #void : {}
 {
-    Term3() (Operator_3())*
+    Expression3() (Operator_3())*
 }
 
-void Term3() #void : {}
+void Expression3() #void : {}
 {
-    Term4() (Operator_4())*
+    Term() (Operator_4())*
 }
 
-void Term4() #void : {}
+void Term() #void : {}
 {
-    <INTEGER> #INT
-    | <TRUE> #TRUE
-    | <FALSE> #FALSE
-    | <IDENTIFIER> #IDENTIFIER
-    | <THIS> #THIS
-    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>) #NEW
-    | <NOT_OP> Expression() #NOT
-    | <LPAR> Expression() <RPAR>
+    <INTEGER> #INT(0) (Operator_5())*
+    | <TRUE> #TRUE(0) (Operator_5())*
+    | <FALSE> #FALSE(0) (Operator_5())*
+    | <THIS> #THIS(0) (Operator_5())*
+    | <NEW> (<INT> <LPARRETO> Expression() <RPARRETO> | <IDENTIFIER> <LPAR> <RPAR>) #NEW(0) (Operator_5())*
+    | <LPAR> Expression() <RPAR> (Operator_5())*
+    | Term_NOT()
+    
+    //TODO
+    |<IDENTIFIER> #IDENTIFIER(0) (Term_1())? (Operator_5())*
+}
+
+void Term_1() #void : {}
+{
+    <ASSIGN> Expression()
+    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression()
+}
+
+void Term_NOT() #void : {}
+{
+    <NOT_OP> Term() #NOT(1)
 }
 
 void Operator_1() #void : {}
 {
-    <AND_OP> Term1() #AND(2)
+    <AND_OP> Expression1() #AND(2)
 }
 
 void Operator_2() #void : {}
 {
-    <LT_OP> Term2() #LT(2)
+    <LT_OP> Expression2() #LT(2)
 }
 
 void Operator_3() #void : {}
 {
-    <PLUS_OP> Term3() #ADD(2)
-    | <MINUS_OP> Term3() #SUB(2)
+    <PLUS_OP> Expression3() #ADD(2)
+    | <MINUS_OP> Expression3() #SUB(2)
 }
 
 void Operator_4() #void : {}
 {
-    <TIMES_OP> Term4() #MUL(2)
-    | <DIVIDE_OP> Term4() #DIV(2)
+    <TIMES_OP> Term() #MUL(2)
+    | <DIVIDE_OP> Term() #DIV(2)
 }
 
-void Expression6() : {}
+void Operator_5() #void : {}
 {
-    <LPARRETO> Expression() <RPARRETO>
-    | <DOT> (<LENGTH> | <IDENTIFIER> <LPAR> (
+    <LPARRETO> Expression() <RPARRETO> #ARRAY(1)
+    | <DOT> Operator_5_DOT()
+}
+
+void Operator_5_DOT() #void : {} {
+    <LENGTH> #LENGTH(1)
+    | <IDENTIFIER> #FUNCTION <LPAR> Args() <RPAR> #DOT(3)
+}
+
+void Args() #Args : {} {
+    (
         Expression() (
             <VIRG> Expression()
         )*
-    )? <RPAR>)
-}
+    )?
+} 
