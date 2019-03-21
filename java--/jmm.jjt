@@ -120,13 +120,19 @@ SKIP :
 
 TOKEN :
 {
-  < OP :
-      "&&"
-    | "<"
-    | "+"
-    | "-"
-    | "*"
-    | "/" >
+//   < OP :
+//       "&&"
+//     | "<"
+//     | "+"
+//     | "-"
+//     | "*"
+//     | "/" >
+< AND_OP : "&&" >
+| < LT_OP : "<" >
+| < PLUS_OP : "+" >
+| < MINUS_OP : "-" >
+| < TIMES_OP : "*" >
+| < DIVIDE_OP : "/" >
 | < NOT_OP : "!" >
 | < WHILE : "while" >
 | < IF : "if" >
@@ -249,8 +255,40 @@ void Expression1() : {}
 
 void Expression2() : {}
 {
-    <OP> Expression()
-    | <LPARRETO> Expression() <RPARRETO>
+    Expression3() (<AND_OP>  Expression2())?
+    // <OP> Expression()
+    // | <LPARRETO> Expression() <RPARRETO>
+    // | <DOT> (<LENGTH> | <IDENTIFIER> <LPAR> (
+    //     Expression() (
+    //         <VIRG> Expression()
+    //     )*
+    // )? <RPAR>)
+}
+
+void Expression3() : {}
+{
+    Expression4() (<LT_OP> Expression3())?
+}
+
+void Expression4() : {}
+{
+    Expression5() (
+        (<TIMES_OP> | <DIVIDE_OP>)
+        Expression4()
+    )?
+}
+
+void Expression5() : {}
+{
+    Expression6() (
+        (<PLUS_OP> | <MINUS_OP>)
+        Expression5()
+    )?
+}
+
+void Expression6() : {}
+{
+    <LPARRETO> Expression() <RPARRETO>
     | <DOT> (<LENGTH> | <IDENTIFIER> <LPAR> (
         Expression() (
             <VIRG> Expression()
