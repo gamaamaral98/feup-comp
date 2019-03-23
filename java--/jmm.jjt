@@ -121,58 +121,58 @@ SKIP :
 
 TOKEN :
 {
-< AND_OP : "&&" >
-| < LT_OP : "<" >
-| < PLUS_OP : "+" >
-| < MINUS_OP : "-" >
-| < TIMES_OP : "*" >
-| < DIVIDE_OP : "/" >
-| < NOT_OP : "!" >
-| < WHILE : "while" >
-| < IF : "if" >
-| < ELSE : "else" >
-| < ASSIGN : "=" >
-| < ASPA : "\"" >
-| < LPAR : "(" >
-| < RPAR : ")" >
-| < DOT : "." >
-| < LENGTH : "length" >
-| < VIRG : "," >
-| < PVIRG : ";" >
-| < LCHAVETA : "{" >
-| < RCHAVETA : "}" >
-| < LPARRETO : "[" >
-| < RPARRETO : "]" >
-| < EXTENDS : "extends" >
-| < CLASS : "class" >
-| < PUBLIC : "public" >
-| < STATIC : "static" >
-| < VOID : "void" >
-| < MAIN : "main" >
-| < INT : "int" >
-| < BOOLEAN : "boolean" >
-| < TRUE : "true" >
-| < FALSE : "false" >
-| < RETURN : "return" >
-| < THIS : "this" >
-| < NEW : "new" >
-| < STRING : "String" >
+    < AND_OP : "&&" >
+    | < LT_OP : "<" >
+    | < PLUS_OP : "+" >
+    | < MINUS_OP : "-" >
+    | < TIMES_OP : "*" >
+    | < DIVIDE_OP : "/" >
+    | < NOT_OP : "!" >
+    | < WHILE : "while" >
+    | < IF : "if" >
+    | < ELSE : "else" >
+    | < ASSIGN : "=" >
+    | < ASPA : "\"" >
+    | < LPAR : "(" >
+    | < RPAR : ")" >
+    | < DOT : "." >
+    | < LENGTH : "length" >
+    | < VIRG : "," >
+    | < PVIRG : ";" >
+    | < LCHAVETA : "{" >
+    | < RCHAVETA : "}" >
+    | < LPARRETO : "[" >
+    | < RPARRETO : "]" >
+    | < EXTENDS : "extends" >
+    | < CLASS : "class" >
+    | < PUBLIC : "public" >
+    | < STATIC : "static" >
+    | < VOID : "void" >
+    | < MAIN : "main" >
+    | < INT : "int" >
+    | < BOOLEAN : "boolean" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+    | < RETURN : "return" >
+    | < THIS : "this" >
+    | < NEW : "new" >
+    | < STRING : "String" >
 }
 
 TOKEN :
 {
-  < INTEGER : (<DIGIT>)+ >
-| < IDENTIFIER : <LETTER> (<ALPHANUM>)* >
+    < INTEGER : (<DIGIT>)+ >
+    | < IDENTIFIER : <LETTER> (<ALPHANUM>)* >
 
-| < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
-| < #DIGIT : [ "0"-"9" ] >
-| < #ALPHANUM : <LETTER> | <DIGIT> >
-| < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
+    | < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
+    | < #DIGIT : [ "0"-"9" ] >
+    | < #ALPHANUM : <LETTER> | <DIGIT> >
+    | < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
 }
 
 SimpleNode Program() : {}
 {
-    Expression(){
+    Statement(){
         return jjtThis;
     }
 }
@@ -224,12 +224,23 @@ void Type() : {}
 void Statement() : {}
 {
     <LCHAVETA> (Statement())* <RCHAVETA>
-    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
-    | <WHILE> <LPAR> Expression() <RPAR> Statement()
+    | If_Else_Statement()
+    | While_Statement()
+
+
     // | Expression() <PVIRG>
     // | <IDENTIFIER> Statement1() <PVIRG>
-
     | <IDENTIFIER> Statement1() <PVIRG>
+}
+
+void If_Else_Statement() : {}
+{
+    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+}
+
+void While_Statement() : {}
+{
+    <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1() : {}

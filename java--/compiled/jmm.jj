@@ -125,53 +125,53 @@ SKIP :
 
 TOKEN :
 {
-< AND_OP : "&&" >
-| < LT_OP : "<" >
-| < PLUS_OP : "+" >
-| < MINUS_OP : "-" >
-| < TIMES_OP : "*" >
-| < DIVIDE_OP : "/" >
-| < NOT_OP : "!" >
-| < WHILE : "while" >
-| < IF : "if" >
-| < ELSE : "else" >
-| < ASSIGN : "=" >
-| < ASPA : "\"" >
-| < LPAR : "(" >
-| < RPAR : ")" >
-| < DOT : "." >
-| < LENGTH : "length" >
-| < VIRG : "," >
-| < PVIRG : ";" >
-| < LCHAVETA : "{" >
-| < RCHAVETA : "}" >
-| < LPARRETO : "[" >
-| < RPARRETO : "]" >
-| < EXTENDS : "extends" >
-| < CLASS : "class" >
-| < PUBLIC : "public" >
-| < STATIC : "static" >
-| < VOID : "void" >
-| < MAIN : "main" >
-| < INT : "int" >
-| < BOOLEAN : "boolean" >
-| < TRUE : "true" >
-| < FALSE : "false" >
-| < RETURN : "return" >
-| < THIS : "this" >
-| < NEW : "new" >
-| < STRING : "String" >
+    < AND_OP : "&&" >
+    | < LT_OP : "<" >
+    | < PLUS_OP : "+" >
+    | < MINUS_OP : "-" >
+    | < TIMES_OP : "*" >
+    | < DIVIDE_OP : "/" >
+    | < NOT_OP : "!" >
+    | < WHILE : "while" >
+    | < IF : "if" >
+    | < ELSE : "else" >
+    | < ASSIGN : "=" >
+    | < ASPA : "\"" >
+    | < LPAR : "(" >
+    | < RPAR : ")" >
+    | < DOT : "." >
+    | < LENGTH : "length" >
+    | < VIRG : "," >
+    | < PVIRG : ";" >
+    | < LCHAVETA : "{" >
+    | < RCHAVETA : "}" >
+    | < LPARRETO : "[" >
+    | < RPARRETO : "]" >
+    | < EXTENDS : "extends" >
+    | < CLASS : "class" >
+    | < PUBLIC : "public" >
+    | < STATIC : "static" >
+    | < VOID : "void" >
+    | < MAIN : "main" >
+    | < INT : "int" >
+    | < BOOLEAN : "boolean" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+    | < RETURN : "return" >
+    | < THIS : "this" >
+    | < NEW : "new" >
+    | < STRING : "String" >
 }
 
 TOKEN :
 {
-  < INTEGER : (<DIGIT>)+ >
-| < IDENTIFIER : <LETTER> (<ALPHANUM>)* >
+    < INTEGER : (<DIGIT>)+ >
+    | < IDENTIFIER : <LETTER> (<ALPHANUM>)* >
 
-| < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
-| < #DIGIT : [ "0"-"9" ] >
-| < #ALPHANUM : <LETTER> | <DIGIT> >
-| < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
+    | < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
+    | < #DIGIT : [ "0"-"9" ] >
+    | < #ALPHANUM : <LETTER> | <DIGIT> >
+    | < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
 }
 
 SimpleNode Program() : {/*@bgen(jjtree) Program */
@@ -182,11 +182,11 @@ SimpleNode Program() : {/*@bgen(jjtree) Program */
 {/*@bgen(jjtree) Program */
     try {
 /*@egen*/
-    Expression()/*@bgen(jjtree)*/
-                {
-                  jjtree.closeNodeScope(jjtn000, true);
-                  jjtc000 = false;
-                }
+    Statement()/*@bgen(jjtree)*/
+               {
+                 jjtree.closeNodeScope(jjtn000, true);
+                 jjtc000 = false;
+               }
 /*@egen*/{
         return jjtn000;
     }/*@bgen(jjtree)*/
@@ -407,12 +407,75 @@ void Statement() : {/*@bgen(jjtree) Statement */
     try {
 /*@egen*/
     <LCHAVETA> (Statement())* <RCHAVETA>
-    | <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
-    | <WHILE> <LPAR> Expression() <RPAR> Statement()
+    | If_Else_Statement()
+    | While_Statement()
+
+
     // | Expression() <PVIRG>
     // | <IDENTIFIER> Statement1() <PVIRG>
-
     | <IDENTIFIER> Statement1() <PVIRG>/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+void If_Else_Statement() : {/*@bgen(jjtree) If_Else_Statement */
+  ASTIf_Else_Statement jjtn000 = new ASTIf_Else_Statement(JJTIF_ELSE_STATEMENT);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) If_Else_Statement */
+    try {
+/*@egen*/
+    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+void While_Statement() : {/*@bgen(jjtree) While_Statement */
+  ASTWhile_Statement jjtn000 = new ASTWhile_Statement(JJTWHILE_STATEMENT);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) While_Statement */
+    try {
+/*@egen*/
+    <WHILE> <LPAR> Expression() <RPAR> Statement()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
