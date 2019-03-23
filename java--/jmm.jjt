@@ -1,7 +1,8 @@
 options {
-    LOOKAHEAD=1;
+    LOOKAHEAD=2;
     MULTI=true;
     FORCE_LA_CHECK=true;
+    //DEBUG_LOOKAHEAD=true;
 }
 
 PARSER_BEGIN(jmm)
@@ -169,11 +170,9 @@ TOKEN :
 | < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
 }
 
-
-
 SimpleNode Program() : {}
 {
-    ClassDeclaration(){
+    Expression(){
         return jjtThis;
     }
 }
@@ -252,7 +251,7 @@ void Expression() #void : {}
 
 void Expression_No_Identifier() #void : {}
 {
-    Term_Literal() (Operator_1())* (Operator_2())* (Operator_3())* (Operator_4())*
+    Term_Literal() (Operator_4())* (Operator_3())* (Operator_2())* (Operator_1())*
 }
 
 void Expression1() #void : {}
