@@ -17,4 +17,12 @@
 // }
 
 
-if(a) a=a+3; else {a=2;}
+// if(oi) {a=a+3;} else {a=2;}
+// if(banana) a=3; else a=4;
+while(a){
+    b = 2;
+}
+while(a){
+    b = 2;
+}
+
