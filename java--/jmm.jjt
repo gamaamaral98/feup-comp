@@ -221,38 +221,43 @@ void Type() : {}
     | <IDENTIFIER>
 }
 
-void Statement() : {}
+void Statement() #void : {}
 {
-    <LCHAVETA> (Statement())* <RCHAVETA>
+    Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
 
 
     // | Expression() <PVIRG>
     // | <IDENTIFIER> Statement1() <PVIRG>
-    | <IDENTIFIER> Statement1() <PVIRG>
+    | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
 }
 
-void If_Else_Statement() : {}
+void Multiple_Statements() #Statements : {}
 {
-    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    <LCHAVETA> (Statement())* <RCHAVETA>
 }
 
-void While_Statement() : {}
+void If_Else_Statement() #IF_ELSE(3) : {}
+{
+    <IF> <LPAR> Expression() <RPAR> Statement() #IF(1) <ELSE> Statement() #ELSE(1)
+}
+
+void While_Statement() #WHILE(2) : {}
 {
     <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
-void Statement1() : {}
+void Statement1() #void : {}
 {
     Expression_No_Identifier()
     | Statement2()
 }
 
-void Statement2() : {}
+void Statement2() #void : {}
 {
     <ASSIGN> Expression() #ASSIGN(2)
-    | <LPARRETO> Expression() <RPARRETO> #ACCESS_ARRAY(1) <ASSIGN> Expression() #ASSIGN(3)
+    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() #ASSIGN_ARRAY(3)
 }
 
 void Expression() #void : {}
