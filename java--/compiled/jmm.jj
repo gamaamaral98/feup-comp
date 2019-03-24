@@ -222,21 +222,28 @@ SimpleNode Program() : {/*@bgen(jjtree) Program */
 }
 
 void ClassDeclaration()       : {}
-{
-    <CLASS>/*@bgen(jjtree) CLASS_NAME */
-            {
-              ASTCLASS_NAME jjtn001 = new ASTCLASS_NAME(JJTCLASS_NAME);
-              boolean jjtc001 = true;
-              jjtree.openNodeScope(jjtn001);
-            }
-            try {
+{   
+    try{
+        <CLASS>/*@bgen(jjtree) CLASS_NAME */
+                {
+                  ASTCLASS_NAME jjtn001 = new ASTCLASS_NAME(JJTCLASS_NAME);
+                  boolean jjtc001 = true;
+                  jjtree.openNodeScope(jjtn001);
+                }
+                try {
 /*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-            } finally {
-              if (jjtc001) {
-                jjtree.closeNodeScope(jjtn001, true);
-              }
-            }
-/*@egen*/             ClassDeclaration_1()
+                } finally {
+                  if (jjtc001) {
+                    jjtree.closeNodeScope(jjtn001, true);
+                  }
+                }
+/*@egen*/            
+    } catch(ParseException e){
+        System.out.println("Syntatic Error on Class initialization. " + e.toString());
+    }
+    ClassDeclaration_1()
+
+    // <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
 }
 
 void ClassDeclaration_1()       : {}
@@ -253,10 +260,18 @@ void ClassDeclaration_Not_Extends()           : {/*@bgen(jjtree) #CLASS( 3) */
 {/*@bgen(jjtree) #CLASS( 3) */
     try {
 /*@egen*/
-    <LCHAVETA>
+    try{
+        <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", LCHAVETA);
+    }
     Vars()
     Methods()
-    <RCHAVETA>/*@bgen(jjtree)*/
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", RCHAVETA);
+    }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -277,6 +292,11 @@ void ClassDeclaration_Not_Extends()           : {/*@bgen(jjtree) #CLASS( 3) */
       }
     }
 /*@egen*/
+    
+    // <LCHAVETA>
+    // Vars()
+    // Methods()
+    // <RCHAVETA>
 }
 
 void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTENDS( 4) */
@@ -287,23 +307,31 @@ void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTE
 {/*@bgen(jjtree) #CLASS_EXTENDS( 4) */
     try {
 /*@egen*/
-    <EXTENDS>/*@bgen(jjtree) EXTENDED_CLASS */
-              {
-                ASTEXTENDED_CLASS jjtn001 = new ASTEXTENDED_CLASS(JJTEXTENDED_CLASS);
-                boolean jjtc001 = true;
-                jjtree.openNodeScope(jjtn001);
-              }
-              try {
+    try{
+        <EXTENDS>/*@bgen(jjtree) EXTENDED_CLASS */
+                  {
+                    ASTEXTENDED_CLASS jjtn001 = new ASTEXTENDED_CLASS(JJTEXTENDED_CLASS);
+                    boolean jjtc001 = true;
+                    jjtree.openNodeScope(jjtn001);
+                  }
+                  try {
 /*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-              } finally {
-                if (jjtc001) {
-                  jjtree.closeNodeScope(jjtn001, true);
-                }
-              }
+                  } finally {
+                    if (jjtc001) {
+                      jjtree.closeNodeScope(jjtn001, true);
+                    }
+                  }
 /*@egen*/                 <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", LCHAVETA);
+    }
     Vars()
     Methods()
-    <RCHAVETA>/*@bgen(jjtree)*/
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", RCHAVETA);
+    }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -324,6 +352,11 @@ void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTE
       }
     }
 /*@egen*/
+
+    // <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+    // Vars()
+    // Methods()
+    // <RCHAVETA>
 }
 
 void Vars()            : {/*@bgen(jjtree) VAR_DECLS */
@@ -365,6 +398,13 @@ void Methods()          : {/*@bgen(jjtree) METHODS */
 {/*@bgen(jjtree) METHODS */
     try {
 /*@egen*/
+    // ( try{
+    //     <PUBLIC> 
+    // }catch(ParseException e){
+    //     System.out.println("Missing PUBLIC in Method" + e.toString());
+    // }
+    // ClassDeclaration_Methods() )*
+
     ( <PUBLIC> ClassDeclaration_Methods() )*/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -477,23 +517,31 @@ void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 3) */
 {/*@bgen(jjtree) #MAIN( 3) */
     try {
 /*@egen*/
-    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO>/*@bgen(jjtree) ARGV */
-                                                                 {
-                                                                   ASTARGV jjtn001 = new ASTARGV(JJTARGV);
-                                                                   boolean jjtc001 = true;
-                                                                   jjtree.openNodeScope(jjtn001);
-                                                                 }
-                                                                 try {
+    try{
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO>/*@bgen(jjtree) ARGV */
+                                                                     {
+                                                                       ASTARGV jjtn001 = new ASTARGV(JJTARGV);
+                                                                       boolean jjtc001 = true;
+                                                                       jjtree.openNodeScope(jjtn001);
+                                                                     }
+                                                                     try {
 /*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-                                                                 } finally {
-                                                                   if (jjtc001) {
-                                                                     jjtree.closeNodeScope(jjtn001, true);
-                                                                   }
-                                                                 }
+                                                                     } finally {
+                                                                       if (jjtc001) {
+                                                                         jjtree.closeNodeScope(jjtn001, true);
+                                                                       }
+                                                                     }
 /*@egen*/      
-    <RPAR> <LCHAVETA>
+        <RPAR> <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Main declaration", LCHAVETA);
+    }
     Vars() Statements()
-    <RCHAVETA>/*@bgen(jjtree)*/
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        System.out.println("Missing } in Main Declaration." + e.toString());
+    }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -514,6 +562,11 @@ void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 3) */
       }
     }
 /*@egen*/
+
+    // <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
+    // <RPAR> <LCHAVETA>
+    // Vars() Statements()
+    // <RCHAVETA>
 }
 
 void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 6) */
@@ -711,7 +764,16 @@ void Type()       : {}
 }
 
 void Statement()       : {}
-{   
+{
+    // try{
+    //     Multiple_Statements()
+    //     | If_Else_Statement()
+    //     | While_Statement()
+    //     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
+    // }
+    // catch(ParseException e){
+    //     System.out.println(e.toString());
+    // }
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
@@ -771,10 +833,17 @@ void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
     try {
 /*@egen*/
     try{
-        <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+        <IF> <LPAR> Expression() <RPAR>
     }catch(ParseException e){
-        error_skipto(e, "IF statement", RCHAVETA);
-    }/*@bgen(jjtree)*/
+        error_skipto(e, "IF statement declaration", RPAR);
+    }
+    Statement()
+    try{
+        <ELSE>
+    } catch(ParseException e){
+        System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
+    }
+    Statement()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -795,6 +864,8 @@ void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
       }
     }
 /*@egen*/
+
+    // <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
 }
 
 void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
@@ -833,8 +904,7 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
     }
 /*@egen*/
 
-    //TODO:
-    //<WHILE> <LPAR> Expression() <RPAR> Statement()
+    // <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1()       : {}

@@ -187,8 +187,15 @@ SimpleNode Program() : {}
 }
 
 void ClassDeclaration() #void : {}
-{
-    <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
+{   
+    try{
+        <CLASS> <IDENTIFIER> #CLASS_NAME
+    } catch(ParseException e){
+        System.out.println("Syntatic Error on Class initialization. " + e.toString());
+    }
+    ClassDeclaration_1()
+
+    // <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
 }
 
 void ClassDeclaration_1() #void : {}
@@ -199,18 +206,44 @@ void ClassDeclaration_1() #void : {}
 
 void ClassDeclaration_Not_Extends() #CLASS(3) : {}
 {
-    <LCHAVETA>
+    try{
+        <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", LCHAVETA);
+    }
     Vars()
     Methods()
-    <RCHAVETA>
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", RCHAVETA);
+    }
+    
+    // <LCHAVETA>
+    // Vars()
+    // Methods()
+    // <RCHAVETA>
 }
 
 void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
 {
-    <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+    try{
+        <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", LCHAVETA);
+    }
     Vars()
     Methods()
-    <RCHAVETA>
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Class declaration", RCHAVETA);
+    }
+
+    // <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+    // Vars()
+    // Methods()
+    // <RCHAVETA>
 }
 
 void Vars() #VAR_DECLS : {}
@@ -220,6 +253,13 @@ void Vars() #VAR_DECLS : {}
 
 void Methods() #METHODS : {}
 {
+    // ( try{
+    //     <PUBLIC> 
+    // }catch(ParseException e){
+    //     System.out.println("Missing PUBLIC in Method" + e.toString());
+    // }
+    // ClassDeclaration_Methods() )*
+
     ( <PUBLIC> ClassDeclaration_Methods() )*
 }
 
@@ -241,10 +281,23 @@ void VarDeclaration() #VAR_DECL(2) : {}
 
 void MainDeclaration() #MAIN(3) : {}
 {
-    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
-    <RPAR> <LCHAVETA>
+    try{
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
+        <RPAR> <LCHAVETA>
+    }catch(ParseException e){
+        error_skipto(e, "Main declaration", LCHAVETA);
+    }
     Vars() Statements()
-    <RCHAVETA>
+    try{
+        <RCHAVETA>
+    }catch(ParseException e){
+        System.out.println("Missing } in Main Declaration." + e.toString());
+    }
+
+    // <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
+    // <RPAR> <LCHAVETA>
+    // Vars() Statements()
+    // <RCHAVETA>
 }
 
 void MethodDeclaration() #METHOD(6) : {}
@@ -274,6 +327,15 @@ void Type() #void : {}
 
 void Statement() #void : {}
 {
+    // try{
+    //     Multiple_Statements()
+    //     | If_Else_Statement()
+    //     | While_Statement()
+    //     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
+    // }
+    // catch(ParseException e){
+    //     System.out.println(e.toString());
+    // }
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
@@ -288,10 +350,19 @@ void Multiple_Statements() #STATEMENT_LIST : {}
 void If_Else_Statement() #IF_ELSE(3) : {}
 {
     try{
-        <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+        <IF> <LPAR> Expression() <RPAR>
     }catch(ParseException e){
-        error_skipto(e, "IF statement", RCHAVETA);
+        error_skipto(e, "IF statement declaration", RPAR);
     }
+    Statement()
+    try{
+        <ELSE>
+    } catch(ParseException e){
+        System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
+    }
+    Statement()
+
+    // <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
 }
 
 void While_Statement() #WHILE(2) : {}
@@ -304,8 +375,7 @@ void While_Statement() #WHILE(2) : {}
     }
     Statement()
 
-    //TODO:
-    //<WHILE> <LPAR> Expression() <RPAR> Statement()
+    // <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1() #void : {}
