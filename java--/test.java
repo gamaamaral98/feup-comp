@@ -1,8 +1,10 @@
 class Fac {
-    public int ComputeFac(int num){
+    int a;
+    public int ComputeFac(int num, boolean t){
         int num_aux ;
-        if (num < 1)
+        if (num < 1) {
             num_aux = 1;
+        }
         else
             num_aux = num * false.ComputeFac(num-1)[12 + 1].a().length;
             num_aux = 1+4*2 && !2 + 2;

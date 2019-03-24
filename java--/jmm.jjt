@@ -1,5 +1,5 @@
 options {
-    LOOKAHEAD=1;
+    LOOKAHEAD=2;
     MULTI=true;
     FORCE_LA_CHECK=true;
 }
@@ -159,6 +159,7 @@ TOKEN :
     | < VOID : "void" >
     | < MAIN : "main" >
     | < INT : "int" >
+    | < INT_ARRAY : "int[]" >
     | < BOOLEAN : "boolean" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -185,47 +186,90 @@ SimpleNode Program() : {}
     }
 }
 
-void ClassDeclaration() : {}
+void ClassDeclaration() #void : {}
 {
-    <CLASS> <IDENTIFIER> (<EXTENDS> <IDENTIFIER>)? <LCHAVETA>
-    ( VarDeclaration() )*
-    ( <PUBLIC> ClassDeclaration_1() )*
+    <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
+}
+
+void ClassDeclaration_1() #void : {}
+{
+    ClassDeclaration_Not_Extends()
+    | ClassDeclaration_Extends()   
+}
+
+void ClassDeclaration_Not_Extends() #CLASS(3) : {}
+{
+    <LCHAVETA>
+    Vars()
+    Methods()
     <RCHAVETA>
 }
 
-void ClassDeclaration_1() : {}
+void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
+{
+    <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+    Vars()
+    Methods()
+    <RCHAVETA>
+}
+
+void Vars() #VAR_DECLS : {}
+{
+    (VarDeclaration())*
+}
+
+void Methods() #METHODS : {}
+{
+    ( <PUBLIC> ClassDeclaration_Methods() )*
+}
+
+void Statements() #STATEMENT_LIST : {}
+{
+    (Statement())*
+}
+
+void ClassDeclaration_Methods() #void : {}
 {
     MainDeclaration()
     | MethodDeclaration()
 }
 
-void VarDeclaration() : {}
+void VarDeclaration() #VAR_DECL(2) : {}
 {
-    Type() <IDENTIFIER> <PVIRG>
+    Type() <IDENTIFIER> #IDENTIFIER <PVIRG>
 }
 
-void MainDeclaration() : {}
+void MainDeclaration() #MAIN(3) : {}
 {
-    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER>
-    <RPAR> <LCHAVETA> (VarDeclaration())* (Statement())* <RCHAVETA>
-}
-
-void MethodDeclaration() : {}
-{
-    Type() <IDENTIFIER> <LPAR>
-    (Type() <IDENTIFIER> 
-        ( <VIRG> Type() <IDENTIFIER> )*
-    )?
+    <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
     <RPAR> <LCHAVETA>
-    (VarDeclaration())* (Statement())*
+    Vars() Statements()
+    <RCHAVETA>
+}
+
+void MethodDeclaration() #METHOD(6) : {}
+{
+    Type() <IDENTIFIER> #NAME <LPAR>
+    MethodDeclaration_Args()
+    <RPAR> <LCHAVETA>
+    Vars() Statements()
     <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 
-void Type() : {}
+void MethodDeclaration_Args() #METHOD_ARGS : {}
 {
-    <INT> (<LPARRETO> <RPARRETO>)?
-    | <BOOLEAN>
-    | <IDENTIFIER>
+    (
+        Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2)
+        ( <VIRG> Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2) )*
+    )?
+}
+
+void Type() #void : {}
+{
+    <INT> #INT
+    | <INT_ARRAY> #INT_ARRAY
+    | <BOOLEAN> #BOOLEAN
+    | <IDENTIFIER> #IDENTIFIER
 }
 
 void Statement() #void : {}
@@ -236,7 +280,7 @@ void Statement() #void : {}
     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
 }
 
-void Multiple_Statements() #Statements : {}
+void Multiple_Statements() #STATEMENT_LIST : {}
 {
     <LCHAVETA> (Statement())* <RCHAVETA>
 }
@@ -382,10 +426,10 @@ void Operator_5_DOT() #void : {}
 void Operator_5_DOT_1() #void : {}
 {
     <LENGTH> #LENGTH(1)
-    | <IDENTIFIER> #FUNCTION <LPAR> Args() <RPAR> #CALL_FUNCTION(3)
+    | <IDENTIFIER> #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
 }
 
-void Args() #ARGUMENTS : {}
+void Operator_5_Call_Args() #CALL_ARGUMENTS : {}
 {
     (
         Expression() (
