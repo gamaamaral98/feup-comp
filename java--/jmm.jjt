@@ -106,6 +106,16 @@ public class jmm{
         }
         return true;	
     }
+
+    public static void error_skipto(ParseException e, String error, int kind) {
+        System.out.println("Syntatic Error on " + error + ". " + e.toString());
+        Token t;
+        do {
+            t = getNextToken();
+            if(t.kind == EOF)
+                break;
+        } while (t.kind != kind);
+    }
 }
 
 PARSER_END(jmm)
@@ -233,12 +243,25 @@ void Multiple_Statements() #Statements : {}
 
 void If_Else_Statement() #IF_ELSE(3) : {}
 {
-    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    try{
+        <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    }catch(ParseException e){
+        error_skipto(e, "IF statement", RCHAVETA);
+    }
 }
 
 void While_Statement() #WHILE(2) : {}
 {
-    <WHILE> <LPAR> Expression() <RPAR> Statement()
+    try{
+        <WHILE> <LPAR> Expression() <RPAR>
+    }
+    catch (ParseException e) {
+        error_skipto(e, "WHILE statement declaration", RPAR);
+    }
+    Statement()
+
+    //TODO:
+    //<WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1() #void : {}

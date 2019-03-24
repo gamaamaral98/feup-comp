@@ -110,6 +110,16 @@ public class jmm/*@bgen(jjtree)*/implements jmmTreeConstants/*@egen*/{/*@bgen(jj
         }
         return true;	
     }
+
+    public static void error_skipto(ParseException e, String error, int kind) {
+        System.out.println("Syntatic Error on " + error + ". " + e.toString());
+        Token t;
+        do {
+            t = getNextToken();
+            if(t.kind == EOF)
+                break;
+        } while (t.kind != kind);
+    }
 }
 
 PARSER_END(jmm)
@@ -455,7 +465,11 @@ void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
 {/*@bgen(jjtree) #IF_ELSE( 3) */
     try {
 /*@egen*/
-    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()/*@bgen(jjtree)*/
+    try{
+        <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
+    }catch(ParseException e){
+        error_skipto(e, "IF statement", RCHAVETA);
+    }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -486,7 +500,13 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
 {/*@bgen(jjtree) #WHILE( 2) */
     try {
 /*@egen*/
-    <WHILE> <LPAR> Expression() <RPAR> Statement()/*@bgen(jjtree)*/
+    try{
+        <WHILE> <LPAR> Expression() <RPAR>
+    }
+    catch (ParseException e) {
+        error_skipto(e, "WHILE statement declaration", RPAR);
+    }
+    Statement()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -507,6 +527,9 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
       }
     }
 /*@egen*/
+
+    //TODO:
+    //<WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1()       : {}
