@@ -1,8 +1,7 @@
 options {
-    LOOKAHEAD=2;
+    LOOKAHEAD=1;
     MULTI=true;
     FORCE_LA_CHECK=true;
-    //DEBUG_LOOKAHEAD=true;
 }
 
 PARSER_BEGIN(jmm)
@@ -167,12 +166,11 @@ TOKEN :
     | < #LETTER : [ "$", "A"-"Z", "_", "a"-"z" ] >
     | < #DIGIT : [ "0"-"9" ] >
     | < #ALPHANUM : <LETTER> | <DIGIT> >
-    | < STRING_ASPAS : "\"" ([ "a"-"z", "A"-"Z", "0"-"9", ":", " ", "=" ])+ "\"" >
 }
 
 SimpleNode Program() : {}
 {
-    Statement(){
+    ClassDeclaration(){
         return jjtThis;
     }
 }
@@ -209,8 +207,7 @@ void MethodDeclaration() : {}
         ( <VIRG> Type() <IDENTIFIER> )*
     )?
     <RPAR> <LCHAVETA>
-    ( VarDeclaration() )*
-    ( Statement() )*
+    (VarDeclaration())* (Statement())*
     <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 
@@ -226,10 +223,6 @@ void Statement() #void : {}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
-
-
-    // | Expression() <PVIRG>
-    // | <IDENTIFIER> Statement1() <PVIRG>
     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
 }
 
@@ -240,7 +233,7 @@ void Multiple_Statements() #Statements : {}
 
 void If_Else_Statement() #IF_ELSE(3) : {}
 {
-    <IF> <LPAR> Expression() <RPAR> Statement() #IF(1) <ELSE> Statement() #ELSE(1)
+    <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
 }
 
 void While_Statement() #WHILE(2) : {}
@@ -251,13 +244,15 @@ void While_Statement() #WHILE(2) : {}
 void Statement1() #void : {}
 {
     Expression_No_Identifier()
-    | Statement2()
+    | Operator_5_DOT() (Operator_5())*
+    | <ASSIGN> Expression() #ASSIGN(2)
+    | <LPARRETO> Expression() <RPARRETO> #ACCESS_ARRAY(2) Statement2() 
 }
 
 void Statement2() #void : {}
 {
-    <ASSIGN> Expression() #ASSIGN(2)
-    | <LPARRETO> Expression() <RPARRETO> <ASSIGN> Expression() #ASSIGN_ARRAY(3)
+    <ASSIGN> Expression() #ASSIGN_ARRAY(2)
+    | (Operator_5())*
 }
 
 void Expression() #void : {}
@@ -307,9 +302,9 @@ void Term_Identifier() #void : {}
     <IDENTIFIER> #IDENTIFIER(0) (Operator_5())*
 }
 
-void Term_NOT() #void : {}
+void Term_NOT() #NOT(1) : {}
 {
-    <NOT_OP> Term() #NOT(1)
+    <NOT_OP> Term()
 }
 
 void Term_NEW() #void : {}
@@ -323,14 +318,14 @@ void Term_NEW_1() #void : {}
     | <IDENTIFIER> #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
-void Operator_1() #void : {}
+void Operator_1() #AND(2) : {}
 {
-    <AND_OP> Expression1() #AND(2)
+    <AND_OP> Expression1()
 }
 
-void Operator_2() #void : {}
+void Operator_2() #LT(2) : {}
 {
-    <LT_OP> Expression2() #LT(2)
+    <LT_OP> Expression2()
 }
 
 void Operator_3() #void : {}
@@ -347,16 +342,28 @@ void Operator_4() #void : {}
 
 void Operator_5() #void : {}
 {
-    <LPARRETO> Expression() <RPARRETO> #ARRAY(2)
-    | <DOT> Operator_5_DOT()
+    Operator_5_ARRAY()
+    | Operator_5_DOT()
 }
 
-void Operator_5_DOT() #void : {} {
+void Operator_5_ARRAY() #ACCESS_ARRAY(2) : {}
+{
+    <LPARRETO> Expression() <RPARRETO>
+}
+
+void Operator_5_DOT() #void : {}
+{
+    <DOT> Operator_5_DOT_1()
+}
+
+void Operator_5_DOT_1() #void : {}
+{
     <LENGTH> #LENGTH(1)
     | <IDENTIFIER> #FUNCTION <LPAR> Args() <RPAR> #CALL_FUNCTION(3)
 }
 
-void Args() #Args : {} {
+void Args() #ARGUMENTS : {}
+{
     (
         Expression() (
             <VIRG> Expression()
