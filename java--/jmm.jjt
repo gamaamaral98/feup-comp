@@ -246,11 +246,6 @@ void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
     // <RCHAVETA>
 }
 
-void Vars() #VAR_DECLS : {}
-{
-    (VarDeclaration())*
-}
-
 void Methods() #METHODS : {}
 {
     // ( try{
@@ -261,6 +256,11 @@ void Methods() #METHODS : {}
     // ClassDeclaration_Methods() )*
 
     ( <PUBLIC> ClassDeclaration_Methods() )*
+}
+
+void Vars() #VAR_DECLS : {}
+{
+    (VarDeclaration())*
 }
 
 void Statements() #STATEMENT_LIST : {}
@@ -279,6 +279,19 @@ void VarDeclaration() #VAR_DECL(2) : {}
     Type() <IDENTIFIER> #IDENTIFIER <PVIRG>
 }
 
+// void Vars_Statement() #void : {}
+// {
+//     Type_1() <IDENTIFIER> Vars_Statement()
+//     | <IDENTIFIER> #ID Vars_Statement_1()
+//     | Statement_Aux() (Statement())*
+// }
+
+// void Vars_Statement_1() #void : {}
+// {
+//     <IDENTIFIER> Vars_Statement()
+//     | Statement1() <PVIRG> (Statement())*
+// }
+
 void MainDeclaration() #MAIN(3) : {}
 {
     try{
@@ -288,6 +301,7 @@ void MainDeclaration() #MAIN(3) : {}
         error_skipto(e, "Main declaration", LCHAVETA);
     }
     Vars() Statements()
+    // Vars_Statement()
     try{
         <RCHAVETA>
     }catch(ParseException e){
@@ -306,6 +320,7 @@ void MethodDeclaration() #METHOD(6) : {}
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars() Statements()
+    // Vars_Statement()
     <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 
@@ -325,6 +340,13 @@ void Type() #void : {}
     | <IDENTIFIER> #IDENTIFIER
 }
 
+// void Type_1() #void : {}
+// {
+//     <INT> #INT
+//     | <INT_ARRAY> #INT_ARRAY
+//     | <BOOLEAN> #BOOLEAN
+// }
+
 void Statement() #void : {}
 {
     // try{
@@ -341,6 +363,13 @@ void Statement() #void : {}
     | While_Statement()
     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
 }
+
+// void Statement_Aux() #void : {}
+// {
+//     Multiple_Statements()
+//     | If_Else_Statement()
+//     | While_Statement()
+// }
 
 void Multiple_Statements() #STATEMENT_LIST : {}
 {

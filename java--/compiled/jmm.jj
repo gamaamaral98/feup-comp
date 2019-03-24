@@ -359,15 +359,22 @@ void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTE
     // <RCHAVETA>
 }
 
-void Vars()            : {/*@bgen(jjtree) VAR_DECLS */
-  ASTVAR_DECLS jjtn000 = new ASTVAR_DECLS(JJTVAR_DECLS);
+void Methods()          : {/*@bgen(jjtree) METHODS */
+  ASTMETHODS jjtn000 = new ASTMETHODS(JJTMETHODS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) VAR_DECLS */
+{/*@bgen(jjtree) METHODS */
     try {
 /*@egen*/
-    (VarDeclaration())*/*@bgen(jjtree)*/
+    // ( try{
+    //     <PUBLIC> 
+    // }catch(ParseException e){
+    //     System.out.println("Missing PUBLIC in Method" + e.toString());
+    // }
+    // ClassDeclaration_Methods() )*
+
+    ( <PUBLIC> ClassDeclaration_Methods() )*/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -390,22 +397,15 @@ void Vars()            : {/*@bgen(jjtree) VAR_DECLS */
 /*@egen*/
 }
 
-void Methods()          : {/*@bgen(jjtree) METHODS */
-  ASTMETHODS jjtn000 = new ASTMETHODS(JJTMETHODS);
+void Vars()            : {/*@bgen(jjtree) VAR_DECLS */
+  ASTVAR_DECLS jjtn000 = new ASTVAR_DECLS(JJTVAR_DECLS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) METHODS */
+{/*@bgen(jjtree) VAR_DECLS */
     try {
 /*@egen*/
-    // ( try{
-    //     <PUBLIC> 
-    // }catch(ParseException e){
-    //     System.out.println("Missing PUBLIC in Method" + e.toString());
-    // }
-    // ClassDeclaration_Methods() )*
-
-    ( <PUBLIC> ClassDeclaration_Methods() )*/*@bgen(jjtree)*/
+    (VarDeclaration())*/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -509,6 +509,19 @@ void VarDeclaration()              : {/*@bgen(jjtree) #VAR_DECL( 2) */
 /*@egen*/
 }
 
+// void Vars_Statement() #void : {}
+// {
+//     Type_1() <IDENTIFIER> Vars_Statement()
+//     | <IDENTIFIER> #ID Vars_Statement_1()
+//     | Statement_Aux() (Statement())*
+// }
+
+// void Vars_Statement_1() #void : {}
+// {
+//     <IDENTIFIER> Vars_Statement()
+//     | Statement1() <PVIRG> (Statement())*
+// }
+
 void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 3) */
   ASTMAIN jjtn000 = new ASTMAIN(JJTMAIN);
   boolean jjtc000 = true;
@@ -537,6 +550,7 @@ void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 3) */
         error_skipto(e, "Main declaration", LCHAVETA);
     }
     Vars() Statements()
+    // Vars_Statement()
     try{
         <RCHAVETA>
     }catch(ParseException e){
@@ -594,6 +608,7 @@ void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 6) */
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars() Statements()
+    // Vars_Statement()
     <RETURN> Expression() <PVIRG> <RCHAVETA>/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -763,6 +778,13 @@ void Type()       : {}
 /*@egen*/            
 }
 
+// void Type_1() #void : {}
+// {
+//     <INT> #INT
+//     | <INT_ARRAY> #INT_ARRAY
+//     | <BOOLEAN> #BOOLEAN
+// }
+
 void Statement()       : {}
 {
     // try{
@@ -792,6 +814,13 @@ void Statement()       : {}
       }
 /*@egen*/             Statement1() <PVIRG>
 }
+
+// void Statement_Aux() #void : {}
+// {
+//     Multiple_Statements()
+//     | If_Else_Statement()
+//     | While_Statement()
+// }
 
 void Multiple_Statements()                 : {/*@bgen(jjtree) STATEMENT_LIST */
   ASTSTATEMENT_LIST jjtn000 = new ASTSTATEMENT_LIST(JJTSTATEMENT_LIST);
