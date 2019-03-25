@@ -1,5 +1,5 @@
 options {
-    LOOKAHEAD=2;
+    LOOKAHEAD=1;
     MULTI=true;
     FORCE_LA_CHECK=true;
 }
@@ -189,13 +189,11 @@ SimpleNode Program() : {}
 void ClassDeclaration() #void : {}
 {   
     try{
-        <CLASS> <IDENTIFIER> #CLASS_NAME
+        <CLASS> Identifier() #CLASS_NAME
     } catch(ParseException e){
         System.out.println("Syntatic Error on Class initialization. " + e.toString());
     }
     ClassDeclaration_1()
-
-    // <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
 }
 
 void ClassDeclaration_1() #void : {}
@@ -218,17 +216,12 @@ void ClassDeclaration_Not_Extends() #CLASS(3) : {}
     }catch(ParseException e){
         error_skipto(e, "Class declaration", RCHAVETA);
     }
-    
-    // <LCHAVETA>
-    // Vars()
-    // Methods()
-    // <RCHAVETA>
 }
 
 void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
 {
     try{
-        <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
+        <EXTENDS> Identifier() #EXTENDED_CLASS <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Class declaration", LCHAVETA);
     }
@@ -239,11 +232,6 @@ void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
     }catch(ParseException e){
         error_skipto(e, "Class declaration", RCHAVETA);
     }
-
-    // <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
-    // Vars()
-    // Methods()
-    // <RCHAVETA>
 }
 
 void Methods() #METHODS : {}
@@ -263,11 +251,6 @@ void Vars() #VAR_DECLS : {}
     (VarDeclaration())*
 }
 
-void Statements() #STATEMENT_LIST : {}
-{
-    (Statement())*
-}
-
 void ClassDeclaration_Methods() #void : {}
 {
     MainDeclaration()
@@ -276,59 +259,57 @@ void ClassDeclaration_Methods() #void : {}
 
 void VarDeclaration() #VAR_DECL(2) : {}
 {
-    Type() <IDENTIFIER> #IDENTIFIER <PVIRG>
+    Type() Identifier() #IDENTIFIER <PVIRG>
 }
 
-// void Vars_Statement() #void : {}
-// {
-//     Type_1() <IDENTIFIER> Vars_Statement()
-//     | <IDENTIFIER> #ID Vars_Statement_1()
-//     | Statement_Aux() (Statement())*
-// }
+void Vars_Statement() #METHOD_BODY : {}
+{
+    Vars_Statement_Aux()
+}
 
-// void Vars_Statement_1() #void : {}
-// {
-//     <IDENTIFIER> Vars_Statement()
-//     | Statement1() <PVIRG> (Statement())*
-// }
+void Vars_Statement_Aux() #void : {}
+{
+    Type_1() Identifier() #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    | Identifier() #IDENTIFIER Vars_Statement_1()
+    | Statement_Aux() (Statement())*
+}
 
-void MainDeclaration() #MAIN(3) : {}
+void Vars_Statement_1() #void : {}
+{
+    Identifier() #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    | Statement1() <PVIRG> (Statement())*
+}
+
+void MainDeclaration() #MAIN(2) : {}
 {
     try{
-        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> Identifier() #ARGV
         <RPAR> <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Main declaration", LCHAVETA);
     }
-    Vars() Statements()
-    // Vars_Statement()
+    Vars_Statement()
     try{
         <RCHAVETA>
     }catch(ParseException e){
         System.out.println("Missing } in Main Declaration." + e.toString());
     }
-
-    // <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
-    // <RPAR> <LCHAVETA>
-    // Vars() Statements()
-    // <RCHAVETA>
 }
 
-void MethodDeclaration() #METHOD(6) : {}
+void MethodDeclaration() #METHOD(5) : {}
 {
-    Type() <IDENTIFIER> #NAME <LPAR>
+    Type() Identifier() #NAME <LPAR>
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
-    Vars() Statements()
-    // Vars_Statement()
+    Vars_Statement()
     <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 
 void MethodDeclaration_Args() #METHOD_ARGS : {}
 {
     (
-        Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2)
-        ( <VIRG> Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2) )*
+        Type() (Identifier() #IDENTIFIER) #ARG(2)
+        ( <VIRG> Type() (Identifier() #IDENTIFIER) #ARG(2) )*
     )?
 }
 
@@ -337,15 +318,15 @@ void Type() #void : {}
     <INT> #INT
     | <INT_ARRAY> #INT_ARRAY
     | <BOOLEAN> #BOOLEAN
-    | <IDENTIFIER> #IDENTIFIER
+    | Identifier() #IDENTIFIER
 }
 
-// void Type_1() #void : {}
-// {
-//     <INT> #INT
-//     | <INT_ARRAY> #INT_ARRAY
-//     | <BOOLEAN> #BOOLEAN
-// }
+void Type_1() #void : {}
+{
+    <INT> #INT
+    | <INT_ARRAY> #INT_ARRAY
+    | <BOOLEAN> #BOOLEAN
+}
 
 void Statement() #void : {}
 {
@@ -361,15 +342,15 @@ void Statement() #void : {}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
-    | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
+    | Identifier() #IDENTIFIER Statement1() <PVIRG>
 }
 
-// void Statement_Aux() #void : {}
-// {
-//     Multiple_Statements()
-//     | If_Else_Statement()
-//     | While_Statement()
-// }
+void Statement_Aux() #void : {}
+{
+    Multiple_Statements()
+    | If_Else_Statement()
+    | While_Statement()
+}
 
 void Multiple_Statements() #STATEMENT_LIST : {}
 {
@@ -390,8 +371,6 @@ void If_Else_Statement() #IF_ELSE(3) : {}
         System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
     }
     Statement()
-
-    // <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
 }
 
 void While_Statement() #WHILE(2) : {}
@@ -403,8 +382,6 @@ void While_Statement() #WHILE(2) : {}
         error_skipto(e, "WHILE statement declaration", RPAR);
     }
     Statement()
-
-    // <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1() #void : {}
@@ -465,7 +442,7 @@ void Term_Literal() #void : {}
 
 void Term_Identifier() #void : {}
 {
-    <IDENTIFIER> #IDENTIFIER(0) (Operator_5())*
+    Identifier() #IDENTIFIER(0) (Operator_5())*
 }
 
 void Term_NOT() #NOT(1) : {}
@@ -481,7 +458,7 @@ void Term_NEW() #void : {}
 void Term_NEW_1() #void : {}
 {
     <INT> <LPARRETO> Expression() <RPARRETO> #NEW_INT_ARRAY(1)
-    | <IDENTIFIER> #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
+    | Identifier() #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
 void Operator_1() #AND(2) : {}
@@ -525,7 +502,7 @@ void Operator_5_DOT() #void : {}
 void Operator_5_DOT_1() #void : {}
 {
     <LENGTH> #LENGTH(1)
-    | <IDENTIFIER> #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
+    | Identifier() #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
 }
 
 void Operator_5_Call_Args() #CALL_ARGUMENTS : {}
@@ -536,3 +513,8 @@ void Operator_5_Call_Args() #CALL_ARGUMENTS : {}
         )*
     )?
 } 
+
+void Identifier() #void : {Token t;}
+{
+    t=<IDENTIFIER> {jjtThis.name = t.image;}
+}
