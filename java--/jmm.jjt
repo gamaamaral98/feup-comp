@@ -18,6 +18,7 @@ public class jmm{
     private static jmm parser;
     private static int optRN = -1;
     private static boolean optO = false;
+    private static int errors = 0;
     
 
     public static void main(String args []) throws ParseException, IOException{
@@ -68,39 +69,39 @@ public class jmm{
     public static boolean validArgs(String arg){
         if(arg.equals("-o")) { 
             if(optO) {
-                System.out.println("Error: Option O has already been defined.");
+                System.out.println("ERROR: Option O has already been defined.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
             optO = true;
         }
         else if(arg.length() < 3){
-            System.out.println("Error: Non valid argument");
+            System.out.println("ERROR: Non valid argument");
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             return false;
         }
         else if(arg.substring(0, 3).equals("-r=")) {
             if(optRN >= 0) {
-                System.out.println("Error: Option R has already been defined.");
+                System.out.println("ERROR: Option R has already been defined.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
             if(arg.substring(3).matches("[0-9]+")) {
                 optRN = Integer.parseInt(arg.substring(3));
                 if(optRN < 0) {
-                    System.out.println("Error: The number in option R must be an integer greater or equal to 0.");
+                    System.out.println("ERROR: The number in option R must be an integer greater or equal to 0.");
                     System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                     return false;
                 }
             }
             else {
-                System.out.println("Error: The number in option R must be an integer.");
+                System.out.println("ERROR: The number in option R must be an integer.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
         }
         else {
-            System.out.println("Error: Non valid argument");
+            System.out.println("ERROR: Non valid argument");
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             return false;
         }
@@ -108,7 +109,7 @@ public class jmm{
     }
 
     public static void error_skipto(ParseException e, String error, int kind) {
-        System.out.println("Syntatic Error on " + error + ". " + e.toString());
+        System.out.println("ERROR: Syntatic Error on " + error + ". " + e.toString());
         Token t;
         do {
             t = getNextToken();
@@ -181,8 +182,12 @@ TOKEN :
 
 SimpleNode Program() : {}
 {
-    ClassDeclaration(){
-        return jjtThis;
+    try{
+        ClassDeclaration(){
+            return jjtThis;
+        }
+    } catch(ParseException e){
+        System.out.println("Code Syntatic Error. " + e.toString());
     }
 }
 
@@ -227,22 +232,11 @@ void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
     }
     Vars()
     Methods()
-    try{
-        <RCHAVETA>
-    }catch(ParseException e){
-        error_skipto(e, "Class declaration", RCHAVETA);
-    }
+    <RCHAVETA>
 }
 
 void Methods() #METHODS : {}
 {
-    // ( try{
-    //     <PUBLIC> 
-    // }catch(ParseException e){
-    //     System.out.println("Missing PUBLIC in Method" + e.toString());
-    // }
-    // ClassDeclaration_Methods() )*
-
     ( <PUBLIC> ClassDeclaration_Methods() )*
 }
 
@@ -330,15 +324,6 @@ void Type_1() #void : {}
 
 void Statement() #void : {}
 {
-    // try{
-    //     Multiple_Statements()
-    //     | If_Else_Statement()
-    //     | While_Statement()
-    //     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
-    // }
-    // catch(ParseException e){
-    //     System.out.println(e.toString());
-    // }
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
@@ -379,6 +364,11 @@ void While_Statement() #WHILE(2) : {}
         <WHILE> <LPAR> Expression() <RPAR>
     }
     catch (ParseException e) {
+        errors++;
+        if(errors > 10){
+            System.out.println("Maximum number of errors allowed");
+            throw e; 
+        }
         error_skipto(e, "WHILE statement declaration", RPAR);
     }
     Statement()
