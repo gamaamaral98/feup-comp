@@ -22,6 +22,7 @@ public class jmm/*@bgen(jjtree)*/implements jmmTreeConstants/*@egen*/{/*@bgen(jj
     private static jmm parser;
     private static int optRN = -1;
     private static boolean optO = false;
+    private static int errors = 0;
     
 
     public static void main(String args []) throws ParseException, IOException{
@@ -72,39 +73,39 @@ public class jmm/*@bgen(jjtree)*/implements jmmTreeConstants/*@egen*/{/*@bgen(jj
     public static boolean validArgs(String arg){
         if(arg.equals("-o")) { 
             if(optO) {
-                System.out.println("Error: Option O has already been defined.");
+                System.out.println("ERROR: Option O has already been defined.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
             optO = true;
         }
         else if(arg.length() < 3){
-            System.out.println("Error: Non valid argument");
+            System.out.println("ERROR: Non valid argument");
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             return false;
         }
         else if(arg.substring(0, 3).equals("-r=")) {
             if(optRN >= 0) {
-                System.out.println("Error: Option R has already been defined.");
+                System.out.println("ERROR: Option R has already been defined.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
             if(arg.substring(3).matches("[0-9]+")) {
                 optRN = Integer.parseInt(arg.substring(3));
                 if(optRN < 0) {
-                    System.out.println("Error: The number in option R must be an integer greater or equal to 0.");
+                    System.out.println("ERROR: The number in option R must be an integer greater or equal to 0.");
                     System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                     return false;
                 }
             }
             else {
-                System.out.println("Error: The number in option R must be an integer.");
+                System.out.println("ERROR: The number in option R must be an integer.");
                 System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
                 return false;
             }
         }
         else {
-            System.out.println("Error: Non valid argument");
+            System.out.println("ERROR: Non valid argument");
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             return false;
         }
@@ -112,7 +113,7 @@ public class jmm/*@bgen(jjtree)*/implements jmmTreeConstants/*@egen*/{/*@bgen(jj
     }
 
     public static void error_skipto(ParseException e, String error, int kind) {
-        System.out.println("Syntatic Error on " + error + ". " + e.toString());
+        System.out.println("ERROR: Syntatic Error on " + error + ". " + e.toString());
         Token t;
         do {
             t = getNextToken();
@@ -191,13 +192,12 @@ SimpleNode Program() : {/*@bgen(jjtree) Program */
 {/*@bgen(jjtree) Program */
     try {
 /*@egen*/
-    ClassDeclaration()/*@bgen(jjtree)*/
-                      {
-                        jjtree.closeNodeScope(jjtn000, true);
-                        jjtc000 = false;
-                      }
-/*@egen*/{
-        return jjtn000;
+    try{
+        ClassDeclaration(){
+            return jjtn000;
+        }
+    } catch(ParseException e){
+        System.out.println("Code Syntatic Error. " + e.toString());
     }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -242,8 +242,6 @@ void ClassDeclaration()       : {}
         System.out.println("Syntatic Error on Class initialization. " + e.toString());
     }
     ClassDeclaration_1()
-
-    // <CLASS> <IDENTIFIER> #CLASS_NAME ClassDeclaration_1()
 }
 
 void ClassDeclaration_1()       : {}
@@ -292,11 +290,6 @@ void ClassDeclaration_Not_Extends()           : {/*@bgen(jjtree) #CLASS( 3) */
       }
     }
 /*@egen*/
-    
-    // <LCHAVETA>
-    // Vars()
-    // Methods()
-    // <RCHAVETA>
 }
 
 void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTENDS( 4) */
@@ -327,11 +320,7 @@ void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTE
     }
     Vars()
     Methods()
-    try{
-        <RCHAVETA>
-    }catch(ParseException e){
-        error_skipto(e, "Class declaration", RCHAVETA);
-    }/*@bgen(jjtree)*/
+    <RCHAVETA>/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -352,11 +341,6 @@ void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTE
       }
     }
 /*@egen*/
-
-    // <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
-    // Vars()
-    // Methods()
-    // <RCHAVETA>
 }
 
 void Methods()          : {/*@bgen(jjtree) METHODS */
@@ -367,13 +351,6 @@ void Methods()          : {/*@bgen(jjtree) METHODS */
 {/*@bgen(jjtree) METHODS */
     try {
 /*@egen*/
-    // ( try{
-    //     <PUBLIC> 
-    // }catch(ParseException e){
-    //     System.out.println("Missing PUBLIC in Method" + e.toString());
-    // }
-    // ClassDeclaration_Methods() )*
-
     ( <PUBLIC> ClassDeclaration_Methods() )*/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -576,11 +553,6 @@ void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 3) */
       }
     }
 /*@egen*/
-
-    // <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
-    // <RPAR> <LCHAVETA>
-    // Vars() Statements()
-    // <RCHAVETA>
 }
 
 void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 6) */
@@ -787,15 +759,6 @@ void Type()       : {}
 
 void Statement()       : {}
 {
-    // try{
-    //     Multiple_Statements()
-    //     | If_Else_Statement()
-    //     | While_Statement()
-    //     | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
-    // }
-    // catch(ParseException e){
-    //     System.out.println(e.toString());
-    // }
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
@@ -893,8 +856,6 @@ void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
       }
     }
 /*@egen*/
-
-    // <IF> <LPAR> Expression() <RPAR> Statement() <ELSE> Statement()
 }
 
 void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
@@ -909,6 +870,11 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
         <WHILE> <LPAR> Expression() <RPAR>
     }
     catch (ParseException e) {
+        errors++;
+        if(errors > 10){
+            System.out.println("Maximum number of errors allowed");
+            throw e; 
+        }
         error_skipto(e, "WHILE statement declaration", RPAR);
     }
     Statement()/*@bgen(jjtree)*/
@@ -932,8 +898,6 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
       }
     }
 /*@egen*/
-
-    // <WHILE> <LPAR> Expression() <RPAR> Statement()
 }
 
 void Statement1()       : {}

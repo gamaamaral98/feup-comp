@@ -1,9 +1,5 @@
-class Fac extends a b{
+class Fac extends a{
     int a;
-    public static void main(String[] a){
-        io.println(new Fac().ComputeFac(10)); 
-    }
-
     public int ComputeFac(int num, boolean t){
         banaa num_aux ;
         if (num < 1) {
@@ -13,7 +9,7 @@ class Fac extends a b{
             num_aux = num * false.ComputeFac(num-1)[12 + 1].a().length;
         }
 
-        while(a = 0) {
+        while (a = 0) {
             b = 3;
         }
 
@@ -23,8 +19,4 @@ class Fac extends a b{
 
         return num_aux;
     }
-
-    // public static void main(String[] a){
-    //     io.println(new Fac().ComputeFac(10)); 
-    // }
 }
