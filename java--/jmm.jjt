@@ -189,7 +189,7 @@ SimpleNode Program() : {}
 void ClassDeclaration() #void : {}
 {   
     try{
-        <CLASS> Identifier() #CLASS_NAME
+        <CLASS> <IDENTIFIER> #CLASS_NAME
     } catch(ParseException e){
         System.out.println("Syntatic Error on Class initialization. " + e.toString());
     }
@@ -221,7 +221,7 @@ void ClassDeclaration_Not_Extends() #CLASS(3) : {}
 void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {}
 {
     try{
-        <EXTENDS> Identifier() #EXTENDED_CLASS <LCHAVETA>
+        <EXTENDS> <IDENTIFIER> #EXTENDED_CLASS <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Class declaration", LCHAVETA);
     }
@@ -259,7 +259,7 @@ void ClassDeclaration_Methods() #void : {}
 
 void VarDeclaration() #VAR_DECL(2) : {}
 {
-    Type() Identifier() #IDENTIFIER <PVIRG>
+    Type() <IDENTIFIER> #IDENTIFIER <PVIRG>
 }
 
 void Vars_Statement() #METHOD_BODY : {}
@@ -269,21 +269,21 @@ void Vars_Statement() #METHOD_BODY : {}
 
 void Vars_Statement_Aux() #void : {}
 {
-    Type_1() Identifier() #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
-    | Identifier() #IDENTIFIER Vars_Statement_1()
+    Type_1() <IDENTIFIER> #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    | <IDENTIFIER> #IDENTIFIER Vars_Statement_1()
     | Statement_Aux() (Statement())*
 }
 
 void Vars_Statement_1() #void : {}
 {
-    Identifier() #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    <IDENTIFIER> #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
     | Statement1() <PVIRG> (Statement())*
 }
 
 void MainDeclaration() #MAIN(2) : {}
 {
     try{
-        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> Identifier() #ARGV
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> <IDENTIFIER> #ARGV
         <RPAR> <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Main declaration", LCHAVETA);
@@ -298,7 +298,7 @@ void MainDeclaration() #MAIN(2) : {}
 
 void MethodDeclaration() #METHOD(5) : {}
 {
-    Type() Identifier() #NAME <LPAR>
+    Type() <IDENTIFIER> #NAME <LPAR>
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars_Statement()
@@ -308,8 +308,8 @@ void MethodDeclaration() #METHOD(5) : {}
 void MethodDeclaration_Args() #METHOD_ARGS : {}
 {
     (
-        Type() (Identifier() #IDENTIFIER) #ARG(2)
-        ( <VIRG> Type() (Identifier() #IDENTIFIER) #ARG(2) )*
+        Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2)
+        ( <VIRG> Type() (<IDENTIFIER> #IDENTIFIER) #ARG(2) )*
     )?
 }
 
@@ -318,7 +318,7 @@ void Type() #void : {}
     <INT> #INT
     | <INT_ARRAY> #INT_ARRAY
     | <BOOLEAN> #BOOLEAN
-    | Identifier() #IDENTIFIER
+    | <IDENTIFIER> #IDENTIFIER
 }
 
 void Type_1() #void : {}
@@ -342,7 +342,7 @@ void Statement() #void : {}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
-    | Identifier() #IDENTIFIER Statement1() <PVIRG>
+    | <IDENTIFIER> #IDENTIFIER Statement1() <PVIRG>
 }
 
 void Statement_Aux() #void : {}
@@ -442,7 +442,7 @@ void Term_Literal() #void : {}
 
 void Term_Identifier() #void : {}
 {
-    Identifier() #IDENTIFIER(0) (Operator_5())*
+    <IDENTIFIER> #IDENTIFIER(0) (Operator_5())*
 }
 
 void Term_NOT() #NOT(1) : {}
@@ -458,7 +458,7 @@ void Term_NEW() #void : {}
 void Term_NEW_1() #void : {}
 {
     <INT> <LPARRETO> Expression() <RPARRETO> #NEW_INT_ARRAY(1)
-    | Identifier() #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
+    | <IDENTIFIER> #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
 void Operator_1() #AND(2) : {}
@@ -502,7 +502,7 @@ void Operator_5_DOT() #void : {}
 void Operator_5_DOT_1() #void : {}
 {
     <LENGTH> #LENGTH(1)
-    | Identifier() #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
+    | <IDENTIFIER> #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
 }
 
 void Operator_5_Call_Args() #CALL_ARGUMENTS : {}
@@ -513,8 +513,3 @@ void Operator_5_Call_Args() #CALL_ARGUMENTS : {}
         )*
     )?
 } 
-
-void Identifier() #void : {Token t;}
-{
-    t=<IDENTIFIER> {jjtThis.name = t.image;}
-}
