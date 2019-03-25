@@ -221,22 +221,27 @@ SimpleNode Program() : {/*@bgen(jjtree) Program */
 /*@egen*/
 }
 
-void ClassDeclaration()       : {}
+void ClassDeclaration()       : {Token t;}
 {   
     try{
-        <CLASS>/*@bgen(jjtree) CLASS_NAME */
-                {
-                  ASTCLASS_NAME jjtn001 = new ASTCLASS_NAME(JJTCLASS_NAME);
-                  boolean jjtc001 = true;
-                  jjtree.openNodeScope(jjtn001);
-                }
-                try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-                } finally {
-                  if (jjtc001) {
-                    jjtree.closeNodeScope(jjtn001, true);
-                  }
-                }
+        <CLASS> t=<IDENTIFIER>/*@bgen(jjtree) CLASS_NAME */
+                               {
+                                 ASTCLASS_NAME jjtn001 = new ASTCLASS_NAME(JJTCLASS_NAME);
+                                 boolean jjtc001 = true;
+                                 jjtree.openNodeScope(jjtn001);
+                               }
+                               try {
+/*@egen*//*@bgen(jjtree)*/
+                               {
+                                 jjtree.closeNodeScope(jjtn001, true);
+                                 jjtc001 = false;
+                               }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                               } finally {
+                                 if (jjtc001) {
+                                   jjtree.closeNodeScope(jjtn001, true);
+                                 }
+                               }
 /*@egen*/            
     } catch(ParseException e){
         System.out.println("Syntatic Error on Class initialization. " + e.toString());
@@ -293,27 +298,32 @@ void ClassDeclaration_Not_Extends()           : {/*@bgen(jjtree) #CLASS( 3) */
 }
 
 void ClassDeclaration_Extends()                   : {/*@bgen(jjtree) #CLASS_EXTENDS( 4) */
-  ASTCLASS_EXTENDS jjtn000 = new ASTCLASS_EXTENDS(JJTCLASS_EXTENDS);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                                     ASTCLASS_EXTENDS jjtn000 = new ASTCLASS_EXTENDS(JJTCLASS_EXTENDS);
+                                                     boolean jjtc000 = true;
+                                                     jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #CLASS_EXTENDS( 4) */
     try {
 /*@egen*/
     try{
-        <EXTENDS>/*@bgen(jjtree) EXTENDED_CLASS */
-                  {
-                    ASTEXTENDED_CLASS jjtn001 = new ASTEXTENDED_CLASS(JJTEXTENDED_CLASS);
-                    boolean jjtc001 = true;
-                    jjtree.openNodeScope(jjtn001);
-                  }
-                  try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-                  } finally {
-                    if (jjtc001) {
-                      jjtree.closeNodeScope(jjtn001, true);
-                    }
-                  }
+        <EXTENDS> t=<IDENTIFIER>/*@bgen(jjtree) EXTENDED_CLASS */
+                                 {
+                                   ASTEXTENDED_CLASS jjtn001 = new ASTEXTENDED_CLASS(JJTEXTENDED_CLASS);
+                                   boolean jjtc001 = true;
+                                   jjtree.openNodeScope(jjtn001);
+                                 }
+                                 try {
+/*@egen*//*@bgen(jjtree)*/
+                                 {
+                                   jjtree.closeNodeScope(jjtn001, true);
+                                   jjtc001 = false;
+                                 }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                                 } finally {
+                                   if (jjtc001) {
+                                     jjtree.closeNodeScope(jjtn001, true);
+                                   }
+                                 }
 /*@egen*/                 <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Class declaration", LCHAVETA);
@@ -412,26 +422,31 @@ void ClassDeclaration_Methods()       : {}
 }
 
 void VarDeclaration()              : {/*@bgen(jjtree) #VAR_DECL( 2) */
-  ASTVAR_DECL jjtn000 = new ASTVAR_DECL(JJTVAR_DECL);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                      ASTVAR_DECL jjtn000 = new ASTVAR_DECL(JJTVAR_DECL);
+                                      boolean jjtc000 = true;
+                                      jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #VAR_DECL( 2) */
     try {
 /*@egen*/
-    Type()/*@bgen(jjtree) IDENTIFIER */
-           {
-             ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-             boolean jjtc001 = true;
-             jjtree.openNodeScope(jjtn001);
-           }
-           try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-           } finally {
-             if (jjtc001) {
-               jjtree.closeNodeScope(jjtn001, true);
-             }
-           }
+    Type() t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                          {
+                            ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                            boolean jjtc001 = true;
+                            jjtree.openNodeScope(jjtn001);
+                          }
+                          try {
+/*@egen*//*@bgen(jjtree)*/
+                          {
+                            jjtree.closeNodeScope(jjtn001, true);
+                            jjtc001 = false;
+                          }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                          } finally {
+                            if (jjtc001) {
+                              jjtree.closeNodeScope(jjtn001, true);
+                            }
+                          }
 /*@egen*/             <PVIRG>/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -486,106 +501,126 @@ void Vars_Statement()              : {/*@bgen(jjtree) METHOD_BODY */
 /*@egen*/
 }
 
-void Vars_Statement_Aux()       : {}
+void Vars_Statement_Aux()       : {Token t;}
 {
-    Type_1()/*@bgen(jjtree) IDENTIFIER */
-             {
-               ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-               boolean jjtc001 = true;
-               jjtree.openNodeScope(jjtn001);
-             }
-             try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-             } finally {
-               if (jjtc001) {
-                 jjtree.closeNodeScope(jjtn001, true);
-               }
-             }
+    Type_1() t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                            {
+                              ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                              boolean jjtc001 = true;
+                              jjtree.openNodeScope(jjtn001);
+                            }
+                            try {
+/*@egen*//*@bgen(jjtree)*/
+                            {
+                              jjtree.closeNodeScope(jjtn001, true);
+                              jjtc001 = false;
+                            }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                            } finally {
+                              if (jjtc001) {
+                                jjtree.closeNodeScope(jjtn001, true);
+                              }
+                            }
 /*@egen*/            /*@bgen(jjtree) #VAR_DECL( 2) */
-                                      {
-                                        ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
-                                        boolean jjtc002 = true;
-                                        jjtree.openNodeScope(jjtn002);
-                                      }
-                                      try {
+                                                                  {
+                                                                    ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
+                                                                    boolean jjtc002 = true;
+                                                                    jjtree.openNodeScope(jjtn002);
+                                                                  }
+                                                                  try {
 /*@egen*/ <PVIRG>/*@bgen(jjtree)*/
-                                      } finally {
-                                        if (jjtc002) {
-                                          jjtree.closeNodeScope(jjtn002,  2);
-                                        }
-                                      }
+                                                                  } finally {
+                                                                    if (jjtc002) {
+                                                                      jjtree.closeNodeScope(jjtn002,  2);
+                                                                    }
+                                                                  }
 /*@egen*/              Vars_Statement_Aux()
-    |/*@bgen(jjtree) IDENTIFIER */
-      {
-        ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
-        boolean jjtc003 = true;
-        jjtree.openNodeScope(jjtn003);
-      }
-      try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc003) {
-          jjtree.closeNodeScope(jjtn003, true);
-        }
-      }
+    | t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                     {
+                       ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                       boolean jjtc003 = true;
+                       jjtree.openNodeScope(jjtn003);
+                     }
+                     try {
+/*@egen*//*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn003, true);
+                       jjtc003 = false;
+                     }
+/*@egen*/ {jjtn003.name = t.image;}/*@bgen(jjtree)*/
+                     } finally {
+                       if (jjtc003) {
+                         jjtree.closeNodeScope(jjtn003, true);
+                       }
+                     }
 /*@egen*/             Vars_Statement_1()
     | Statement_Aux() (Statement())*
 }
 
-void Vars_Statement_1()       : {}
-{/*@bgen(jjtree) IDENTIFIER */
-    {
-      ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
-    try {
-/*@egen*/
-    <IDENTIFIER>/*@bgen(jjtree)*/
-    } finally {
-      if (jjtc001) {
-        jjtree.closeNodeScope(jjtn001, true);
-      }
-    }
+void Vars_Statement_1()       : {Token t;}
+{
+    t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                   {
+                     ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                     boolean jjtc001 = true;
+                     jjtree.openNodeScope(jjtn001);
+                   }
+                   try {
+/*@egen*//*@bgen(jjtree)*/
+                   {
+                     jjtree.closeNodeScope(jjtn001, true);
+                     jjtc001 = false;
+                   }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                   } finally {
+                     if (jjtc001) {
+                       jjtree.closeNodeScope(jjtn001, true);
+                     }
+                   }
 /*@egen*/            /*@bgen(jjtree) #VAR_DECL( 2) */
-                             {
-                               ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
-                               boolean jjtc002 = true;
-                               jjtree.openNodeScope(jjtn002);
-                             }
-                             try {
+                                                         {
+                                                           ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
+                                                           boolean jjtc002 = true;
+                                                           jjtree.openNodeScope(jjtn002);
+                                                         }
+                                                         try {
 /*@egen*/ <PVIRG>/*@bgen(jjtree)*/
-                             } finally {
-                               if (jjtc002) {
-                                 jjtree.closeNodeScope(jjtn002,  2);
-                               }
-                             }
+                                                         } finally {
+                                                           if (jjtc002) {
+                                                             jjtree.closeNodeScope(jjtn002,  2);
+                                                           }
+                                                         }
 /*@egen*/              Vars_Statement_Aux()
     | Statement1() <PVIRG> (Statement())*
 }
 
 void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 2) */
-  ASTMAIN jjtn000 = new ASTMAIN(JJTMAIN);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                   ASTMAIN jjtn000 = new ASTMAIN(JJTMAIN);
+                                   boolean jjtc000 = true;
+                                   jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #MAIN( 2) */
     try {
 /*@egen*/
     try{
-        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO>/*@bgen(jjtree) ARGV */
-                                                                     {
-                                                                       ASTARGV jjtn001 = new ASTARGV(JJTARGV);
-                                                                       boolean jjtc001 = true;
-                                                                       jjtree.openNodeScope(jjtn001);
-                                                                     }
-                                                                     try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-                                                                     } finally {
-                                                                       if (jjtc001) {
-                                                                         jjtree.closeNodeScope(jjtn001, true);
-                                                                       }
-                                                                     }
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> t=<IDENTIFIER>/*@bgen(jjtree) ARGV */
+                                                                                    {
+                                                                                      ASTARGV jjtn001 = new ASTARGV(JJTARGV);
+                                                                                      boolean jjtc001 = true;
+                                                                                      jjtree.openNodeScope(jjtn001);
+                                                                                    }
+                                                                                    try {
+/*@egen*//*@bgen(jjtree)*/
+                                                                                    {
+                                                                                      jjtree.closeNodeScope(jjtn001, true);
+                                                                                      jjtc001 = false;
+                                                                                    }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                                                                                    } finally {
+                                                                                      if (jjtc001) {
+                                                                                        jjtree.closeNodeScope(jjtn001, true);
+                                                                                      }
+                                                                                    }
 /*@egen*/      
         <RPAR> <LCHAVETA>
     }catch(ParseException e){
@@ -620,26 +655,31 @@ void MainDeclaration()          : {/*@bgen(jjtree) #MAIN( 2) */
 }
 
 void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 5) */
-  ASTMETHOD jjtn000 = new ASTMETHOD(JJTMETHOD);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                       ASTMETHOD jjtn000 = new ASTMETHOD(JJTMETHOD);
+                                       boolean jjtc000 = true;
+                                       jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #METHOD( 5) */
     try {
 /*@egen*/
-    Type()/*@bgen(jjtree) NAME */
-           {
-             ASTNAME jjtn001 = new ASTNAME(JJTNAME);
-             boolean jjtc001 = true;
-             jjtree.openNodeScope(jjtn001);
-           }
-           try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-           } finally {
-             if (jjtc001) {
-               jjtree.closeNodeScope(jjtn001, true);
-             }
-           }
+    Type() t=<IDENTIFIER>/*@bgen(jjtree) NAME */
+                          {
+                            ASTNAME jjtn001 = new ASTNAME(JJTNAME);
+                            boolean jjtc001 = true;
+                            jjtree.openNodeScope(jjtn001);
+                          }
+                          try {
+/*@egen*//*@bgen(jjtree)*/
+                          {
+                            jjtree.closeNodeScope(jjtn001, true);
+                            jjtc001 = false;
+                          }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                          } finally {
+                            if (jjtc001) {
+                              jjtree.closeNodeScope(jjtn001, true);
+                            }
+                          }
 /*@egen*/       <LPAR>
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
@@ -668,10 +708,10 @@ void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 5) */
 }
 
 void MethodDeclaration_Args()              : {/*@bgen(jjtree) METHOD_ARGS */
-  ASTMETHOD_ARGS jjtn000 = new ASTMETHOD_ARGS(JJTMETHOD_ARGS);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                              ASTMETHOD_ARGS jjtn000 = new ASTMETHOD_ARGS(JJTMETHOD_ARGS);
+                                              boolean jjtc000 = true;
+                                              jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t1, t2;}
 {/*@bgen(jjtree) METHOD_ARGS */
     try {
 /*@egen*/
@@ -683,19 +723,24 @@ void MethodDeclaration_Args()              : {/*@bgen(jjtree) METHOD_ARGS */
                  jjtree.openNodeScope(jjtn002);
                }
                try {
-/*@egen*/ (/*@bgen(jjtree) IDENTIFIER */
-                {
-                  ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-                  boolean jjtc001 = true;
-                  jjtree.openNodeScope(jjtn001);
-                }
-                try {
-/*@egen*/<IDENTIFIER>/*@bgen(jjtree)*/
-                } finally {
-                  if (jjtc001) {
-                    jjtree.closeNodeScope(jjtn001, true);
-                  }
-                }
+/*@egen*/ (t1=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                                {
+                                  ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                                  boolean jjtc001 = true;
+                                  jjtree.openNodeScope(jjtn001);
+                                }
+                                try {
+/*@egen*//*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn001, true);
+                                  jjtc001 = false;
+                                }
+/*@egen*/ {jjtn001.name = t1.image;}/*@bgen(jjtree)*/
+                                } finally {
+                                  if (jjtc001) {
+                                    jjtree.closeNodeScope(jjtn001, true);
+                                  }
+                                }
 /*@egen*/            )/*@bgen(jjtree)*/
                } finally {
                  if (jjtc002) {
@@ -710,19 +755,24 @@ void MethodDeclaration_Args()              : {/*@bgen(jjtree) METHOD_ARGS */
                           jjtree.openNodeScope(jjtn004);
                         }
                         try {
-/*@egen*/ (/*@bgen(jjtree) IDENTIFIER */
-                         {
-                           ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
-                           boolean jjtc003 = true;
-                           jjtree.openNodeScope(jjtn003);
-                         }
-                         try {
-/*@egen*/<IDENTIFIER>/*@bgen(jjtree)*/
-                         } finally {
-                           if (jjtc003) {
-                             jjtree.closeNodeScope(jjtn003, true);
-                           }
-                         }
+/*@egen*/ (t2=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                                         {
+                                           ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                                           boolean jjtc003 = true;
+                                           jjtree.openNodeScope(jjtn003);
+                                         }
+                                         try {
+/*@egen*//*@bgen(jjtree)*/
+                                         {
+                                           jjtree.closeNodeScope(jjtn003, true);
+                                           jjtc003 = false;
+                                         }
+/*@egen*/ {jjtn003.name = t2.image;}/*@bgen(jjtree)*/
+                                         } finally {
+                                           if (jjtc003) {
+                                             jjtree.closeNodeScope(jjtn003, true);
+                                           }
+                                         }
 /*@egen*/            )/*@bgen(jjtree)*/
                         } finally {
                           if (jjtc004) {
@@ -753,63 +803,27 @@ void MethodDeclaration_Args()              : {/*@bgen(jjtree) METHOD_ARGS */
 /*@egen*/
 }
 
-void Type()       : {}
-{/*@bgen(jjtree) INT */
-    {
-      ASTINT jjtn001 = new ASTINT(JJTINT);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
-    try {
-/*@egen*/
-    <INT>/*@bgen(jjtree)*/
-    } finally {
-      if (jjtc001) {
-        jjtree.closeNodeScope(jjtn001, true);
-      }
-    }
-/*@egen*/     
-    |/*@bgen(jjtree) INT_ARRAY */
-      {
-        ASTINT_ARRAY jjtn002 = new ASTINT_ARRAY(JJTINT_ARRAY);
-        boolean jjtc002 = true;
-        jjtree.openNodeScope(jjtn002);
-      }
-      try {
-/*@egen*/ <INT_ARRAY>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc002) {
-          jjtree.closeNodeScope(jjtn002, true);
-        }
-      }
-/*@egen*/           
-    |/*@bgen(jjtree) BOOLEAN */
-      {
-        ASTBOOLEAN jjtn003 = new ASTBOOLEAN(JJTBOOLEAN);
-        boolean jjtc003 = true;
-        jjtree.openNodeScope(jjtn003);
-      }
-      try {
-/*@egen*/ <BOOLEAN>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc003) {
-          jjtree.closeNodeScope(jjtn003, true);
-        }
-      }
-/*@egen*/         
-    |/*@bgen(jjtree) IDENTIFIER */
-      {
-        ASTIDENTIFIER jjtn004 = new ASTIDENTIFIER(JJTIDENTIFIER);
-        boolean jjtc004 = true;
-        jjtree.openNodeScope(jjtn004);
-      }
-      try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc004) {
-          jjtree.closeNodeScope(jjtn004, true);
-        }
-      }
+void Type()       : {Token t;}
+{
+    Type_1()
+    | t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                     {
+                       ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                       boolean jjtc001 = true;
+                       jjtree.openNodeScope(jjtn001);
+                     }
+                     try {
+/*@egen*//*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn001, true);
+                       jjtc001 = false;
+                     }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                     } finally {
+                       if (jjtc001) {
+                         jjtree.closeNodeScope(jjtn001, true);
+                       }
+                     }
 /*@egen*/            
 }
 
@@ -859,24 +873,29 @@ void Type_1()       : {}
 /*@egen*/         
 }
 
-void Statement()       : {}
+void Statement()       : {Token t;}
 {
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
-    |/*@bgen(jjtree) IDENTIFIER */
-      {
-        ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-        boolean jjtc001 = true;
-        jjtree.openNodeScope(jjtn001);
-      }
-      try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc001) {
-          jjtree.closeNodeScope(jjtn001, true);
-        }
-      }
+    | t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
+                     {
+                       ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                       boolean jjtc001 = true;
+                       jjtree.openNodeScope(jjtn001);
+                     }
+                     try {
+/*@egen*//*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn001, true);
+                       jjtc001 = false;
+                     }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                     } finally {
+                       if (jjtc001) {
+                         jjtree.closeNodeScope(jjtn001, true);
+                       }
+                     }
 /*@egen*/             Statement1() <PVIRG>
 }
 
@@ -1114,49 +1133,64 @@ void Term()       : {}
     | Term_Identifier()
 }
 
-void Term_Literal()       : {}
-{/*@bgen(jjtree) #INT( 0) */
-     {
-       ASTINT jjtn001 = new ASTINT(JJTINT);
-       boolean jjtc001 = true;
-       jjtree.openNodeScope(jjtn001);
-     }
-     try {
-/*@egen*/
-     <INTEGER>/*@bgen(jjtree)*/
-     } finally {
-       if (jjtc001) {
-         jjtree.closeNodeScope(jjtn001,  0);
-       }
-     }
+void Term_Literal()       : {Token t;}
+{
+    t=<INTEGER>/*@bgen(jjtree) #INT( 0) */
+                {
+                  ASTINT jjtn001 = new ASTINT(JJTINT);
+                  boolean jjtc001 = true;
+                  jjtree.openNodeScope(jjtn001);
+                }
+                try {
+/*@egen*//*@bgen(jjtree)*/
+                {
+                  jjtree.closeNodeScope(jjtn001,  0);
+                  jjtc001 = false;
+                }
+/*@egen*/ {jjtn001.valueInt = t.image;}/*@bgen(jjtree)*/
+                } finally {
+                  if (jjtc001) {
+                    jjtree.closeNodeScope(jjtn001,  0);
+                  }
+                }
 /*@egen*/         (Operator_5())*
-    |/*@bgen(jjtree) #TRUE( 0) */
-      {
-        ASTTRUE jjtn002 = new ASTTRUE(JJTTRUE);
-        boolean jjtc002 = true;
-        jjtree.openNodeScope(jjtn002);
-      }
-      try {
-/*@egen*/ <TRUE>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc002) {
-          jjtree.closeNodeScope(jjtn002,  0);
-        }
-      }
+    | t=<TRUE>/*@bgen(jjtree) #TRUE( 0) */
+               {
+                 ASTTRUE jjtn002 = new ASTTRUE(JJTTRUE);
+                 boolean jjtc002 = true;
+                 jjtree.openNodeScope(jjtn002);
+               }
+               try {
+/*@egen*//*@bgen(jjtree)*/
+               {
+                 jjtree.closeNodeScope(jjtn002,  0);
+                 jjtc002 = false;
+               }
+/*@egen*/ {jjtn002.valueBoolean = t.image;}/*@bgen(jjtree)*/
+               } finally {
+                 if (jjtc002) {
+                   jjtree.closeNodeScope(jjtn002,  0);
+                 }
+               }
 /*@egen*/          (Operator_5())*
-    |/*@bgen(jjtree) #FALSE( 0) */
-      {
-        ASTFALSE jjtn003 = new ASTFALSE(JJTFALSE);
-        boolean jjtc003 = true;
-        jjtree.openNodeScope(jjtn003);
-      }
-      try {
-/*@egen*/ <FALSE>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc003) {
-          jjtree.closeNodeScope(jjtn003,  0);
-        }
-      }
+    | t=<FALSE>/*@bgen(jjtree) #FALSE( 0) */
+                {
+                  ASTFALSE jjtn003 = new ASTFALSE(JJTFALSE);
+                  boolean jjtc003 = true;
+                  jjtree.openNodeScope(jjtn003);
+                }
+                try {
+/*@egen*//*@bgen(jjtree)*/
+                {
+                  jjtree.closeNodeScope(jjtn003,  0);
+                  jjtc003 = false;
+                }
+/*@egen*/ {jjtn003.valueBoolean = t.image;}/*@bgen(jjtree)*/
+                } finally {
+                  if (jjtc003) {
+                    jjtree.closeNodeScope(jjtn003,  0);
+                  }
+                }
 /*@egen*/           (Operator_5())*
     |/*@bgen(jjtree) #THIS( 0) */
       {
@@ -1177,21 +1211,26 @@ void Term_Literal()       : {}
     | Term_NOT()
 }
 
-void Term_Identifier()       : {}
-{/*@bgen(jjtree) #IDENTIFIER( 0) */
-    {
-      ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
-      boolean jjtc001 = true;
-      jjtree.openNodeScope(jjtn001);
-    }
-    try {
-/*@egen*/
-    <IDENTIFIER>/*@bgen(jjtree)*/
-    } finally {
-      if (jjtc001) {
-        jjtree.closeNodeScope(jjtn001,  0);
-      }
-    }
+void Term_Identifier()       : {Token t;}
+{
+    t=<IDENTIFIER>/*@bgen(jjtree) #IDENTIFIER( 0) */
+                   {
+                     ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
+                     boolean jjtc001 = true;
+                     jjtree.openNodeScope(jjtn001);
+                   }
+                   try {
+/*@egen*//*@bgen(jjtree)*/
+                   {
+                     jjtree.closeNodeScope(jjtn001,  0);
+                     jjtc001 = false;
+                   }
+/*@egen*/ {jjtn001.name = t.image;}/*@bgen(jjtree)*/
+                   } finally {
+                     if (jjtc001) {
+                       jjtree.closeNodeScope(jjtn001,  0);
+                     }
+                   }
 /*@egen*/                (Operator_5())*
 }
 
@@ -1231,7 +1270,7 @@ void Term_NEW()       : {}
     <NEW> Term_NEW_1()
 }
 
-void Term_NEW_1()       : {}
+void Term_NEW_1()       : {Token t;}
 {
     <INT> <LPARRETO> Expression()/*@bgen(jjtree) #NEW_INT_ARRAY( 1) */
                                   {
@@ -1247,32 +1286,37 @@ void Term_NEW_1()       : {}
                                     }
                                   }
 /*@egen*/                  
-    |/*@bgen(jjtree) CLASS */
-      {
-        ASTCLASS jjtn002 = new ASTCLASS(JJTCLASS);
-        boolean jjtc002 = true;
-        jjtree.openNodeScope(jjtn002);
-      }
-      try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc002) {
-          jjtree.closeNodeScope(jjtn002, true);
-        }
-      }
-/*@egen*/        <LPAR>/*@bgen(jjtree) #NEW_CLASS( 1) */
-                                 {
-                                   ASTNEW_CLASS jjtn003 = new ASTNEW_CLASS(JJTNEW_CLASS);
-                                   boolean jjtc003 = true;
-                                   jjtree.openNodeScope(jjtn003);
-                                 }
-                                 try {
+    | t=<IDENTIFIER>/*@bgen(jjtree) CLASS */
+                     {
+                       ASTCLASS jjtn002 = new ASTCLASS(JJTCLASS);
+                       boolean jjtc002 = true;
+                       jjtree.openNodeScope(jjtn002);
+                     }
+                     try {
+/*@egen*//*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn002, true);
+                       jjtc002 = false;
+                     }
+/*@egen*/ {jjtn002.name = t.image;}/*@bgen(jjtree)*/
+                     } finally {
+                       if (jjtc002) {
+                         jjtree.closeNodeScope(jjtn002, true);
+                       }
+                     }
+/*@egen*/         <LPAR>/*@bgen(jjtree) #NEW_CLASS( 1) */
+                                                              {
+                                                                ASTNEW_CLASS jjtn003 = new ASTNEW_CLASS(JJTNEW_CLASS);
+                                                                boolean jjtc003 = true;
+                                                                jjtree.openNodeScope(jjtn003);
+                                                              }
+                                                              try {
 /*@egen*/ <RPAR>/*@bgen(jjtree)*/
-                                 } finally {
-                                   if (jjtc003) {
-                                     jjtree.closeNodeScope(jjtn003,  1);
-                                   }
-                                 }
+                                                              } finally {
+                                                                if (jjtc003) {
+                                                                  jjtree.closeNodeScope(jjtn003,  1);
+                                                                }
+                                                              }
 /*@egen*/              
 }
 
@@ -1500,7 +1544,7 @@ void Operator_5_DOT()       : {}
     <DOT> Operator_5_DOT_1()
 }
 
-void Operator_5_DOT_1()       : {}
+void Operator_5_DOT_1()       : {Token t;}
 {/*@bgen(jjtree) #LENGTH( 1) */
     {
       ASTLENGTH jjtn001 = new ASTLENGTH(JJTLENGTH);
@@ -1516,32 +1560,37 @@ void Operator_5_DOT_1()       : {}
       }
     }
 /*@egen*/           
-    |/*@bgen(jjtree) FUNCTION */
-      {
-        ASTFUNCTION jjtn002 = new ASTFUNCTION(JJTFUNCTION);
-        boolean jjtc002 = true;
-        jjtree.openNodeScope(jjtn002);
-      }
-      try {
-/*@egen*/ <IDENTIFIER>/*@bgen(jjtree)*/
-      } finally {
-        if (jjtc002) {
-          jjtree.closeNodeScope(jjtn002, true);
-        }
-      }
-/*@egen*/           <LPAR> Operator_5_Call_Args()/*@bgen(jjtree) #CALL_FUNCTION( 3) */
-                                                           {
-                                                             ASTCALL_FUNCTION jjtn003 = new ASTCALL_FUNCTION(JJTCALL_FUNCTION);
-                                                             boolean jjtc003 = true;
-                                                             jjtree.openNodeScope(jjtn003);
-                                                           }
-                                                           try {
+    | t=<IDENTIFIER>/*@bgen(jjtree) FUNCTION */
+                     {
+                       ASTFUNCTION jjtn002 = new ASTFUNCTION(JJTFUNCTION);
+                       boolean jjtc002 = true;
+                       jjtree.openNodeScope(jjtn002);
+                     }
+                     try {
+/*@egen*//*@bgen(jjtree)*/
+                     {
+                       jjtree.closeNodeScope(jjtn002, true);
+                       jjtc002 = false;
+                     }
+/*@egen*/ {jjtn002.name = t.image;}/*@bgen(jjtree)*/
+                     } finally {
+                       if (jjtc002) {
+                         jjtree.closeNodeScope(jjtn002, true);
+                       }
+                     }
+/*@egen*/            <LPAR> Operator_5_Call_Args()/*@bgen(jjtree) #CALL_FUNCTION( 3) */
+                                                                                        {
+                                                                                          ASTCALL_FUNCTION jjtn003 = new ASTCALL_FUNCTION(JJTCALL_FUNCTION);
+                                                                                          boolean jjtc003 = true;
+                                                                                          jjtree.openNodeScope(jjtn003);
+                                                                                        }
+                                                                                        try {
 /*@egen*/ <RPAR>/*@bgen(jjtree)*/
-                                                           } finally {
-                                                             if (jjtc003) {
-                                                               jjtree.closeNodeScope(jjtn003,  3);
-                                                             }
-                                                           }
+                                                                                        } finally {
+                                                                                          if (jjtc003) {
+                                                                                            jjtree.closeNodeScope(jjtn003,  3);
+                                                                                          }
+                                                                                        }
 /*@egen*/                  
 }
 

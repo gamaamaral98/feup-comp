@@ -71,15 +71,15 @@ class SimpleNode implements Node {
 
   public void dump(String prefix) {
     
-    System.out.print(toString(prefix) + " (");
+    System.out.print(toString(prefix));
     if(name != null)
-      System.out.print("Name: " + name);
+      System.out.print("  (Name: " + name + ")");
     if(valueBoolean != null)
-      System.out.print("ValueBoolean: " + valueBoolean);
+      System.out.print("  (Value: " + valueBoolean + ")");
     if(valueInt != null)
-      System.out.print("ValueInt: " + valueInt);
-    System.out.println(")");
+      System.out.print("  (Value: " + valueInt + ")");
 
+    System.out.println("");
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];

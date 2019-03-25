@@ -1,7 +1,10 @@
-class Fac extends a{
+class Fac extends ClassA{
     int a;
+    boolean bool;
+
     public int ComputeFac(int num, boolean t){
-        banaa num_aux ;
+        int num_aux;
+        num_aux = 3;
         if (num < 1) {
             num_aux = 1;
         }
@@ -12,10 +15,6 @@ class Fac extends a{
         while (a = 0) {
             b = 3;
         }
-
-    //     while(a < 1) {
-    //         b = 3;
-    //     }
 
         return num_aux;
     }
