@@ -295,6 +295,11 @@ void MethodDeclaration() #METHOD(5) : {Token t;}
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars_Statement()
+    Method_Return()
+}
+
+void Method_Return() #RETURN_EXPRESSION : {}
+{
     <RETURN> Expression() <PVIRG> <RCHAVETA>
 }
 

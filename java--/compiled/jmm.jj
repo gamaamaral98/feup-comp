@@ -2,7 +2,6 @@
 /*@egen*/options {
     LOOKAHEAD=1;
                
-    FORCE_LA_CHECK=true;
 }
 
 PARSER_BEGIN(jmm)
@@ -129,8 +128,8 @@ SKIP :
 {
     " " | "\t" | "\n" | "\r"
     /* Comments */
-    | < "//" (~["\r", "\n"])* >
-    | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
+    // | < "//" (~["\r", "\n"])* >
+    // | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
 }
 
 TOKEN :
@@ -684,7 +683,7 @@ void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 5) */
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars_Statement()
-    <RETURN> Expression() <PVIRG> <RCHAVETA>/*@bgen(jjtree)*/
+    Method_Return()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -702,6 +701,37 @@ void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 5) */
     } finally {
       if (jjtc000) {
         jjtree.closeNodeScope(jjtn000,  5);
+      }
+    }
+/*@egen*/
+}
+
+void Method_Return()                    : {/*@bgen(jjtree) RETURN_EXPRESSION */
+  ASTRETURN_EXPRESSION jjtn000 = new ASTRETURN_EXPRESSION(JJTRETURN_EXPRESSION);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) RETURN_EXPRESSION */
+    try {
+/*@egen*/
+    <RETURN> Expression() <PVIRG> <RCHAVETA>/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
       }
     }
 /*@egen*/

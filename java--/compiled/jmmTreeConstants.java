@@ -16,33 +16,34 @@ public interface jmmTreeConstants
   public int JJTARGV = 12;
   public int JJTMETHOD = 13;
   public int JJTNAME = 14;
-  public int JJTMETHOD_ARGS = 15;
-  public int JJTARG = 16;
-  public int JJTINT = 17;
-  public int JJTINT_ARRAY = 18;
-  public int JJTBOOLEAN = 19;
-  public int JJTSTATEMENT_LIST = 20;
-  public int JJTIF_ELSE = 21;
-  public int JJTWHILE = 22;
-  public int JJTASSIGN = 23;
-  public int JJTACCESS_ARRAY = 24;
-  public int JJTASSIGN_ARRAY = 25;
-  public int JJTTRUE = 26;
-  public int JJTFALSE = 27;
-  public int JJTTHIS = 28;
-  public int JJTNOT = 29;
-  public int JJTNEW_INT_ARRAY = 30;
-  public int JJTNEW_CLASS = 31;
-  public int JJTAND = 32;
-  public int JJTLT = 33;
-  public int JJTADD = 34;
-  public int JJTSUB = 35;
-  public int JJTMUL = 36;
-  public int JJTDIV = 37;
-  public int JJTLENGTH = 38;
-  public int JJTFUNCTION = 39;
-  public int JJTCALL_FUNCTION = 40;
-  public int JJTCALL_ARGUMENTS = 41;
+  public int JJTRETURN_EXPRESSION = 15;
+  public int JJTMETHOD_ARGS = 16;
+  public int JJTARG = 17;
+  public int JJTINT = 18;
+  public int JJTINT_ARRAY = 19;
+  public int JJTBOOLEAN = 20;
+  public int JJTSTATEMENT_LIST = 21;
+  public int JJTIF_ELSE = 22;
+  public int JJTWHILE = 23;
+  public int JJTASSIGN = 24;
+  public int JJTACCESS_ARRAY = 25;
+  public int JJTASSIGN_ARRAY = 26;
+  public int JJTTRUE = 27;
+  public int JJTFALSE = 28;
+  public int JJTTHIS = 29;
+  public int JJTNOT = 30;
+  public int JJTNEW_INT_ARRAY = 31;
+  public int JJTNEW_CLASS = 32;
+  public int JJTAND = 33;
+  public int JJTLT = 34;
+  public int JJTADD = 35;
+  public int JJTSUB = 36;
+  public int JJTMUL = 37;
+  public int JJTDIV = 38;
+  public int JJTLENGTH = 39;
+  public int JJTFUNCTION = 40;
+  public int JJTCALL_FUNCTION = 41;
+  public int JJTCALL_ARGUMENTS = 42;
 
 
   public String[] jjtNodeName = {
@@ -61,6 +62,7 @@ public interface jmmTreeConstants
     "ARGV",
     "METHOD",
     "NAME",
+    "RETURN_EXPRESSION",
     "METHOD_ARGS",
     "ARG",
     "INT",
@@ -90,4 +92,4 @@ public interface jmmTreeConstants
     "CALL_ARGUMENTS",
   };
 }
-/* JavaCC - OriginalChecksum=5b3fd9c90522d49797b16fe0d17c5185 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5025f38d1bff91b9dd99c83c6cff3503 (do not edit this line) */
