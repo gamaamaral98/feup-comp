@@ -31,4 +31,4 @@ clean:
 	@rm -f bin/* compiled/* $(SRC).jj *.class
 
 run:
-	java -cp bin jmm test/test.java
+	java -cp bin jmm test/MonteCarloPi.java
