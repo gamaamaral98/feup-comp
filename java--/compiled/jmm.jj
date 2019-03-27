@@ -145,7 +145,6 @@ TOKEN :
     | < IF : "if" >
     | < ELSE : "else" >
     | < ASSIGN : "=" >
-    | < ASPA : "\"" >
     | < LPAR : "(" >
     | < RPAR : ")" >
     | < DOT : "." >
@@ -477,7 +476,13 @@ void Vars_Statement()              : {/*@bgen(jjtree) METHOD_BODY */
 {/*@bgen(jjtree) METHOD_BODY */
     try {
 /*@egen*/
-    Vars_Statement_Aux()/*@bgen(jjtree)*/
+    Vars_Statement_Aux()
+    |/*@bgen(jjtree)*/
+      {
+        jjtree.closeNodeScope(jjtn000, true);
+        jjtc000 = false;
+      }
+/*@egen*/ {}/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -967,26 +972,26 @@ void Multiple_Statements()                 : {/*@bgen(jjtree) STATEMENT_LIST */
 /*@egen*/
 }
 
-void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
-  ASTIF_ELSE jjtn000 = new ASTIF_ELSE(JJTIF_ELSE);
+void If_Else_Statement()                       : {/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
+  ASTIF_ELSE_STATEMENT jjtn000 = new ASTIF_ELSE_STATEMENT(JJTIF_ELSE_STATEMENT);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) #IF_ELSE( 3) */
+{/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
     try {
 /*@egen*/
     try{
-        <IF> <LPAR> Expression() <RPAR>
+        <IF> <LPAR> Statement_COND() <RPAR>
     }catch(ParseException e){
         error_skipto(e, "IF statement declaration", RPAR);
     }
-    Statement()
+    If_Else_Statement_IF()
     try{
         <ELSE>
     } catch(ParseException e){
         System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
     }
-    Statement()/*@bgen(jjtree)*/
+    If_Else_Statement_ELSE()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -1009,25 +1014,45 @@ void If_Else_Statement()             : {/*@bgen(jjtree) #IF_ELSE( 3) */
 /*@egen*/
 }
 
-void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
-  ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
+void Statement_COND()            : {/*@bgen(jjtree) CONDITION */
+  ASTCONDITION jjtn000 = new ASTCONDITION(JJTCONDITION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) #WHILE( 2) */
+{/*@bgen(jjtree) CONDITION */
     try {
 /*@egen*/
-    try{
-        <WHILE> <LPAR> Expression() <RPAR>
+    Expression()/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
     }
-    catch (ParseException e) {
-        errors++;
-        if(errors > 10){
-            System.out.println("Maximum number of errors allowed");
-            throw e; 
-        }
-        error_skipto(e, "WHILE statement declaration", RPAR);
-    }
+/*@egen*/
+}
+
+void If_Else_Statement_IF()          : {/*@bgen(jjtree) IF_BODY */
+  ASTIF_BODY jjtn000 = new ASTIF_BODY(JJTIF_BODY);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) IF_BODY */
+    try {
+/*@egen*/
     Statement()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
@@ -1045,7 +1070,111 @@ void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
       throw (Error)jjte000;
     } finally {
       if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+void If_Else_Statement_ELSE()            : {/*@bgen(jjtree) ELSE_BODY */
+  ASTELSE_BODY jjtn000 = new ASTELSE_BODY(JJTELSE_BODY);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) ELSE_BODY */
+    try {
+/*@egen*/
+    Statement()/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
+  ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) #WHILE( 2) */
+    try {
+/*@egen*/
+    try{
+        <WHILE> <LPAR> Statement_COND() <RPAR>
+    }
+    catch (ParseException e) {
+        errors++;
+        if(errors > 10){
+            System.out.println("Maximum number of errors allowed");
+            throw e; 
+        }
+        error_skipto(e, "WHILE statement declaration", RPAR);
+    }
+    While_Statement_BODY()/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
         jjtree.closeNodeScope(jjtn000,  2);
+      }
+    }
+/*@egen*/
+}
+
+void While_Statement_BODY()             : {/*@bgen(jjtree) WHILE_BODY */
+  ASTWHILE_BODY jjtn000 = new ASTWHILE_BODY(JJTWHILE_BODY);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) WHILE_BODY */
+    try {
+/*@egen*/
+    Statement()/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
       }
     }
 /*@egen*/

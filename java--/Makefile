@@ -6,7 +6,7 @@ JJTREE_FLAGS := -output_directory=$(JJTREE_DIR)
 
 JAVACC_DIR := compiled
 JAVACC_DEBUG := -debug_lookahead #-debug_token_manager
-JAVACC_FLAGS := -debug_parser -output_directory=$(JAVACC_DIR)
+JAVACC_FLAGS := -output_directory=$(JAVACC_DIR) #-debug_parser
 
 JAVAC_DIR := bin
 JAVAC_DEBUG := -g
@@ -31,4 +31,4 @@ clean:
 	@rm -f bin/* compiled/* $(SRC).jj *.class
 
 run:
-	java -cp bin jmm test.java
+	java -cp bin jmm test/test.java

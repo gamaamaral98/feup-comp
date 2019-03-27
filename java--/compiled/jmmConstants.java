@@ -31,67 +31,65 @@ public interface jmmConstants {
   /** RegularExpression Id. */
   int ASSIGN = 15;
   /** RegularExpression Id. */
-  int ASPA = 16;
+  int LPAR = 16;
   /** RegularExpression Id. */
-  int LPAR = 17;
+  int RPAR = 17;
   /** RegularExpression Id. */
-  int RPAR = 18;
+  int DOT = 18;
   /** RegularExpression Id. */
-  int DOT = 19;
+  int LENGTH = 19;
   /** RegularExpression Id. */
-  int LENGTH = 20;
+  int VIRG = 20;
   /** RegularExpression Id. */
-  int VIRG = 21;
+  int PVIRG = 21;
   /** RegularExpression Id. */
-  int PVIRG = 22;
+  int LCHAVETA = 22;
   /** RegularExpression Id. */
-  int LCHAVETA = 23;
+  int RCHAVETA = 23;
   /** RegularExpression Id. */
-  int RCHAVETA = 24;
+  int LPARRETO = 24;
   /** RegularExpression Id. */
-  int LPARRETO = 25;
+  int RPARRETO = 25;
   /** RegularExpression Id. */
-  int RPARRETO = 26;
+  int EXTENDS = 26;
   /** RegularExpression Id. */
-  int EXTENDS = 27;
+  int CLASS = 27;
   /** RegularExpression Id. */
-  int CLASS = 28;
+  int PUBLIC = 28;
   /** RegularExpression Id. */
-  int PUBLIC = 29;
+  int STATIC = 29;
   /** RegularExpression Id. */
-  int STATIC = 30;
+  int VOID = 30;
   /** RegularExpression Id. */
-  int VOID = 31;
+  int MAIN = 31;
   /** RegularExpression Id. */
-  int MAIN = 32;
+  int INT = 32;
   /** RegularExpression Id. */
-  int INT = 33;
+  int INT_ARRAY = 33;
   /** RegularExpression Id. */
-  int INT_ARRAY = 34;
+  int BOOLEAN = 34;
   /** RegularExpression Id. */
-  int BOOLEAN = 35;
+  int TRUE = 35;
   /** RegularExpression Id. */
-  int TRUE = 36;
+  int FALSE = 36;
   /** RegularExpression Id. */
-  int FALSE = 37;
+  int RETURN = 37;
   /** RegularExpression Id. */
-  int RETURN = 38;
+  int THIS = 38;
   /** RegularExpression Id. */
-  int THIS = 39;
+  int NEW = 39;
   /** RegularExpression Id. */
-  int NEW = 40;
+  int STRING = 40;
   /** RegularExpression Id. */
-  int STRING = 41;
+  int INTEGER = 41;
   /** RegularExpression Id. */
-  int INTEGER = 42;
+  int IDENTIFIER = 42;
   /** RegularExpression Id. */
-  int IDENTIFIER = 43;
+  int LETTER = 43;
   /** RegularExpression Id. */
-  int LETTER = 44;
+  int DIGIT = 44;
   /** RegularExpression Id. */
-  int DIGIT = 45;
-  /** RegularExpression Id. */
-  int ALPHANUM = 46;
+  int ALPHANUM = 45;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -114,7 +112,6 @@ public interface jmmConstants {
     "\"if\"",
     "\"else\"",
     "\"=\"",
-    "\"\\\"\"",
     "\"(\"",
     "\")\"",
     "\".\"",
