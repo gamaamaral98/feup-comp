@@ -70,7 +70,7 @@ class SimpleNode implements Node {
      out its children. */
 
   public void dump(String prefix) {
-    
+
     System.out.print(toString(prefix));
     if(name != null)
       System.out.print("  (Name: " + name + ")");
