@@ -12,6 +12,9 @@ JAVAC_DIR := bin
 JAVAC_DEBUG := -g
 JAVAC_FLAGS := -d $(JAVAC_DIR) -sourcepath $(JAVACC_DIR)
 
+TEST_DIR := test
+TEST_FILE := FindMaximum.java
+
 all: mkdir
 	jjtree $(JJTREE_FLAGS) $(SRC).jjt
 	javacc $(JAVACC_FLAGS) $(JJTREE_DIR)/$(SRC).jj
@@ -31,4 +34,4 @@ clean:
 	@rm -f bin/* compiled/* $(SRC).jj *.class
 
 run:
-	java -cp bin jmm test/MonteCarloPi.java
+	java -cp ${JAVAC_DIR} ${SRC} ${TEST_DIR}/${TEST_FILE}
