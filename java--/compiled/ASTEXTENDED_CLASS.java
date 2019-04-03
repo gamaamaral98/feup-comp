@@ -6,9 +6,9 @@ class ASTEXTENDED_CLASS extends SimpleNode {
     super(id);
   }
 
-  public ASTEXTENDED_CLASS(jmm p, int id) {
+  public ASTEXTENDED_CLASS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=cf4f6c2439f2936456fcc7b939bb6c99 (do not edit this line) */
+/* JavaCC - OriginalChecksum=387123b06bddecd788fec27a4a2127d6 (do not edit this line) */

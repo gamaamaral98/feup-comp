@@ -6,9 +6,9 @@ class ASTINT extends SimpleNode {
     super(id);
   }
 
-  public ASTINT(jmm p, int id) {
+  public ASTINT(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=4a7c09d3f7b3b75d9e031b2e2ce6f618 (do not edit this line) */
+/* JavaCC - OriginalChecksum=0c62c554a4cf4a0be9248be02161b858 (do not edit this line) */

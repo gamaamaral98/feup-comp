@@ -6,9 +6,9 @@ class ASTARGV extends SimpleNode {
     super(id);
   }
 
-  public ASTARGV(jmm p, int id) {
+  public ASTARGV(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=7e8b29d65817a429210e39043058fca4 (do not edit this line) */
+/* JavaCC - OriginalChecksum=63d9b2b982f7f11dc7bacef139f8dbff (do not edit this line) */

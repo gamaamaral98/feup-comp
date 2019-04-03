@@ -6,9 +6,9 @@ class ASTIF_ELSE_STATEMENT extends SimpleNode {
     super(id);
   }
 
-  public ASTIF_ELSE_STATEMENT(jmm p, int id) {
+  public ASTIF_ELSE_STATEMENT(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=ce8c39fdc48bbe9cf9518a236bf9dc53 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a22c9d848f1fcf50e699008a4d940d6a (do not edit this line) */

@@ -6,9 +6,9 @@ class ASTIF_BODY extends SimpleNode {
     super(id);
   }
 
-  public ASTIF_BODY(jmm p, int id) {
+  public ASTIF_BODY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=c5165817756f2e11f789250a8a56c0cc (do not edit this line) */
+/* JavaCC - OriginalChecksum=0386f14650f4799b021bce9a747c65fb (do not edit this line) */

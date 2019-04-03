@@ -6,9 +6,9 @@ class ASTCONDITION extends SimpleNode {
     super(id);
   }
 
-  public ASTCONDITION(jmm p, int id) {
+  public ASTCONDITION(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=3f761e217fb2076153629922d8656685 (do not edit this line) */
+/* JavaCC - OriginalChecksum=7ee828c0566f48666d01d2783d8a8544 (do not edit this line) */

@@ -6,9 +6,9 @@ class ASTMETHOD_BODY extends SimpleNode {
     super(id);
   }
 
-  public ASTMETHOD_BODY(jmm p, int id) {
+  public ASTMETHOD_BODY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=dfa6587b77bdf7064a958489d75ace24 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e74d2c742607bc53ada8cad9ff6888e7 (do not edit this line) */

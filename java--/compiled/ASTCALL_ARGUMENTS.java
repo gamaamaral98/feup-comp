@@ -6,9 +6,9 @@ class ASTCALL_ARGUMENTS extends SimpleNode {
     super(id);
   }
 
-  public ASTCALL_ARGUMENTS(jmm p, int id) {
+  public ASTCALL_ARGUMENTS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=c3a6a3c9740242518f7c54a47ac5d204 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5695dec51c8f336a3f3dbe38d8aaa802 (do not edit this line) */

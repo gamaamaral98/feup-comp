@@ -6,9 +6,9 @@ class ASTDIV extends SimpleNode {
     super(id);
   }
 
-  public ASTDIV(jmm p, int id) {
+  public ASTDIV(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=441d33f0011307712aadc424a8776146 (do not edit this line) */
+/* JavaCC - OriginalChecksum=6f782417b97c448b5e9e68820437348e (do not edit this line) */

@@ -6,9 +6,9 @@ class ASTWHILE_BODY extends SimpleNode {
     super(id);
   }
 
-  public ASTWHILE_BODY(jmm p, int id) {
+  public ASTWHILE_BODY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=e474dc246a5ad78d4f349d087c2bc75d (do not edit this line) */
+/* JavaCC - OriginalChecksum=e8026306a68076b1a3daacb62fa88f2b (do not edit this line) */

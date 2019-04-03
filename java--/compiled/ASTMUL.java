@@ -6,9 +6,9 @@ class ASTMUL extends SimpleNode {
     super(id);
   }
 
-  public ASTMUL(jmm p, int id) {
+  public ASTMUL(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=7f9367400619d3bb2b3064661b68e5d4 (do not edit this line) */
+/* JavaCC - OriginalChecksum=7b83d712278c04e6809b63ab4c4fab80 (do not edit this line) */

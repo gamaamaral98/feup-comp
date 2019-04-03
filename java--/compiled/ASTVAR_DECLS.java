@@ -6,9 +6,9 @@ class ASTVAR_DECLS extends SimpleNode {
     super(id);
   }
 
-  public ASTVAR_DECLS(jmm p, int id) {
+  public ASTVAR_DECLS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=b85b0901a4354f2646ebf82f6ae94fbe (do not edit this line) */
+/* JavaCC - OriginalChecksum=22ab1384bed9618b7fe247a2004230b7 (do not edit this line) */

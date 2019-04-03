@@ -6,9 +6,9 @@ class ASTMAIN extends SimpleNode {
     super(id);
   }
 
-  public ASTMAIN(jmm p, int id) {
+  public ASTMAIN(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=1d154e77c8ba9c33486719ee38624f82 (do not edit this line) */
+/* JavaCC - OriginalChecksum=40340cf834030cbf9422206d1531f0fa (do not edit this line) */

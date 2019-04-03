@@ -6,9 +6,9 @@ class ASTWHILE extends SimpleNode {
     super(id);
   }
 
-  public ASTWHILE(jmm p, int id) {
+  public ASTWHILE(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=31b550908a24355d98a780f86e1334e3 (do not edit this line) */
+/* JavaCC - OriginalChecksum=75196906bdbac6b68465fc21d9fb11b6 (do not edit this line) */

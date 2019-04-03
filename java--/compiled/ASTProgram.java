@@ -6,9 +6,9 @@ class ASTProgram extends SimpleNode {
     super(id);
   }
 
-  public ASTProgram(jmm p, int id) {
+  public ASTProgram(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=54145dde53e53184117c8cb42fa97741 (do not edit this line) */
+/* JavaCC - OriginalChecksum=1c1f0e2b61b589a105266241e7e4ac78 (do not edit this line) */

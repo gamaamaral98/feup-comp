@@ -6,9 +6,9 @@ class ASTAND extends SimpleNode {
     super(id);
   }
 
-  public ASTAND(jmm p, int id) {
+  public ASTAND(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=8dcccd344fb9b36c969908575969fa87 (do not edit this line) */
+/* JavaCC - OriginalChecksum=130551f8bf769a7ed9a56dad9394a573 (do not edit this line) */

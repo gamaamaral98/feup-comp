@@ -6,9 +6,9 @@ class ASTARG extends SimpleNode {
     super(id);
   }
 
-  public ASTARG(jmm p, int id) {
+  public ASTARG(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=5d80476eb4ddf2439fe08227efae16c8 (do not edit this line) */
+/* JavaCC - OriginalChecksum=f190a79de20c3cbc6c096a78bc705079 (do not edit this line) */

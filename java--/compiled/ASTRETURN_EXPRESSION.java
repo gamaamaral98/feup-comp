@@ -6,9 +6,9 @@ class ASTRETURN_EXPRESSION extends SimpleNode {
     super(id);
   }
 
-  public ASTRETURN_EXPRESSION(jmm p, int id) {
+  public ASTRETURN_EXPRESSION(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=4c8e9c360372155c4672c5c5f0d43513 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5db2ad73d2a1eec59b1898ab41ecf976 (do not edit this line) */

@@ -6,9 +6,9 @@ class ASTACCESS_ARRAY extends SimpleNode {
     super(id);
   }
 
-  public ASTACCESS_ARRAY(jmm p, int id) {
+  public ASTACCESS_ARRAY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=8b951aaefe3d3e2647e82c7d24c9509b (do not edit this line) */
+/* JavaCC - OriginalChecksum=8c8be59df83f84df3d8f7df2b95b9235 (do not edit this line) */

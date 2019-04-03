@@ -6,9 +6,9 @@ class ASTCALL_FUNCTION extends SimpleNode {
     super(id);
   }
 
-  public ASTCALL_FUNCTION(jmm p, int id) {
+  public ASTCALL_FUNCTION(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=875f6fcab4615e6d33d71275ff5e2971 (do not edit this line) */
+/* JavaCC - OriginalChecksum=47c74f44551c159ba619c12adca1c225 (do not edit this line) */

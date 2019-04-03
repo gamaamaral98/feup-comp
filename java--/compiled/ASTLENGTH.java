@@ -6,9 +6,9 @@ class ASTLENGTH extends SimpleNode {
     super(id);
   }
 
-  public ASTLENGTH(jmm p, int id) {
+  public ASTLENGTH(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=efcf74dbc5811953df582068be418b98 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a3e8d837f6c05650935b0cf322da18b7 (do not edit this line) */

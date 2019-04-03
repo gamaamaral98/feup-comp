@@ -6,9 +6,9 @@ class ASTADD extends SimpleNode {
     super(id);
   }
 
-  public ASTADD(jmm p, int id) {
+  public ASTADD(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=9adadfa0a2e284aa78a0718d7a21462d (do not edit this line) */
+/* JavaCC - OriginalChecksum=35ae759239e5cd16b5d47182e3dfe8d1 (do not edit this line) */

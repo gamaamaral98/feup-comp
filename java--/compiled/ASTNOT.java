@@ -6,9 +6,9 @@ class ASTNOT extends SimpleNode {
     super(id);
   }
 
-  public ASTNOT(jmm p, int id) {
+  public ASTNOT(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=9bd722e957a24904d46cd008902ac9b9 (do not edit this line) */
+/* JavaCC - OriginalChecksum=0b970ab2e10b1db9c62c967c25e52a79 (do not edit this line) */

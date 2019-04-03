@@ -6,9 +6,9 @@ class ASTNEW_INT_ARRAY extends SimpleNode {
     super(id);
   }
 
-  public ASTNEW_INT_ARRAY(jmm p, int id) {
+  public ASTNEW_INT_ARRAY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=238eb9ab90c31ad307b72f52708488d2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=9e63fb02b1e326ba1e0b5a9c70985599 (do not edit this line) */

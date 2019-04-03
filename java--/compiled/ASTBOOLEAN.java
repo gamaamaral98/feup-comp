@@ -6,9 +6,9 @@ class ASTBOOLEAN extends SimpleNode {
     super(id);
   }
 
-  public ASTBOOLEAN(jmm p, int id) {
+  public ASTBOOLEAN(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=69281956bc930efe54a7fb567ae021b7 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5dce9e906e428e3ba6c68bd890655b10 (do not edit this line) */

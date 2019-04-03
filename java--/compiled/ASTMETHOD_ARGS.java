@@ -6,9 +6,9 @@ class ASTMETHOD_ARGS extends SimpleNode {
     super(id);
   }
 
-  public ASTMETHOD_ARGS(jmm p, int id) {
+  public ASTMETHOD_ARGS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=2aabc75df0e32a8a8f2cf594fe119fea (do not edit this line) */
+/* JavaCC - OriginalChecksum=4bf2d6181b54ed7bff3370d81c8b3922 (do not edit this line) */

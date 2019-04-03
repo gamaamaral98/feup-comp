@@ -6,9 +6,9 @@ class ASTTRUE extends SimpleNode {
     super(id);
   }
 
-  public ASTTRUE(jmm p, int id) {
+  public ASTTRUE(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=4d41283b710be0962e0817bc984bb530 (do not edit this line) */
+/* JavaCC - OriginalChecksum=4eead6c5e31574eef9dc155d2e009441 (do not edit this line) */

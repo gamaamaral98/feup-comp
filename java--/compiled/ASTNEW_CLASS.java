@@ -6,9 +6,9 @@ class ASTNEW_CLASS extends SimpleNode {
     super(id);
   }
 
-  public ASTNEW_CLASS(jmm p, int id) {
+  public ASTNEW_CLASS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=ee35accb64c4072c7d0d0b19358e2f51 (do not edit this line) */
+/* JavaCC - OriginalChecksum=a396eda366b365eea15ba9273ae05695 (do not edit this line) */

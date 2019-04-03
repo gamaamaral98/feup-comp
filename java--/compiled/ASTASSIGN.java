@@ -6,9 +6,9 @@ class ASTASSIGN extends SimpleNode {
     super(id);
   }
 
-  public ASTASSIGN(jmm p, int id) {
+  public ASTASSIGN(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=482229fe16e62ac833501230dccf81f8 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d57e2ea432ea30fa601aaa0a77c46f09 (do not edit this line) */

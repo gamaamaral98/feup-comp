@@ -6,9 +6,9 @@ class ASTELSE_BODY extends SimpleNode {
     super(id);
   }
 
-  public ASTELSE_BODY(jmm p, int id) {
+  public ASTELSE_BODY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=4ee892775f5258b84d03c8d42f778e10 (do not edit this line) */
+/* JavaCC - OriginalChecksum=1b01862114a19f6386e9c8b54cf5f84c (do not edit this line) */

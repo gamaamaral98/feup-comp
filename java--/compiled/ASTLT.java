@@ -6,9 +6,9 @@ class ASTLT extends SimpleNode {
     super(id);
   }
 
-  public ASTLT(jmm p, int id) {
+  public ASTLT(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=604a4f3cb51b9d6583df21f33d77682c (do not edit this line) */
+/* JavaCC - OriginalChecksum=de72064389e20d71410ca6bd1a0d6775 (do not edit this line) */

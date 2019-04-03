@@ -6,9 +6,9 @@ class ASTSTATEMENT_LIST extends SimpleNode {
     super(id);
   }
 
-  public ASTSTATEMENT_LIST(jmm p, int id) {
+  public ASTSTATEMENT_LIST(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=e73713738104fb69c16c30eef779e352 (do not edit this line) */
+/* JavaCC - OriginalChecksum=5276deca955af45233f91d5745829550 (do not edit this line) */

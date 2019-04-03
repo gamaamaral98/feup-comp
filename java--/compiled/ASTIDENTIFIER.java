@@ -6,9 +6,9 @@ class ASTIDENTIFIER extends SimpleNode {
     super(id);
   }
 
-  public ASTIDENTIFIER(jmm p, int id) {
+  public ASTIDENTIFIER(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=36d3fcd5bf65ffdb04040392fa62dadb (do not edit this line) */
+/* JavaCC - OriginalChecksum=07a8ae0e76e5a75c3a020bf26c583074 (do not edit this line) */

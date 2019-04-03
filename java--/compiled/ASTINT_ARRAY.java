@@ -6,9 +6,9 @@ class ASTINT_ARRAY extends SimpleNode {
     super(id);
   }
 
-  public ASTINT_ARRAY(jmm p, int id) {
+  public ASTINT_ARRAY(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=cfe2d62267bee9975e92aedddccda8d6 (do not edit this line) */
+/* JavaCC - OriginalChecksum=30cf30a9638f982957800a1bc77bbf31 (do not edit this line) */

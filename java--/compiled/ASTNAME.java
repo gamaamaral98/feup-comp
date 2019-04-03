@@ -6,9 +6,9 @@ class ASTNAME extends SimpleNode {
     super(id);
   }
 
-  public ASTNAME(jmm p, int id) {
+  public ASTNAME(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=8ff84731c60cf7250b06306647a2f3c2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=69ad130d939511d0f7ba41f91bdefb94 (do not edit this line) */

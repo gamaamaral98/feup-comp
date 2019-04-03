@@ -6,9 +6,9 @@ class ASTTHIS extends SimpleNode {
     super(id);
   }
 
-  public ASTTHIS(jmm p, int id) {
+  public ASTTHIS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=8058181242a0d5725260f0c39c203baf (do not edit this line) */
+/* JavaCC - OriginalChecksum=33325217248303e58ea9635a9d9860ee (do not edit this line) */

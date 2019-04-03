@@ -6,9 +6,9 @@ class ASTCLASS extends SimpleNode {
     super(id);
   }
 
-  public ASTCLASS(jmm p, int id) {
+  public ASTCLASS(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=1a2baf7723dd7e594946ca38167eafcc (do not edit this line) */
+/* JavaCC - OriginalChecksum=acf404c2b2de03ee88639639d8a2c4b6 (do not edit this line) */

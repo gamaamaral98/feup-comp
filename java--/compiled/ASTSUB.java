@@ -6,9 +6,9 @@ class ASTSUB extends SimpleNode {
     super(id);
   }
 
-  public ASTSUB(jmm p, int id) {
+  public ASTSUB(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=99423427428beba19dabc28a9a71a292 (do not edit this line) */
+/* JavaCC - OriginalChecksum=15880f7734bec04cb936426ee8572343 (do not edit this line) */

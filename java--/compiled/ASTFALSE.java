@@ -6,9 +6,9 @@ class ASTFALSE extends SimpleNode {
     super(id);
   }
 
-  public ASTFALSE(jmm p, int id) {
+  public ASTFALSE(Parser p, int id) {
     super(p, id);
   }
 
 }
-/* JavaCC - OriginalChecksum=a5052667f415ac9db4bd1b0b21fba1ce (do not edit this line) */
+/* JavaCC - OriginalChecksum=57d9f9e9b139f91ef7cec52de054ee34 (do not edit this line) */
