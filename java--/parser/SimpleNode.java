@@ -2,12 +2,15 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=false,TRACK_TOKENS=false,NODE_PREFIX=AST,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 public
 class SimpleNode implements Node {
-
   protected Node parent;
   protected Node[] children;
   protected int id;
   protected Object value;
   protected Parser parser;
+
+  public String name;
+  public String valueInt;
+  public String valueBoolean;
 
   public SimpleNode(int i) {
     id = i;
@@ -46,7 +49,10 @@ class SimpleNode implements Node {
     return (children == null) ? 0 : children.length;
   }
 
-  public void jjtSetValue(Object value) { this.value = value; }
+  public void jjtSetValue(Object value) {
+    this.value = value;
+  }
+
   public Object jjtGetValue() { return value; }
 
   /* You can override these two methods in subclasses of SimpleNode to
@@ -64,12 +70,21 @@ class SimpleNode implements Node {
      out its children. */
 
   public void dump(String prefix) {
-    System.out.println(toString(prefix));
+
+    System.out.print(toString(prefix));
+    if(name != null)
+      System.out.print("  (Name: " + name + ")");
+    if(valueBoolean != null)
+      System.out.print("  (Value: " + valueBoolean + ")");
+    if(valueInt != null)
+      System.out.print("  (Value: " + valueInt + ")");
+
+    System.out.println("");
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
         SimpleNode n = (SimpleNode)children[i];
         if (n != null) {
-          n.dump(prefix + " ");
+          n.dump(prefix + "  ");
         }
       }
     }
@@ -80,4 +95,4 @@ class SimpleNode implements Node {
   }
 }
 
-/* JavaCC - OriginalChecksum=f27b3f1f08e0cf7e49d32b6e8c184d2d (do not edit this line) */
+/* JavaCC - OriginalChecksum=b715587beecfd28b0e03367f901ce94f (do not edit this line) */
