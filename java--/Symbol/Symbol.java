@@ -3,7 +3,7 @@ package symbol;
 public class Symbol {
 
     public enum SymbolType {
-        INT, BOOLEAN, ARRAY
+        INT, BOOLEAN, INT_ARRAY, STRING_ARRAY, IDENTIFIER
     }
 
     private String attribute = null;
@@ -16,6 +16,9 @@ public class Symbol {
     private int intValue;
     private int[] arrayValue;
 
+    // If type is IDENTIFIER
+    private String identifier_name;
+
     public Symbol(String atr, SymbolType type) {
         this.attribute = atr;
         this.type = type;
@@ -25,6 +28,12 @@ public class Symbol {
         this.attribute = atr;
         this.type = type;
         this.local_value = local_value;
+    }
+
+    public Symbol(String atr, SymbolType type, String identifier_name){
+        this.attribute = atr;
+        this.type = type;
+        this.identifier_name = identifier_name;
     }
 
     public String getAttribute() {
@@ -60,7 +69,7 @@ public class Symbol {
     }
 
     public boolean setArrayValue(int[] arrayValue) {
-        if(type != SymbolType.ARRAY){
+        if(type != SymbolType.INT_ARRAY){
             System.out.println("Wrong variable type");
             return false;
         }
@@ -69,4 +78,17 @@ public class Symbol {
         return true;
     }
 
+    public boolean setIdentifierValue(String identifier_name) {
+        if(type != SymbolType.IDENTIFIER){
+            System.out.println("Wrong variable type");
+            return false;
+        }
+        this.identifier_name = identifier_name;
+        this.init = true;
+        return true;
+    }
+
+    public String getIdentifier_name() {
+        return identifier_name;
+    }
 }

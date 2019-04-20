@@ -9,87 +9,87 @@ public interface ParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int AND_OP = 5;
+  int AND_OP = 7;
   /** RegularExpression Id. */
-  int LT_OP = 6;
+  int LT_OP = 8;
   /** RegularExpression Id. */
-  int PLUS_OP = 7;
+  int PLUS_OP = 9;
   /** RegularExpression Id. */
-  int MINUS_OP = 8;
+  int MINUS_OP = 10;
   /** RegularExpression Id. */
-  int TIMES_OP = 9;
+  int TIMES_OP = 11;
   /** RegularExpression Id. */
-  int DIVIDE_OP = 10;
+  int DIVIDE_OP = 12;
   /** RegularExpression Id. */
-  int NOT_OP = 11;
+  int NOT_OP = 13;
   /** RegularExpression Id. */
-  int WHILE = 12;
+  int WHILE = 14;
   /** RegularExpression Id. */
-  int IF = 13;
+  int IF = 15;
   /** RegularExpression Id. */
-  int ELSE = 14;
+  int ELSE = 16;
   /** RegularExpression Id. */
-  int ASSIGN = 15;
+  int ASSIGN = 17;
   /** RegularExpression Id. */
-  int LPAR = 16;
+  int LPAR = 18;
   /** RegularExpression Id. */
-  int RPAR = 17;
+  int RPAR = 19;
   /** RegularExpression Id. */
-  int DOT = 18;
+  int DOT = 20;
   /** RegularExpression Id. */
-  int LENGTH = 19;
+  int LENGTH = 21;
   /** RegularExpression Id. */
-  int VIRG = 20;
+  int VIRG = 22;
   /** RegularExpression Id. */
-  int PVIRG = 21;
+  int PVIRG = 23;
   /** RegularExpression Id. */
-  int LCHAVETA = 22;
+  int LCHAVETA = 24;
   /** RegularExpression Id. */
-  int RCHAVETA = 23;
+  int RCHAVETA = 25;
   /** RegularExpression Id. */
-  int LPARRETO = 24;
+  int LPARRETO = 26;
   /** RegularExpression Id. */
-  int RPARRETO = 25;
+  int RPARRETO = 27;
   /** RegularExpression Id. */
-  int EXTENDS = 26;
+  int EXTENDS = 28;
   /** RegularExpression Id. */
-  int CLASS = 27;
+  int CLASS = 29;
   /** RegularExpression Id. */
-  int PUBLIC = 28;
+  int PUBLIC = 30;
   /** RegularExpression Id. */
-  int STATIC = 29;
+  int STATIC = 31;
   /** RegularExpression Id. */
-  int VOID = 30;
+  int VOID = 32;
   /** RegularExpression Id. */
-  int MAIN = 31;
+  int MAIN = 33;
   /** RegularExpression Id. */
-  int INT = 32;
+  int INT = 34;
   /** RegularExpression Id. */
-  int INT_ARRAY = 33;
+  int INT_ARRAY = 35;
   /** RegularExpression Id. */
-  int BOOLEAN = 34;
+  int BOOLEAN = 36;
   /** RegularExpression Id. */
-  int TRUE = 35;
+  int TRUE = 37;
   /** RegularExpression Id. */
-  int FALSE = 36;
+  int FALSE = 38;
   /** RegularExpression Id. */
-  int RETURN = 37;
+  int RETURN = 39;
   /** RegularExpression Id. */
-  int THIS = 38;
+  int THIS = 40;
   /** RegularExpression Id. */
-  int NEW = 39;
+  int NEW = 41;
   /** RegularExpression Id. */
-  int STRING = 40;
+  int STRING = 42;
   /** RegularExpression Id. */
-  int INTEGER = 41;
+  int INTEGER = 43;
   /** RegularExpression Id. */
-  int IDENTIFIER = 42;
+  int IDENTIFIER = 44;
   /** RegularExpression Id. */
-  int LETTER = 43;
+  int LETTER = 45;
   /** RegularExpression Id. */
-  int DIGIT = 44;
+  int DIGIT = 46;
   /** RegularExpression Id. */
-  int ALPHANUM = 45;
+  int ALPHANUM = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -101,6 +101,8 @@ public interface ParserConstants {
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
+    "<token of kind 5>",
+    "<token of kind 6>",
     "\"&&\"",
     "\"<\"",
     "\"+\"",

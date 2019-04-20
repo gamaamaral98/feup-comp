@@ -33,8 +33,8 @@ SKIP :
 {
     " " | "\t" | "\n" | "\r"
     /* Comments */
-    // | < "//" (~["\r", "\n"])* >
-    // | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
+    | < "//" (~["\r", "\n"])* >
+    | < "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
 }
 
 TOKEN :
@@ -101,7 +101,7 @@ SimpleNode Program() : {}
 void ClassDeclaration() #void : {Token t;}
 {   
     try{
-        <CLASS> t=<IDENTIFIER> {jjtThis.name = t.image;} #CLASS_NAME
+        <CLASS> t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine; } #CLASS_NAME
     } catch(ParseException e){
         System.out.println("Syntatic Error on Class initialization. " + e.toString());
     }
@@ -133,7 +133,7 @@ void ClassDeclaration_Not_Extends() #CLASS(3) : {}
 void ClassDeclaration_Extends() #CLASS_EXTENDS(4) : {Token t;}
 {
     try{
-        <EXTENDS> t=<IDENTIFIER> {jjtThis.name = t.image;} #EXTENDED_CLASS <LCHAVETA>
+        <EXTENDS> t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #EXTENDED_CLASS <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Class declaration", LCHAVETA);
     }
@@ -160,7 +160,7 @@ void ClassDeclaration_Methods() #void : {}
 
 void VarDeclaration() #VAR_DECL(2) : {Token t;}
 {
-    Type() t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER <PVIRG>
+    Type() t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER <PVIRG>
 }
 
 void Vars_Statement() #METHOD_BODY : {}
@@ -171,21 +171,21 @@ void Vars_Statement() #METHOD_BODY : {}
 
 void Vars_Statement_Aux() #void : {Token t;}
 {
-    Type_1() t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
-    | t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER Vars_Statement_1()
+    Type_1() t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER Vars_Statement_1()
     | Statement_Aux() (Statement())*
 }
 
 void Vars_Statement_1() #void : {Token t;}
 {
-    t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
+    t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
     | Statement1() <PVIRG> (Statement())*
 }
 
 void MainDeclaration() #MAIN(2) : {Token t;}
 {
     try{
-        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> t=<IDENTIFIER> {jjtThis.name = t.image;} #ARGV
+        <STATIC> <VOID> <MAIN> <LPAR> <STRING> <LPARRETO> <RPARRETO> t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #ARGV
         <RPAR> <LCHAVETA>
     }catch(ParseException e){
         error_skipto(e, "Main declaration", LCHAVETA);
@@ -200,7 +200,7 @@ void MainDeclaration() #MAIN(2) : {Token t;}
 
 void MethodDeclaration() #METHOD(5) : {Token t;}
 {
-    Type() t=<IDENTIFIER> {jjtThis.name = t.image;} #NAME <LPAR>
+    Type() t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #NAME <LPAR>
     MethodDeclaration_Args()
     <RPAR> <LCHAVETA>
     Vars_Statement()
@@ -215,15 +215,15 @@ void Method_Return() #RETURN_EXPRESSION : {}
 void MethodDeclaration_Args() #METHOD_ARGS : {Token t1, t2;}
 {
     (
-        Type() (t1=<IDENTIFIER> {jjtThis.name = t1.image;} #IDENTIFIER) #ARG(2)
-        ( <VIRG> Type() (t2=<IDENTIFIER> {jjtThis.name = t2.image;} #IDENTIFIER) #ARG(2) )*
+        Type() (t1=<IDENTIFIER> {jjtThis.name = t1.image; jjtThis.line = t1.beginLine;} #IDENTIFIER) #ARG(2)
+        ( <VIRG> Type() (t2=<IDENTIFIER> {jjtThis.name = t2.image; jjtThis.line = t2.beginLine;} #IDENTIFIER) #ARG(2) )*
     )?
 }
 
 void Type() #void : {Token t;}
 {
     Type_1()
-    | t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER
 }
 
 void Type_1() #void : {}
@@ -238,7 +238,7 @@ void Statement() #void : {Token t;}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
-    | t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER Statement1() <PVIRG>
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER Statement1() <PVIRG>
 }
 
 void Statement_Aux() #void : {}
@@ -363,7 +363,7 @@ void Term_Literal() #void : {Token t;}
 
 void Term_Identifier() #void : {Token t;}
 {
-    t=<IDENTIFIER> {jjtThis.name = t.image;} #IDENTIFIER(0) (Operator_5())*
+    t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER(0) (Operator_5())*
 }
 
 void Term_NOT() #NOT(1) : {}
@@ -379,7 +379,7 @@ void Term_NEW() #void : {}
 void Term_NEW_1() #void : {Token t;}
 {
     <INT> <LPARRETO> Expression() <RPARRETO> #NEW_INT_ARRAY(1)
-    | t=<IDENTIFIER> {jjtThis.name = t.image;}  #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;}  #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
 void Operator_1() #AND(2) : {}
@@ -423,7 +423,7 @@ void Operator_5_DOT() #void : {}
 void Operator_5_DOT_1() #void : {Token t;}
 {
     <LENGTH> #LENGTH(1)
-    | t=<IDENTIFIER> {jjtThis.name = t.image;}  #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;}  #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
 }
 
 void Operator_5_Call_Args() #CALL_ARGUMENTS : {}

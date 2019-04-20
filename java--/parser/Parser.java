@@ -64,7 +64,7 @@ ASTCLASS_NAME jjtn001 = new ASTCLASS_NAME(JJTCLASS_NAME);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                                  jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                                    jjtree.closeNodeScope(jjtn001, true);
@@ -145,7 +145,7 @@ ASTEXTENDED_CLASS jjtn001 = new ASTEXTENDED_CLASS(JJTEXTENDED_CLASS);
         try {
 jjtree.closeNodeScope(jjtn001, true);
                                    jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
         } finally {
 if (jjtc001) {
                                      jjtree.closeNodeScope(jjtn001, true);
@@ -294,7 +294,7 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                             jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                               jjtree.closeNodeScope(jjtn001, true);
@@ -378,21 +378,21 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                               jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                                 jjtree.closeNodeScope(jjtn001, true);
                               }
       }
 ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
-                                                                    boolean jjtc002 = true;
-                                                                    jjtree.openNodeScope(jjtn002);
+                                                                                                boolean jjtc002 = true;
+                                                                                                jjtree.openNodeScope(jjtn002);
       try {
         jj_consume_token(PVIRG);
       } finally {
 if (jjtc002) {
-                                                                      jjtree.closeNodeScope(jjtn002,  2);
-                                                                    }
+                                                                                                  jjtree.closeNodeScope(jjtn002,  2);
+                                                                                                }
       }
       Vars_Statement_Aux();
       break;
@@ -405,7 +405,7 @@ ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn003, true);
                        jjtc003 = false;
-jjtn003.name = t.image;
+jjtn003.name = t.image; jjtn003.line = t.beginLine;
       } finally {
 if (jjtc003) {
                          jjtree.closeNodeScope(jjtn003, true);
@@ -453,21 +453,21 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                      jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                        jjtree.closeNodeScope(jjtn001, true);
                      }
       }
 ASTVAR_DECL jjtn002 = new ASTVAR_DECL(JJTVAR_DECL);
-                                                           boolean jjtc002 = true;
-                                                           jjtree.openNodeScope(jjtn002);
+                                                                                       boolean jjtc002 = true;
+                                                                                       jjtree.openNodeScope(jjtn002);
       try {
         jj_consume_token(PVIRG);
       } finally {
 if (jjtc002) {
-                                                             jjtree.closeNodeScope(jjtn002,  2);
-                                                           }
+                                                                                         jjtree.closeNodeScope(jjtn002,  2);
+                                                                                       }
       }
       Vars_Statement_Aux();
       break;
@@ -529,7 +529,7 @@ ASTARGV jjtn001 = new ASTARGV(JJTARGV);
         try {
 jjtree.closeNodeScope(jjtn001, true);
                                                                                       jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
         } finally {
 if (jjtc001) {
                                                                                         jjtree.closeNodeScope(jjtn001, true);
@@ -580,7 +580,7 @@ ASTNAME jjtn001 = new ASTNAME(JJTNAME);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                             jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                               jjtree.closeNodeScope(jjtn001, true);
@@ -665,7 +665,7 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
           try {
 jjtree.closeNodeScope(jjtn001, true);
                                   jjtc001 = false;
-jjtn001.name = t1.image;
+jjtn001.name = t1.image; jjtn001.line = t1.beginLine;
           } finally {
 if (jjtc001) {
                                     jjtree.closeNodeScope(jjtn001, true);
@@ -700,7 +700,7 @@ ASTIDENTIFIER jjtn003 = new ASTIDENTIFIER(JJTIDENTIFIER);
             try {
 jjtree.closeNodeScope(jjtn003, true);
                                            jjtc003 = false;
-jjtn003.name = t2.image;
+jjtn003.name = t2.image; jjtn003.line = t2.beginLine;
             } finally {
 if (jjtc003) {
                                              jjtree.closeNodeScope(jjtn003, true);
@@ -755,7 +755,7 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                        jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                          jjtree.closeNodeScope(jjtn001, true);
@@ -840,7 +840,7 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
       try {
 jjtree.closeNodeScope(jjtn001, true);
                        jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
       } finally {
 if (jjtc001) {
                          jjtree.closeNodeScope(jjtn001, true);
@@ -1568,7 +1568,7 @@ ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
     try {
 jjtree.closeNodeScope(jjtn001,  0);
                      jjtc001 = false;
-jjtn001.name = t.image;
+jjtn001.name = t.image; jjtn001.line = t.beginLine;
     } finally {
 if (jjtc001) {
                        jjtree.closeNodeScope(jjtn001,  0);
@@ -1649,7 +1649,7 @@ ASTCLASS jjtn002 = new ASTCLASS(JJTCLASS);
       try {
 jjtree.closeNodeScope(jjtn002, true);
                        jjtc002 = false;
-jjtn002.name = t.image;
+jjtn002.name = t.image; jjtn002.line = t.beginLine;
       } finally {
 if (jjtc002) {
                          jjtree.closeNodeScope(jjtn002, true);
@@ -1657,14 +1657,14 @@ if (jjtc002) {
       }
       jj_consume_token(LPAR);
 ASTNEW_CLASS jjtn003 = new ASTNEW_CLASS(JJTNEW_CLASS);
-                                                                boolean jjtc003 = true;
-                                                                jjtree.openNodeScope(jjtn003);
+                                                                                            boolean jjtc003 = true;
+                                                                                            jjtree.openNodeScope(jjtn003);
       try {
         jj_consume_token(RPAR);
       } finally {
 if (jjtc003) {
-                                                                  jjtree.closeNodeScope(jjtn003,  1);
-                                                                }
+                                                                                              jjtree.closeNodeScope(jjtn003,  1);
+                                                                                            }
       }
       break;
       }
@@ -1935,7 +1935,7 @@ ASTFUNCTION jjtn002 = new ASTFUNCTION(JJTFUNCTION);
       try {
 jjtree.closeNodeScope(jjtn002, true);
                        jjtc002 = false;
-jjtn002.name = t.image;
+jjtn002.name = t.image; jjtn002.line = t.beginLine;
       } finally {
 if (jjtc002) {
                          jjtree.closeNodeScope(jjtn002, true);
@@ -1944,14 +1944,14 @@ if (jjtc002) {
       jj_consume_token(LPAR);
       Operator_5_Call_Args();
 ASTCALL_FUNCTION jjtn003 = new ASTCALL_FUNCTION(JJTCALL_FUNCTION);
-                                                                                          boolean jjtc003 = true;
-                                                                                          jjtree.openNodeScope(jjtn003);
+                                                                                                                      boolean jjtc003 = true;
+                                                                                                                      jjtree.openNodeScope(jjtn003);
       try {
         jj_consume_token(RPAR);
       } finally {
 if (jjtc003) {
-                                                                                            jjtree.closeNodeScope(jjtn003,  3);
-                                                                                          }
+                                                                                                                        jjtree.closeNodeScope(jjtn003,  3);
+                                                                                                                      }
       }
       break;
       }
@@ -2036,10 +2036,10 @@ if (jjtc000) {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4400000,0x10000000,0x0,0x20000000,0x403000,0x403000,0x403000,0x403000,0x1058800,0x100000,0x0,0x0,0x0,0x403000,0x403000,0x403000,0x1040000,0x1058800,0x1040000,0x8000,0x20,0x600,0x180,0x40,0x20,0x40,0x180,0x600,0x10800,0x1040000,0x1040000,0x1040000,0x1040000,0x1040000,0x1040000,0x10800,0x1040000,0x0,0x180,0x600,0x1040000,0x80000,0x100000,0x10800,};
+      jj_la1_0 = new int[] {0x11000000,0x40000000,0x0,0x80000000,0x100c000,0x100c000,0x100c000,0x100c000,0x4162000,0x400000,0x0,0x0,0x0,0x100c000,0x100c000,0x100c000,0x4100000,0x4162000,0x4100000,0x20000,0x80,0x1800,0x600,0x100,0x80,0x100,0x600,0x1800,0x42000,0x4100000,0x4100000,0x4100000,0x4100000,0x4100000,0x4100000,0x42000,0x4100000,0x0,0x600,0x1800,0x4100000,0x200000,0x400000,0x42000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x407,0x407,0x407,0x400,0x407,0x400,0x6d8,0x0,0x407,0x407,0x7,0x400,0x0,0x400,0x0,0x2d8,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6d8,0x0,0x0,0x0,0x0,0x0,0x0,0x2d8,0x0,0x401,0x0,0x0,0x0,0x400,0x0,0x6d8,};
+      jj_la1_1 = new int[] {0x0,0x0,0x101c,0x101c,0x101c,0x1000,0x101c,0x1000,0x1b60,0x0,0x101c,0x101c,0x1c,0x1000,0x0,0x1000,0x0,0xb60,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1b60,0x0,0x0,0x0,0x0,0x0,0x0,0xb60,0x0,0x1004,0x0,0x0,0x0,0x1000,0x0,0x1b60,};
    }
 
   /** Constructor with InputStream. */
@@ -2180,7 +2180,7 @@ if (jjtc000) {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[46];
+    boolean[] la1tokens = new boolean[48];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -2197,7 +2197,7 @@ if (jjtc000) {
         }
       }
     }
-    for (int i = 0; i < 46; i++) {
+    for (int i = 0; i < 48; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
