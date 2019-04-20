@@ -4,12 +4,14 @@ import java.util.HashMap;
 
 public class ClassSymbolTable {
 
+    private String className;
     // Key is function name
     private HashMap<String, FunctionSymbolTable> functions;
     // Key is the variable name
     private HashMap<String, Symbol> global_variables;
 
-    public ClassSymbolTable(){
+    public ClassSymbolTable(String className){
+        this.className = className;
         this.functions = new HashMap<>();
         this.global_variables = new HashMap<>();
     }

@@ -32,7 +32,24 @@ public class jmm{
     }
 
     public void buildSymbolTables(SimpleNode node){
+        if(node != null && node instanceof ASTProgram){
+            ASTCLASS ast_class = (ASTCLASS) node.jjtGetChild(0);
+            ASTCLASS_NAME class_name = (ASTCLASS_NAME) ast_class.jjtGetChild(0);
 
+            this.symbolTables = new ClassSymbolTable(class_name.name);
+
+            for(int i = 1; i < ast_class.jjtGetNumChildren(); i++){
+                System.out.println(ast_class.jjtGetChild(i));
+
+                if(ast_class.jjtGetChild(i) instanceof ASTVAR_DECLS){
+
+                }
+                else if(ast_class.jjtGetChild(i) instanceof ASTMETHODS){
+                    
+                }
+            }
+
+        }
     }
 
     public static void openFile(String filename){
