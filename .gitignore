@@ -2,3 +2,5 @@ Exemplos/
 javacc-6.0/
 *.class
 !test.java
+.idea/
+java--.iml

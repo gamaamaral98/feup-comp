@@ -8,8 +8,9 @@ public class jmm{
     private static int optRN = -1;
     private static boolean optO = false;
     private static FileInputStream fileStream;
-    
 
+    private SymbolTables symbolTables;
+    
     public static void main(String args []) throws ParseException, IOException{
 
         if(readArgs(args) == false){
@@ -17,8 +18,19 @@ public class jmm{
         }
     
         Parser parser = new Parser(fileStream);
+
+        new jmm(parser);
+    }
+
+    public jmm(Parser parser){
         SimpleNode node = parser.Program();
         node.dump("");
+
+        buildSymbolTables(node);
+    }
+
+    public void buildSymbolTables(SimpleNode node){
+
     }
 
     public static void openFile(String filename){
