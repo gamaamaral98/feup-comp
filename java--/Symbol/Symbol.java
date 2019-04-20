@@ -1,47 +1,72 @@
-package Symbol;
+package symbol;
 
 public class Symbol {
 
+    public enum SymbolType {
+        INT, BOOLEAN, ARRAY
+    }
+
     private String attribute = null;
-    private String type;
+    private SymbolType type;
     private boolean init = false;
 
-    public Symbol(String atr, String type) {
+    private int local_value;
+
+    private boolean booleanValue;
+    private int intValue;
+    private int[] arrayValue;
+
+    public Symbol(String atr, SymbolType type) {
         this.attribute = atr;
         this.type = type;
     }
 
-    public String getAtr() {
-        return this.attribute;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public boolean getInit(){
-        return this.init;
-    }
-
-    public void setAtr(String atr) {
+    public Symbol(String atr, SymbolType type, int local_value){
         this.attribute = atr;
-    }
-
-    public void setType(String type) {
         this.type = type;
+        this.local_value = local_value;
     }
 
-    public void setInit() {
+    public String getAttribute() {
+        return attribute;
+    }
+
+    public SymbolType getType() {
+        return type;
+    }
+
+    public void setInit(boolean init) {
+        this.init = init;
+    }
+
+    public boolean setBooleanValue(boolean booleanValue) {
+        if(type != SymbolType.BOOLEAN){
+            System.out.println("Wrong variable type");
+            return false;
+        }
+        this.booleanValue = booleanValue;
         this.init = true;
+        return true;
     }
 
-    public void unsetInit() {
-        this.init = false;
+    public boolean setIntValue(int intValue) {
+        if(type != SymbolType.INT){
+            System.out.println("Wrong variable type");
+            return false;
+        }
+        this.intValue = intValue;
+        this.init = true;
+        return true;
     }
 
-    public boolean equals(Object symbol) {
-        Symbol s = (Symbol) symbol;
-        return this.attribute.equals(s.getAtr());
+    public boolean setArrayValue(int[] arrayValue) {
+        if(type != SymbolType.ARRAY){
+            System.out.println("Wrong variable type");
+            return false;
+        }
+        this.arrayValue = arrayValue;
+        this.init = true;
+        return true;
     }
 
 }

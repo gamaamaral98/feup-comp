@@ -17,8 +17,7 @@ TEST_DIR := test
 TEST_FILE := FindMaximum.java
 
 all:
-	javac $(JAVAC_FLAGS) $(SRC).java
-	cp $(JAVAC_DIR)/$(SRC).class .
+	javac $(JAVAC_FLAGS) symbol/*.java $(SRC).java
 
 parser: mkdir
 	jjtree $(JJTREE_FLAGS) $(JJTREE_DIR)/$(JJTREE_PARSER).jjt

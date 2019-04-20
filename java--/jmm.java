@@ -1,3 +1,5 @@
+import symbol.ClassSymbolTable;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +11,7 @@ public class jmm{
     private static boolean optO = false;
     private static FileInputStream fileStream;
 
-    private SymbolTables symbolTables;
+    private ClassSymbolTable symbolTables;
     
     public static void main(String args []) throws ParseException, IOException{
 
@@ -22,7 +24,7 @@ public class jmm{
         new jmm(parser);
     }
 
-    public jmm(Parser parser){
+    public jmm(Parser parser) throws ParseException, IOException{
         SimpleNode node = parser.Program();
         node.dump("");
 
