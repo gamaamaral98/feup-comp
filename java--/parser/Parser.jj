@@ -822,6 +822,7 @@ void Statement()       : {Token t;}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
+    | Expression_No_Identifier() <PVIRG>
     | t=<IDENTIFIER>/*@bgen(jjtree) IDENTIFIER */
                      {
                        ASTIDENTIFIER jjtn001 = new ASTIDENTIFIER(JJTIDENTIFIER);
