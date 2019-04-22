@@ -1,10 +1,13 @@
 import symbol.ClassSymbolTable;
+import symbol.FunctionSymbolTable;
 import symbol.Symbol;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class jmm{
 
@@ -28,9 +31,14 @@ public class jmm{
 
     public jmm(Parser parser) throws ParseException, IOException{
         SimpleNode node = parser.Program();
+        System.out.println("\n---- TREE ----");
         node.dump("");
 
+        System.out.println("\n---- SEMANTIC ERRORS ----");
         createSymbolTables(node);
+
+        System.out.println("\n---- SYMBOL TABLES ----");
+        printSymbolTables();
     }
 
     public void createSymbolTables(SimpleNode node){
@@ -200,7 +208,6 @@ public class jmm{
                 }
             }
         }
-        //System.out.println(this.symbolTables.getFunctions());
     }
 
     public void handleMethodBody(String function_name, ASTMETHOD_BODY body){
@@ -231,7 +238,6 @@ public class jmm{
     }
 
     public void handleReturnExpression(String function_name, ASTRETURN_EXPRESSION return_expression){
-        // TODO: FAZER ISTO TBM
         int line = return_expression.line;
         if(return_expression.jjtGetChild(0) instanceof ASTNOT){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
@@ -291,8 +297,42 @@ public class jmm{
 
     }
 
+    public void printSymbolTables(){
+        if(this.symbolTables.getExtendedClassName().equals("")){
+            System.out.println("> Class name: " + this.symbolTables.getClassName());
+        }else{
+            System.out.println("> Class name: " + this.symbolTables.getClassName() + "\t> Extends: " + this.symbolTables.getExtendedClassName());
+        }
+
+        System.out.println("> Global variables:");
+        for (Map.Entry<String, Symbol> entry : this.symbolTables.getGlobal_variables().entrySet()) {
+            System.out.println("\t>Name: " + entry.getKey() + "\t>Type: " + entry.getValue().getTypeString());
+        }
+
+        System.out.println("> Functions:");
+        for (Map.Entry<String, FunctionSymbolTable> entry : this.symbolTables.getFunctions().entrySet()) {
+            System.out.println("\t> Function name: " + entry.getKey());
+
+            System.out.println("\t\t> Parameters:");
+            for (Map.Entry<String, Symbol> parameter_entry : entry.getValue().getParameters().entrySet()){
+                // TODO:
+            }
+
+            System.out.println("\t\t> Local Variables:");
+            for (Map.Entry<String, Symbol> variable_entry : entry.getValue().getLocalVariables().entrySet()){
+                // TODO:
+            }
+
+            if(entry.getKey().equals("main")){
+                System.out.println("\t\t> Return: void");
+            } else{
+                System.out.println("\t\t> Return: " + entry.getValue().getReturnSymbol().getTypeString());
+            }
+        }
+    }
+
     public void semanticError(String error, String name, int line_number){
-        System.out.println(++number_errors + "º Semantic Error (line "+ line_number + "): " + error + " -> "+ name);
+        System.out.println("> " + ++number_errors + "º Semantic Error (line "+ line_number + "): " + error + " -> "+ name);
     }
 
     public static void openFile(String filename){

@@ -63,4 +63,17 @@ public class Symbol {
     public void setAttribute(String attribute) {
         this.attribute = attribute;
     }
+
+    public String getTypeString(){
+        if(type == Symbol.SymbolType.IDENTIFIER){
+            return identifier_name;
+        } else if(type == SymbolType.INT){
+            return "int";
+        } else if(type == SymbolType.INT_ARRAY){
+            return "int[]";
+        } else if(type == SymbolType.BOOLEAN){
+            return "boolean";
+        }
+        return "";
+    }
 }

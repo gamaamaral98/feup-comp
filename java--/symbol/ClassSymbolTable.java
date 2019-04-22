@@ -157,4 +157,12 @@ public class ClassSymbolTable {
         else
             return global_variables.get(variableName).getIdentifier_name();
     }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public String getExtendedClassName() {
+        return extendedClassName;
+    }
 }
