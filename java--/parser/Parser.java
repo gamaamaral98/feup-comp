@@ -614,11 +614,12 @@ if (jjtc000) {
   }
 
   static final public void Method_Return() throws ParseException {/*@bgen(jjtree) RETURN_EXPRESSION */
-  ASTRETURN_EXPRESSION jjtn000 = new ASTRETURN_EXPRESSION(JJTRETURN_EXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+                                           ASTRETURN_EXPRESSION jjtn000 = new ASTRETURN_EXPRESSION(JJTRETURN_EXPRESSION);
+                                           boolean jjtc000 = true;
+                                           jjtree.openNodeScope(jjtn000);Token t;
     try {
-      jj_consume_token(RETURN);
+      t = jj_consume_token(RETURN);
+jjtn000.line = t.beginLine;
       Expression();
       jj_consume_token(PVIRG);
       jj_consume_token(RCHAVETA);

@@ -4,41 +4,53 @@ class FindMaximum extends ClassA {
 	int pera;
 	random yoyo;
 
-	public puta getYoyo(){
-		return !yoyo;
-	}
+//	public puta getYoyo(){
+//		return !yoyo;
+//	}
+//
+//	public puta getYoyo20(){
+//		return !!0;
+//	}
 
-	public puta getYoyo2(){
-		return (yoyo);
+	public random getYoyo2(){
+		return yoyo;
 	}
-
-	public puta getYoyo3(){
-		return true;
-	}
-
-	public puta getYoyo4(){
-		return 0;
-	}
-
-	public puta getYoyo5(){
-		return a + b;
-	}
-
-	public puta getYoyo6(){
-		return a && b;
-	}
-
-	public puta getYoyo7(){
-		return a < b;
-	}
-
-	public puta getYoyo8(){
-		return a - b;
-	}
-
-	public puta getYoyo9(){
-		return a * b;
-	}
+//
+//	public puta getYoyo3(){
+//		return true;
+//	}
+//
+//	public puta getYoyo4(){
+//		return 0;
+//	}
+//
+//	public int[] getYoyo15(){
+//		return test_arr;
+//	}
+//
+//	public int getYoyo16(){
+//		return test_arr[2];
+//	}
+//
+//	public puta getYoyo5(){
+//		return a + b;
+//	}
+//
+//	public puta getYoyo6(){
+//		return a && b;
+//	}
+//
+//	public puta getYoyo7(){
+//		return a < b;
+//	}
+//
+//	public puta getYoyo8(){
+//		return a - b;
+//	}
+//
+//	public puta getYoyo9(){
+//		return a * b;
+//	}
 
 	public puta getYoyo10(){
 		return a / b;

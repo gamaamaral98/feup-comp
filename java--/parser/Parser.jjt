@@ -207,9 +207,9 @@ void MethodDeclaration() #METHOD(5) : {Token t;}
     Method_Return()
 }
 
-void Method_Return() #RETURN_EXPRESSION : {}
+void Method_Return() #RETURN_EXPRESSION : {Token t;}
 {
-    <RETURN> Expression() <PVIRG> <RCHAVETA>
+    t=<RETURN> {jjtThis.line = t.beginLine;} Expression() <PVIRG> <RCHAVETA>
 }
 
 void MethodDeclaration_Args() #METHOD_ARGS : {Token t1, t2;}

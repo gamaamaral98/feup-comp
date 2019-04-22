@@ -75,11 +75,11 @@ public class ClassSymbolTable {
         }
     }
 
-    public boolean setFunctionReturnSymbol(String functionName, String atr, Symbol.SymbolType type){
+    public boolean setFunctionReturnType(String functionName, Symbol.SymbolType type){
         if(!functions.containsKey(functionName)){
             return false;
         }
-        if(functions.get(functionName).setReturnSymbol(atr, type)){
+        if(functions.get(functionName).setReturnType(type)){
             return true;
         }
         else{
@@ -87,23 +87,27 @@ public class ClassSymbolTable {
         }
     }
 
-    public boolean setFunctionReturnType(String functionName, Symbol.SymbolType type){
+    public boolean setFunctionReturnAttribute(String functionName, String atr){
         if(!functions.containsKey(functionName)){
             return false;
         }
-        if(functions.get(functionName).setDeclaratedReturnType(type)){
-            return true;
-        }
-        else{
-            return false;
-        }
+        functions.get(functionName).setReturnAttribute(atr);
+        return true;
+    }
+
+    public Symbol.SymbolType getFunctionsReturnType(String functionName){
+        return functions.get(functionName).getReturnType();
+    }
+
+    public String getFunctionsReturnIdentifierType(String functionName){
+        return functions.get(functionName).getReturnIdentifierType();
     }
 
     public boolean setFunctionReturnType(String functionName, Symbol.SymbolType type, String identifier_name){
         if(!functions.containsKey(functionName)){
             return false;
         }
-        if(functions.get(functionName).setDeclaratedReturnType(type, identifier_name)){
+        if(functions.get(functionName).setReturnType(type, identifier_name)){
             return true;
         }
         else{
@@ -135,5 +139,22 @@ public class ClassSymbolTable {
 
     public LinkedHashMap<String, Symbol> getGlobal_variables() {
         return global_variables;
+    }
+
+    public boolean hasVariable(String functionName, String variableName){
+        return functions.get(functionName).getLocalVariables().containsKey(variableName) || global_variables.containsKey(variableName);
+    }
+
+    public boolean hasVariableBeenInitialized(String functionName, String variableName){
+        if(global_variables.containsKey(variableName))
+            return global_variables.get(variableName).isInit();
+        return functions.get(functionName).getLocalVariables().get(variableName).isInit();
+    }
+
+    public String getVariableIdentifierType(String functionName, String variableName){
+        if(functions.get(functionName).getLocalVariables().containsKey(variableName))
+            return functions.get(functionName).getLocalVariables().get(variableName).getIdentifier_name();
+        else
+            return global_variables.get(variableName).getIdentifier_name();
     }
 }

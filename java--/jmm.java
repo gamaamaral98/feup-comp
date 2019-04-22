@@ -232,6 +232,63 @@ public class jmm{
 
     public void handleReturnExpression(String function_name, ASTRETURN_EXPRESSION return_expression){
         // TODO: FAZER ISTO TBM
+        int line = return_expression.line;
+        if(return_expression.jjtGetChild(0) instanceof ASTNOT){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible return types", function_name, line);
+            }
+            //TODO: NOT INT, NOT IDENTIFIER ... NOT EXPRESSION
+        } else if (return_expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            String name = ((ASTIDENTIFIER) return_expression.jjtGetChild(0)).name;
+            if(!this.symbolTables.hasVariable(function_name, name)){
+                semanticError("Cannot find symbol", name, line);
+            } else if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER
+                    || !this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getVariableIdentifierType(function_name, name))){
+                semanticError("Incompatible return types", function_name, line);
+            } else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                semanticError("Variable might not have been initialized", name, line);
+            }
+            this.symbolTables.setFunctionReturnAttribute(function_name, name);
+        } else if (return_expression.jjtGetChild(0) instanceof ASTTRUE){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible return types", function_name, line);
+            }
+        } else if (return_expression.jjtGetChild(0) instanceof ASTFALSE){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible return types", function_name, line);
+            }
+        } else if (return_expression.jjtGetChild(0) instanceof ASTINT){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+                semanticError("Incompatible return types", function_name, line);
+            }
+        } else if (return_expression.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTADD){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTAND){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTLT){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTSUB){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTMUL){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTDIV){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTLENGTH){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_CLASS){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_INT_ARRAY){
+            //TODO:
+        } else if (return_expression.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            //TODO:
+        }
+        else{
+            // DELETE
+            System.out.println("WTF IS THIS?");
+        }
+
     }
 
     public void semanticError(String error, String name, int line_number){

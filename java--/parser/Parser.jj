@@ -621,14 +621,14 @@ void MethodDeclaration()            : {/*@bgen(jjtree) #METHOD( 5) */
 }
 
 void Method_Return()                    : {/*@bgen(jjtree) RETURN_EXPRESSION */
-  ASTRETURN_EXPRESSION jjtn000 = new ASTRETURN_EXPRESSION(JJTRETURN_EXPRESSION);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                           ASTRETURN_EXPRESSION jjtn000 = new ASTRETURN_EXPRESSION(JJTRETURN_EXPRESSION);
+                                           boolean jjtc000 = true;
+                                           jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) RETURN_EXPRESSION */
     try {
 /*@egen*/
-    <RETURN> Expression() <PVIRG> <RCHAVETA>/*@bgen(jjtree)*/
+    t=<RETURN> {jjtn000.line = t.beginLine;} Expression() <PVIRG> <RCHAVETA>/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);

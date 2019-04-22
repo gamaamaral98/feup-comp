@@ -9,17 +9,12 @@ public class FunctionSymbolTable {
     // Key is the variable name
     private LinkedHashMap<String, Symbol> local_variables;
 
-    private Symbol.SymbolType declaratedReturnType;
-    // If declaratedReturnType is IDENTIFIER
-    private String identifier_name;
-
     private Symbol returnSymbol;
 
     public FunctionSymbolTable() {
         this.parameters = new LinkedHashMap<>();
         this.local_variables = new LinkedHashMap<>();
         this.returnSymbol = null;
-        this.declaratedReturnType = null;
     }
 
     public LinkedHashMap<String, Symbol> getParameters() {
@@ -32,15 +27,6 @@ public class FunctionSymbolTable {
 
     public Symbol getReturnSymbol() {
         return returnSymbol;
-    }
-
-    public boolean setReturnSymbol(String atr, Symbol.SymbolType type) {
-        if(returnSymbol != null)
-            return false;
-
-        Symbol s = new Symbol(atr, type);
-        this.returnSymbol = s;
-        return true;
     }
 
     public boolean addParameter(String atr, Symbol.SymbolType type){
@@ -67,26 +53,30 @@ public class FunctionSymbolTable {
         return true;
     }
 
-    public boolean setDeclaratedReturnType(Symbol.SymbolType declaratedReturnType) {
-        if(this.declaratedReturnType != null)
+    public boolean setReturnType(Symbol.SymbolType returnType) {
+        if(this.returnSymbol != null)
             return false;
-        this.declaratedReturnType = declaratedReturnType;
+        this.returnSymbol = new Symbol(returnType);
         return true;
     }
 
-    public boolean setDeclaratedReturnType(Symbol.SymbolType declaratedReturnType, String identifier_name) {
-        if(this.declaratedReturnType != null)
+    public boolean setReturnType(Symbol.SymbolType returnType, String identifier_name) {
+        if(this.returnSymbol != null)
             return false;
-        this.declaratedReturnType = declaratedReturnType;
-        this.identifier_name = identifier_name;
+        this.returnSymbol = new Symbol(returnType);
+        this.returnSymbol.setIdentifier_name(identifier_name);
         return true;
     }
 
-    public Symbol.SymbolType getDeclaratedReturnType() {
-        return declaratedReturnType;
+    public Symbol.SymbolType getReturnType() {
+        return returnSymbol.getType();
     }
 
-    public String getIdentifier_name() {
-        return identifier_name;
+    public String getReturnIdentifierType() {
+        return this.returnSymbol.getIdentifier_name();
+    }
+
+    public void setReturnAttribute(String atr){
+        this.returnSymbol.setAttribute(atr);
     }
 }
