@@ -238,6 +238,7 @@ void Statement() #void : {Token t;}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
+    | Expression_No_Identifier() <PVIRG>
     | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER Statement1() <PVIRG>
 }
 
