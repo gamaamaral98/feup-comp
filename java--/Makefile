@@ -14,7 +14,7 @@ JAVAC_DEBUG := -g
 JAVAC_FLAGS := -d $(JAVAC_DIR) -sourcepath $(JAVACC_DIR)
 
 TEST_DIR := test
-TEST_FILE := test.java
+TEST_FILE := FindMaximum.java
 
 all:
 	javac $(JAVAC_FLAGS) symbol/*.java $(SRC).java
