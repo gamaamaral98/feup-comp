@@ -11,13 +11,13 @@ JAVACC_FLAGS := -output_directory=$(JAVACC_DIR) #-debug_parser
 
 JAVAC_DIR := bin
 JAVAC_DEBUG := -g
-JAVAC_FLAGS := -d $(JAVAC_DIR) -sourcepath $(JAVACC_DIR)
+JAVAC_FLAGS := -d $(JAVAC_DIR)
 
 TEST_DIR := test
 TEST_FILE := FindMaximum.java
 
 all:
-	javac $(JAVAC_FLAGS) symbol/*.java $(SRC).java
+	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java $(SRC).java
 
 parser: mkdir
 	jjtree $(JJTREE_FLAGS) $(JJTREE_DIR)/$(JJTREE_PARSER).jjt

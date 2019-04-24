@@ -9,6 +9,7 @@ class SimpleNode implements Node {
   protected Parser parser;
 
   public String name;
+  public int line;
   public String valueInt;
   public String valueBoolean;
 

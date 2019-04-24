@@ -158,6 +158,13 @@ public class ClassSymbolTable {
             return global_variables.get(variableName).getIdentifier_name();
     }
 
+    public Symbol.SymbolType getVariableType(String functionName, String variableName){
+        if(functions.get(functionName).getLocalVariables().containsKey(variableName))
+            return functions.get(functionName).getLocalVariables().get(variableName).getType();
+        else
+            return global_variables.get(variableName).getType();
+    }
+
     public String getClassName() {
         return className;
     }
