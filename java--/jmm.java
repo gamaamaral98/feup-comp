@@ -2,6 +2,7 @@ import parser.*;
 import symbol.ClassSymbolTable;
 import symbol.FunctionSymbolTable;
 import symbol.Symbol;
+import codeGen.JasminGenerator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +42,8 @@ public class jmm{
 
         System.out.println("\n---- SYMBOL TABLES ----");
         printSymbolTables();
+
+        JasminGenerator jasminGenerator = new JasminGenerator(symbolTables, node);
     }
 
     public void createSymbolTables(SimpleNode node){
@@ -257,22 +260,22 @@ public class jmm{
             */
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN){
 
-                //Primeiro filho é garantido ser identifier no entanto verificamos se foi inicializado ou não
-                if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                    String name = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).name;
-                    int line = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).line;
+                // //Primeiro filho é garantido ser identifier no entanto verificamos se foi inicializado ou não
+                // if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                //     String name = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).name;
+                //     int line = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).line;
                     
-                    if(!this.symbolTables.hasVariable(function_name, name)){
-                        semanticError("Cannot find symbol", name, line);
-                    }
-                    else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
-                        semanticError("Variable might not have been initialized", name, line);
-                    }
-                }
+                //     if(!this.symbolTables.hasVariable(function_name, name)){
+                //         semanticError("Cannot find symbol", name, line);
+                //     }
+                //     else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                //         semanticError("Variable might not have been initialized", name, line);
+                //     }
+                // }
 
-                if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTINT){
-                    continue;
-                }
+                // if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTINT){
+                //     continue;
+                // }
 
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
                 continue;

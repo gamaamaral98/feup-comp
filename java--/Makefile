@@ -14,10 +14,10 @@ JAVAC_DEBUG := -g
 JAVAC_FLAGS := -d $(JAVAC_DIR)
 
 TEST_DIR := test
-TEST_FILE := test.java
+TEST_FILE := FindMaximum.java
 
 all:
-	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java $(SRC).java
+	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java codeGen/*.java $(SRC).java
 
 parser: mkdir
 	jjtree $(JJTREE_FLAGS) $(JJTREE_DIR)/$(JJTREE_PARSER).jjt
