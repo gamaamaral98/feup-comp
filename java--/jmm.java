@@ -219,30 +219,68 @@ public class jmm{
             //System.out.println(function_body.jjtGetChild(n));
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.IDENTIFIER, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, local));
+                    if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
+                        semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
+                    else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.IDENTIFIER, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, local)){
+                        semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
                
                 } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTBOOLEAN){
-                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.BOOLEAN, local));
+                    if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
+                        semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
+                    else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.BOOLEAN, local)){
+                        semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
                
                 } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT){
-                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT, local));
+                    if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
+                        semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
+                    else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT, local)){
+                        semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
                
                 }else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT_ARRAY){}
-                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT_ARRAY, local));
+                    if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
+                        semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
+                    else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT_ARRAY, local)){
+                        semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                    }
             
-
-
-
+            /*
+            Identifier,"=",Expression,";"
+            Identifier,"[",Expression,"]","=",Expression,";"
+            */
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN){
 
+                //Primeiro filho é garantido ser identifier no entanto verificamos se foi inicializado ou não
+                if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                    String name = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).name;
+                    int line = (ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).line;
+                    
+                    if(!this.symbolTables.hasVariable(function_name, name)){
+                        semanticError("Cannot find symbol", name, line);
+                    }
+                    else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                        semanticError("Variable might not have been initialized", name, line);
+                    }
+                }
+
+                if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTINT){
+                    continue;
+                }
+
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
-
+                continue;
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
-
+                continue;
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
-
+                continue;
             } else if(body.jjtGetChild(n) instanceof ASTCALL_FUNCTION){
-
+                continue;
             }
             // FALTA { Statement }
             // FALTA Expression ;
