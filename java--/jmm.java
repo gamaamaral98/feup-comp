@@ -212,14 +212,40 @@ public class jmm{
 
     public void handleMethodBody(String function_name, ASTMETHOD_BODY body){
         // TODO: FAZER ISTO
+
+        int local = 1;
+
         for(int n = 0; n < body.jjtGetNumChildren(); n++){
             //System.out.println(function_body.jjtGetChild(n));
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.IDENTIFIER, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, local));
+               
+                } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTBOOLEAN){
+                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.BOOLEAN, local));
+               
+                } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT){
+                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT, local));
+               
+                }else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT_ARRAY){}
+                    if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT_ARRAY, local));
+            
 
-                } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
 
-                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN){
 
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
