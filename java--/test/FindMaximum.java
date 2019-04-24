@@ -36,22 +36,29 @@ class FindMaximum extends ClassA {
 	// 	return test_arr[2];
 	// }
 
-	// int a;
 	// public int getYoyo5(){
-	// 	return a + b;
-	// }
+	//  	return a + b;
+	//  }
 
 	// public puta getYoyo6(){
 	// 	return 1 + 2;
 	// }
 
-	// public puta getYoyo6(){
-	// 	return a && b;
-	// }
-
-	// public puta getYoyo7(){
-	// 	return a < b;
-	// }
+//	public puta getYoyo6(){
+//		return a && b;
+//	}
+//
+//	public puta getYoyo6(){
+//		return true && false;
+//	}
+//
+//	public puta getYoyo7(){
+//		return a < b;
+//	}
+	int a;
+	public int getYoyo7(){
+		return a.length;
+	}
 
 	// public puta getYoyo8(){
 	// 	return a - b;
@@ -65,9 +72,9 @@ class FindMaximum extends ClassA {
 	// 	return a / b;
 	// }
 
-	public puta getYoyo11(){
-		return a.length;
-	}
+	// public puta getYoyo11(){
+	// 	return this.a;
+	// }
 
 	// public puta getYoyo12(){
 	// 	return a.bananas(bananaboa, bananama);
