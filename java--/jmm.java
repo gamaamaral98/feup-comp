@@ -346,7 +346,12 @@ public class jmm{
 
             System.out.println("\t\t> Local Variables:");
             for (Map.Entry<String, Symbol> variable_entry : entry.getValue().getLocalVariables().entrySet()){
-                // TODO:
+                System.out.print("\t\t\t>Name: " + variable_entry.getValue().getAttribute() + "\tType: " + variable_entry.getValue().getTypeString() + "\tLocal: ");
+                int n = 1;
+                for(int i = 1; i < n; i++){
+                    System.out.print("1.");
+                }
+                System.out.println("1");
             }
 
             if(entry.getKey().equals("main")){
