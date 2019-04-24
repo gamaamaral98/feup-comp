@@ -249,6 +249,7 @@ void Statement_Aux() #void : {}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
+    | Expression_No_Identifier() <PVIRG>
 }
 
 void Multiple_Statements() #STATEMENT_LIST : {}
@@ -314,6 +315,7 @@ void Statement1() #void : {}
     | Operator_5_DOT() (Operator_5())*
     | <ASSIGN> Expression() #ASSIGN(2)
     | <LPARRETO> Expression() <RPARRETO> #ACCESS_ARRAY(2) Statement2() 
+    | (Operator_4())* (Operator_3())* (Operator_2())* (Operator_1())*
 }
 
 void Statement2() #void : {}

@@ -1,12 +1,6 @@
 class Fac extends ClassA{
-    int a;
-    boolean bool;
-
-    public int ComputeFac(int num, boolean t){
-        while (a < 0) {
-            b = 3;
-        }
-        a*b;
+    public int ComputeFac(){
+        a[1];
         return num_aux;
     }
 }

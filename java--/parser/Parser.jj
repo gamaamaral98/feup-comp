@@ -851,6 +851,7 @@ void Statement_Aux()       : {}
     Multiple_Statements()
     | If_Else_Statement()
     | While_Statement()
+    | Expression_No_Identifier() <PVIRG>
 }
 
 void Multiple_Statements()                 : {/*@bgen(jjtree) STATEMENT_LIST */
@@ -1138,6 +1139,7 @@ void Statement1()       : {}
                                 }
                               }
 /*@egen*/                  Statement2() 
+    | (Operator_4())* (Operator_3())* (Operator_2())* (Operator_1())*
 }
 
 void Statement2()       : {}
