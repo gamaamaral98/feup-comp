@@ -1,3 +1,4 @@
+import parser.*;
 import symbol.ClassSymbolTable;
 import symbol.FunctionSymbolTable;
 import symbol.Symbol;
@@ -6,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -213,9 +215,8 @@ public class jmm{
     public void handleMethodBody(String function_name, ASTMETHOD_BODY body){
         // TODO: FAZER ISTO
 
-        int local = 1;
-
         for(int n = 0; n < body.jjtGetNumChildren(); n++){
+            int local = 1;
             //System.out.println(function_body.jjtGetChild(n));
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
@@ -294,7 +295,7 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
             }
-            //TODO: NOT INT, NOT IDENTIFIER ... NOT EXPRESSION
+            //TODO: NOT BOOLEAN, NOT IDENTIFIER, NOT TRUE, NOT FALSE, NOT LT ... NOT EXPRESSION
         } else if (return_expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
             String name = ((ASTIDENTIFIER) return_expression.jjtGetChild(0)).name;
             if(!this.symbolTables.hasVariable(function_name, name)){
@@ -321,24 +322,44 @@ public class jmm{
         } else if (return_expression.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
             //TODO:
         } else if (return_expression.jjtGetChild(0) instanceof ASTADD){
-            //TODO:
+            handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTAND){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible return types", function_name, line);
+            }
+            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+
+            }
             //TODO:
         } else if (return_expression.jjtGetChild(0) instanceof ASTLT){
             //TODO:
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+                semanticError("Incompatible return types", function_name, line);
+            }
         } else if (return_expression.jjtGetChild(0) instanceof ASTSUB){
-            //TODO:
+            handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTMUL){
-            //TODO:
+            handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTDIV){
-            //TODO:
+            handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTLENGTH){
-            //TODO:
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+                semanticError("Incompatible return types", function_name, line);
+            }
+
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.IDENTIFIER);
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
+            }
         } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_CLASS){
             //TODO:
         } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_INT_ARRAY){
             //TODO:
         } else if (return_expression.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            //TODO:
+        } else if(return_expression.jjtGetChild(0) instanceof ASTTHIS){
             //TODO:
         }
         else{
@@ -346,6 +367,41 @@ public class jmm{
             System.out.println("WTF IS THIS?");
         }
 
+    }
+
+    public void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbol){
+        String variable_name = ((ASTIDENTIFIER) node).name;
+        if(!this.symbolTables.hasVariable(function_name, variable_name)){
+            semanticError("Cannot find symbol", variable_name, line);
+        }
+        else if(!symbol.contains(this.symbolTables.getVariableType(function_name, variable_name))){
+            semanticError("Incompatible symbol type", variable_name, line);
+        }
+        else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name)){
+            semanticError("Variable might not have been initialized", variable_name, line);
+        }
+    }
+
+    public void handleMathOperationsReturnExpression(String function_name, int line, Node node){
+        if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+            semanticError("Incompatible return types", function_name, line);
+        }
+
+        if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT);
+            handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
+        } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
+            semanticError("Cannot add symbol", function_name, line);
+        }
+
+        if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT);
+            handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
+        } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
+            semanticError("Cannot add symbol", function_name, line);
+        }
     }
 
     public void printSymbolTables(){
