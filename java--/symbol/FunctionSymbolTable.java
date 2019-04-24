@@ -53,6 +53,14 @@ public class FunctionSymbolTable {
         return true;
     }
 
+    public boolean addLocalVariable(String atr, Symbol.SymbolType type, String identifier_name, int local_value){
+        if(local_variables.containsKey(atr))
+            return false;
+        Symbol s = new Symbol(atr, type, identifier_name, local_value);
+        local_variables.put(atr, s);
+        return true;
+    }
+
     public boolean setReturnType(Symbol.SymbolType returnType) {
         if(this.returnSymbol != null)
             return false;

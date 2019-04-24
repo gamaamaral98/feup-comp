@@ -315,7 +315,7 @@ public class jmm{
 
             System.out.println("\t\t> Parameters:");
             for (Map.Entry<String, Symbol> parameter_entry : entry.getValue().getParameters().entrySet()){
-                // TODO:
+                System.out.println("\t\t\t>Name: " + parameter_entry.getValue().getAttribute() + "\tType: " + parameter_entry.getValue().getTypeString());
             }
 
             System.out.println("\t\t> Local Variables:");

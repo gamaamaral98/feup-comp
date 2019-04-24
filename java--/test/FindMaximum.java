@@ -72,25 +72,25 @@ class FindMaximum extends ClassA {
 		return new int[pinar];
 	}
 
-//	public int find_maximum(int[] arr, boolean preta, int verde, incolor cor) {
-//		int i;
-//		int maximum;
-//		int value;
-//		banana = false;
-//		i = 1;
-//		maximum = arr[0];
-//		while (i < arr.length) {
-//			value = arr[i];
-//			if (maximum < value) {
-//				maximum = value;
-//
-//			} else {
-//			}
-//			i = i + 1;
-//		}
-//
-//		return maximum;
-//	}
+	public int find_maximum(int[] arr, boolean preta, int verde, incolor cor) {
+		int i;
+		int maximum;
+		int value;
+		banana = false;
+		i = 1;
+		maximum = arr[0];
+		while (i < arr.length) {
+			value = arr[i];
+			if (maximum < value) {
+				maximum = value;
+
+			} else {
+			}
+			i = i + 1;
+		}
+
+		return maximum;
+	}
 //
 	public int build_test_arr() {
 		test_arr = new int[5];

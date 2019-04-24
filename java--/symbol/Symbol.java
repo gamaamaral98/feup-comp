@@ -30,6 +30,13 @@ public class Symbol {
         this.local_value = local_value;
     }
 
+    public Symbol(String atr, SymbolType type, String identifier_name, int local_value){
+        this.attribute = atr;
+        this.type = type;
+        this.local_value = local_value;
+        this.identifier_name = identifier_name;
+    }
+
     public Symbol(String atr, SymbolType type, String identifier_name){
         this.attribute = atr;
         this.type = type;
@@ -73,6 +80,8 @@ public class Symbol {
             return "int[]";
         } else if(type == SymbolType.BOOLEAN){
             return "boolean";
+        } else if(type == SymbolType.STRING_ARRAY){
+            return "string[]";
         }
         return "";
     }
