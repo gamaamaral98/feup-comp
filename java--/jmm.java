@@ -523,8 +523,26 @@ public class jmm{
             }
         } else if (return_expression.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
             //TODO:
+
+            // public puta getYoyo11(){
+            // 	return this.ab();
+            // }
+
+            // public puta getYoyo12(){
+            // 	return ab();
+            // }
+
+            // public puta getYoyo12(){
+            // 	return a.bananas(bananaboa, bananama);
+            // }
+
+            // public puta getYoyo12(){
+            // 	return bananas(bananaboa, bananama);
+            // }
         } else if(return_expression.jjtGetChild(0) instanceof ASTTHIS){
-            System.out.println(this.symbolTables.getFunctionsReturnType(function_name));
+            if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
+                semanticError("Incompatible return types", function_name, line);
+            }
         }
         else{
             // DELETE
