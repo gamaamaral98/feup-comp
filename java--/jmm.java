@@ -222,6 +222,7 @@ public class jmm{
             //System.out.println(function_body.jjtGetChild(n));
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
+
                     if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
                         semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
@@ -266,9 +267,7 @@ public class jmm{
                     
                     if(!this.symbolTables.hasVariable(function_name, name)){
                         semanticError("Cannot find symbol", name, line);
-                    }
-                    else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
-                        semanticError("Variable might not have been initialized", name, line);
+                        return;
                     }
                 }
 
@@ -329,9 +328,10 @@ public class jmm{
                     if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT_ARRAY){
                         semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
                     } 
-                    if(){
-                        
-                    } 
+
+                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
+                        semanticError("Incompatible types: cannot be converted to int", body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0).toString(), ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNOT){
