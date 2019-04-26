@@ -1,9 +1,7 @@
 package codeGen;
 
-import symbol.ClassSymbolTable;
-import symbol.FunctionSymbolTable;
-import symbol.Symbol;
-import parser.SimpleNode;
+import symbol.*;
+import parser.*;
 
 import java.io.*;
 import java.util.*;
@@ -57,13 +55,12 @@ public class JasminGenerator{
 	// public static final float PI;   ->   .field public static final PI F
 	private void manageFields(){
 
-		this.printWriter.println("; global variables");
+		this.printWriter.println("; global variables\n");
 		Map<String, Symbol> map = symbolTable.getGlobal_variables();
 		map.forEach((key, value) -> {
 
 			String str = ".field ";
-			// Falta saber pela function symbol table se é public ou private + static
-			str += "public? ";
+			// str += "public"...idk se o .j precisa de ter isto na mesma
 			str += key + " ";
 			str += value.getTypeDescriptor();
 
@@ -71,31 +68,73 @@ public class JasminGenerator{
 		});
 	}
 
-	// .method <access-spec> <method-spec>
- 	//        <statements>
- 	//    .end method
+
 	private void manageMethods(){
 
 		this.printWriter.println("\n\n; methods");
-		Map<String, FunctionSymbolTable> map = symbolTable.getFunctions();
-		map.forEach((key, value) -> {
 
-			String str = "\n.method ";
+		SimpleNode methodsNode = (SimpleNode) this.rootNode.jjtGetChild(this.rootNode.jjtGetNumChildren() - 1);
+		for(int i = 0; i < methodsNode.jjtGetNumChildren(); i++){
 
-			// Falta saber pela function symbol table se é public ou private + static
-			str += "public? ";
-			str += key;
-			str += getParametersInformation(value);
-			str += value.getReturnSymbol().getTypeDescriptor();
-			this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
+			manageMethod((SimpleNode) methodsNode.jjtGetChild(i));
+		}
+	}
 
+	// .method <access-spec> <method-spec>
+ 	//     <statements>
+ 	// .end method
+	private void manageMethod(SimpleNode method){
 
-			// STATEMENTS
-			this.printWriter.println("\t<statements>");
-			
+		String methodName = ((SimpleNode) method.jjtGetChild(1)).getName();
+		FunctionSymbolTable fst = this.symbolTable.getFunctions().get(methodName);
+		
+		manageMethodHeader(methodName, fst);
 
-			this.printWriter.println(".end method");
-		});
+		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
+		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
+
+		manageMethodBody((SimpleNode) method.jjtGetChild(3));
+		// manageMethodReturn((SimpleNode) method.jjtGetChild(4));
+
+		this.printWriter.println(".end method");
+	}
+
+	private void manageMethodHeader(String methodName, FunctionSymbolTable fst){
+
+		String str = "\n.method public ";
+
+		if(methodName.equals("main"))
+			str += "static ";
+
+		str += methodName;
+		str += getParametersInformation(fst);
+
+		if(fst.getReturnSymbol() == null)
+			str += "V";
+		else
+			str += fst.getReturnSymbol().getTypeDescriptor();
+
+		this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
+	}
+
+	private void manageMethodBody(SimpleNode body){
+
+		for(int i = 0; i < body.jjtGetNumChildren(); i++){
+
+			if(body.jjtGetChild(i) instanceof ASTVAR_DECL){
+				System.out.println("ASTVAR_DECL");
+			} 
+			else if(body.jjtGetChild(i) instanceof ASTASSIGN){
+				System.out.println("ASTASSIGN");
+			}
+			else if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY){
+				System.out.println("ASTASSIGN_ARRAY");
+			}
+			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
+				System.out.println("ASTCALL_FUNCTION");
+			}
+		}
+		System.out.println("---");
 	}
 
 	private String getParametersInformation(FunctionSymbolTable value){
