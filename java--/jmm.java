@@ -306,19 +306,32 @@ public class jmm{
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTTRUE){
-                    continue;
+                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTFALSE){
-                    continue;
+                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNEW_CLASS){
-                    continue;
+                    String class_name = ((ASTCLASS)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name;
+                    int line = ((ASTCLASS)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).line;
+                    if(!this.symbolTables.getClassName().equals(class_name)){
+                        semanticError("Class not found", class_name, line);
+                    }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNEW_INT_ARRAY){
-                    continue;
+                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT_ARRAY){
+                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    } 
+                    if(){
+                        
+                    } 
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNOT){
