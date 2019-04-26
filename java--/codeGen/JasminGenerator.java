@@ -1,6 +1,7 @@
 package codeGen;
 
 import symbol.ClassSymbolTable;
+import symbol.FunctionSymbolTable;
 import symbol.Symbol;
 import parser.SimpleNode;
 
@@ -21,10 +22,11 @@ public class JasminGenerator{
 
 		createFile();
 
-		createFileHeader();
-		// manageGlobals();
+		createFileHeader();			// .class .super
+		manageFields();				// Global Variables
+		manageMethods();			// Methods
 
-		printWriter.close();
+		this.printWriter.close();
 	}
 
 	private void createFile(){
@@ -46,28 +48,67 @@ public class JasminGenerator{
 
 	private void createFileHeader(){
 
-		printWriter.println(".class public " + symbolTable.getClassName());
-		printWriter.println(".super java/lang/Object\n");
+		this.printWriter.println(".class public " + symbolTable.getClassName());
+		this.printWriter.println(".super java/lang/Object\n");
 	}
 
-	// private void manageGlobals(){
 
-	// 	// Pela SymbolTable
-	// 	Map<String, Symbol> map = symbolTable.getGlobal_variables();
-	// 	map.forEach((key,value) -> {
-	// 	    System.out.println(key + " -> " + value.getType());
-	// 	});
+	// .field <access-spec> <field-name> <descriptor>
+	// public static final float PI;   ->   .field public static final PI F
+	private void manageFields(){
+
+		this.printWriter.println("; global variables");
+		Map<String, Symbol> map = symbolTable.getGlobal_variables();
+		map.forEach((key, value) -> {
+
+			String str = ".field ";
+			// Falta saber pela function symbol table se é public ou private + static
+			str += "public? ";
+			str += key + " ";
+			str += value.getTypeDescriptor();
+
+			this.printWriter.println(str);
+		});
+	}
+
+	// .method <access-spec> <method-spec>
+ 	//        <statements>
+ 	//    .end method
+	private void manageMethods(){
+
+		this.printWriter.println("\n\n; methods");
+		Map<String, FunctionSymbolTable> map = symbolTable.getFunctions();
+		map.forEach((key, value) -> {
+
+			String str = "\n.method ";
+
+			// Falta saber pela function symbol table se é public ou private + static
+			str += "public? ";
+			str += key;
+			str += getParametersInformation(value);
+			str += value.getReturnSymbol().getTypeDescriptor();
+			this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
 
 
-	// 	// Pela AST
-	// 	for(int i = 0; i < this.rootNode.jjtGetNumChildren()){
+			// STATEMENTS
+			this.printWriter.println("\t<statements>");
+			
 
-	// 		SimpleNode child = (SimpleNode) this.rootNode.jjtGetChild(i);
+			this.printWriter.println(".end method");
+		});
+	}
 
-	// 		if(child instanceof ASTVAR_DECL){
+	private String getParametersInformation(FunctionSymbolTable value){
 
-	// 			createDeclaration((ASTVAR_DECL) child);
-	// 		}
-	// 	}
-	// }
+		String str = "(";
+
+		Map<String, Symbol> map2 = value.getParameters();
+		for (Map.Entry<String, Symbol> entry : map2.entrySet()) {
+		    str += entry.getValue().getTypeDescriptor();
+		    str += ";";
+		}
+
+		str += ")";
+		return str;
+	}
 }

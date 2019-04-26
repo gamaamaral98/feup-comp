@@ -1,5 +1,5 @@
 class FindMaximum extends ClassA {
-	int[] test_arr;
+	// int[] test_arr;
 	boolean banana;
 	int pera;
 	random yoyo;
@@ -12,9 +12,9 @@ class FindMaximum extends ClassA {
 //		return !!0;
 //	}
 
-	// public random getYoyo2(){
-	// 	return yoyo;
-	// }
+	public random getYoyo2(int a, int b){
+		return yoyo;
+	}
 
 	// public random getYoyo2(){
 	// 	return !(a < b);
@@ -40,9 +40,9 @@ class FindMaximum extends ClassA {
 	//  	return a + b;
 	//  }
 
-	// public puta getYoyo6(){
-	// 	return 1 + 2;
-	// }
+	public int getYoyo6(){
+		return 1 + 2;
+	}
 
 //	public puta getYoyo6(){
 //		return a && b;
@@ -55,10 +55,10 @@ class FindMaximum extends ClassA {
 //	public puta getYoyo7(){
 //		return a < b;
 //	}
-	int a;
-	public int getYoyo7(){
-		return a.length;
-	}
+	// int a;
+	// public int getYoyo7(){
+	// 	return a.length;
+	// }
 
 	// public puta getYoyo8(){
 	// 	return a - b;

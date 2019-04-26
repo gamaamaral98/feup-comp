@@ -85,4 +85,22 @@ public class Symbol {
         }
         return "";
     }
+
+    public String getTypeDescriptor(){
+
+        switch(getType()) {
+            case INT:
+                return "I";
+            case BOOLEAN:
+                return "B";
+            case INT_ARRAY:
+                return "[I";
+            case STRING_ARRAY:
+                return "[Ljava/lang/String";
+            case IDENTIFIER:
+                return "Ljava/lang/" + getIdentifier_name();
+            default:
+                return "";
+        }
+    }
 }
