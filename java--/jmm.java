@@ -420,21 +420,61 @@ public class jmm{
                 semanticError("Incompatible return types", function_name, line);
             }
         } else if (return_expression.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
-            //TODO:
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+                semanticError("Incompatible return types", function_name, line);
+            }
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if (return_expression.jjtGetChild(0) instanceof ASTADD){
             handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTAND){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
             }
-            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
 
+            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.BOOLEAN);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
+            } else if (!(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTTRUE || return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTFALSE)){
+                semanticError("Bad operand types for binary operator '&&'", function_name, line);
             }
-            //TODO:
+
+            if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.BOOLEAN);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1), symbols);
+            } else if (!(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTTRUE || return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTFALSE)){
+                semanticError("Bad operand types for binary operator '&&'", function_name, line);
+            }
         } else if (return_expression.jjtGetChild(0) instanceof ASTLT){
-            //TODO:
-            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
+            }
+
+            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
+            } else if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTACCESS_ARRAY){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT_ARRAY);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0).jjtGetChild(0), symbols);
+            } else if(!(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTINT)){
+                semanticError("Bad operand types for binary operator '&&'", function_name, line);
+            }
+
+            if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1), symbols);
+            } else if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTACCESS_ARRAY){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT_ARRAY);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1).jjtGetChild(0), symbols);
+            } else if(!(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTINT)){
+                semanticError("Bad operand types for binary operator '&&'", function_name, line);
             }
         } else if (return_expression.jjtGetChild(0) instanceof ASTSUB){
             handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
@@ -454,13 +494,24 @@ public class jmm{
                 handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
             }
         } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_CLASS){
-            //TODO:
+            if(!this.symbolTables.getClassName().equals(((ASTCLASS)return_expression.jjtGetChild(0).jjtGetChild(0)).name)){
+                semanticError("Class not found", ((ASTCLASS)return_expression.jjtGetChild(0).jjtGetChild(0)).name, line);
+            }
         } else if (return_expression.jjtGetChild(0) instanceof ASTNEW_INT_ARRAY){
-            //TODO:
+            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT_ARRAY){
+                semanticError("Incompatible return types", function_name, line);
+            }
+            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT);
+                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
+            } else if(!(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTINT)){
+                semanticError("Incompatible types: cannot be converted to int", return_expression.jjtGetChild(0).jjtGetChild(0).toString(), line);
+            }
         } else if (return_expression.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
             //TODO:
         } else if(return_expression.jjtGetChild(0) instanceof ASTTHIS){
-            //TODO:
+            System.out.println(this.symbolTables.getFunctionsReturnType(function_name));
         }
         else{
             // DELETE
@@ -469,13 +520,13 @@ public class jmm{
 
     }
 
-    public void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbol){
+    public void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbols){
         String variable_name = ((ASTIDENTIFIER) node).name;
         if(!this.symbolTables.hasVariable(function_name, variable_name)){
             semanticError("Cannot find symbol", variable_name, line);
         }
-        else if(!symbol.contains(this.symbolTables.getVariableType(function_name, variable_name))){
-            semanticError("Incompatible symbol type", variable_name, line);
+        else if(!symbols.contains(this.symbolTables.getVariableType(function_name, variable_name))){
+            semanticError("Bad operand type", variable_name, line);
         }
         else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name)){
             semanticError("Variable might not have been initialized", variable_name, line);
@@ -516,16 +567,22 @@ public class jmm{
             System.out.println("\t>Name: " + entry.getKey() + "\t>Type: " + entry.getValue().getTypeString());
         }
 
-        System.out.println("> Functions:");
+        if(this.symbolTables.getFunctions().entrySet().size() != 0)
+            System.out.println("> Functions:");
+
         for (Map.Entry<String, FunctionSymbolTable> entry : this.symbolTables.getFunctions().entrySet()) {
             System.out.println("\t> Function name: " + entry.getKey());
 
-            System.out.println("\t\t> Parameters:");
+            if(entry.getValue().getParameters().entrySet().size() != 0)
+                System.out.println("\t\t> Parameters:");
+
             for (Map.Entry<String, Symbol> parameter_entry : entry.getValue().getParameters().entrySet()){
                 System.out.println("\t\t\t>Name: " + parameter_entry.getValue().getAttribute() + "\tType: " + parameter_entry.getValue().getTypeString());
             }
 
-            System.out.println("\t\t> Local Variables:");
+            if(entry.getValue().getLocalVariables().entrySet().size() != 0)
+                System.out.println("\t\t> Local Variables:");
+
             for (Map.Entry<String, Symbol> variable_entry : entry.getValue().getLocalVariables().entrySet()){
                 System.out.print("\t\t\t>Name: " + variable_entry.getValue().getAttribute() + "\tType: " + variable_entry.getValue().getTypeString() + "\tLocal: ");
                 int n = 1;
@@ -535,9 +592,7 @@ public class jmm{
                 System.out.println("1");
             }
 
-            if(entry.getKey().equals("main")){
-                System.out.println("\t\t> Return: void");
-            } else{
+            if(!entry.getKey().equals("main")){
                 System.out.println("\t\t> Return: " + entry.getValue().getReturnSymbol().getTypeString());
             }
         }
