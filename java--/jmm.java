@@ -222,7 +222,6 @@ public class jmm{
             //System.out.println(function_body.jjtGetChild(n));
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
-
                     if (this.symbolTables.getGlobal_variables().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)) {
                         semanticError("Redefinition of global variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
@@ -254,6 +253,7 @@ public class jmm{
                         semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
                 }
+
             
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN){
 
