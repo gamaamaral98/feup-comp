@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class jmm{
@@ -464,7 +463,7 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
             }
-            //TODO: NOT BOOLEAN, NOT IDENTIFIER, NOT TRUE, NOT FALSE, NOT LT ... NOT EXPRESSION
+            handleNOT(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
             String name = ((ASTIDENTIFIER) return_expression.jjtGetChild(0)).name;
             if(!this.symbolTables.hasVariable(function_name, name)){
@@ -501,50 +500,12 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
             }
-
-            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.BOOLEAN);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
-            } else if (!(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTTRUE || return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTFALSE)){
-                semanticError("Bad operand types for binary operator '&&'", function_name, line);
-            }
-
-            if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTIDENTIFIER){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.BOOLEAN);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1), symbols);
-            } else if (!(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTTRUE || return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTFALSE)){
-                semanticError("Bad operand types for binary operator '&&'", function_name, line);
-            }
+            handleAND(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTLT){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible return types", function_name, line);
             }
-
-            if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.INT);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0), symbols);
-            } else if(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTACCESS_ARRAY){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.INT_ARRAY);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(0).jjtGetChild(0), symbols);
-            } else if(!(return_expression.jjtGetChild(0).jjtGetChild(0) instanceof ASTINT)){
-                semanticError("Bad operand types for binary operator '&&'", function_name, line);
-            }
-
-            if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTIDENTIFIER){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.INT);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1), symbols);
-            } else if(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTACCESS_ARRAY){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.INT_ARRAY);
-                handleIdentifier(function_name, line, return_expression.jjtGetChild(0).jjtGetChild(1).jjtGetChild(0), symbols);
-            } else if(!(return_expression.jjtGetChild(0).jjtGetChild(1) instanceof ASTINT)){
-                semanticError("Bad operand types for binary operator '&&'", function_name, line);
-            }
+            handleLT(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTSUB){
             handleMathOperationsReturnExpression(function_name, line, return_expression.jjtGetChild(0));
         } else if (return_expression.jjtGetChild(0) instanceof ASTMUL){
@@ -555,7 +516,6 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
                 semanticError("Incompatible return types", function_name, line);
             }
-
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.IDENTIFIER);
             symbols.add(Symbol.SymbolType.INT_ARRAY);
@@ -605,6 +565,79 @@ public class jmm{
             System.out.println("WTF IS THIS?");
         }
 
+    }
+
+    public void handleNOT(String function_name, int line, Node node){
+        if(node.jjtGetChild(0) instanceof ASTNOT){
+            handleNOT(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.BOOLEAN);
+            handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTAND){
+            handleAND(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTLT){
+            handleLT(function_name, line, node.jjtGetChild(0));
+        } else if (!(node.jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(0) instanceof ASTFALSE)){
+            semanticError("Bad operand type for unary operator '!'", function_name, line);
+        }
+    }
+
+    public void handleLT(String function_name, int line, Node node){
+        if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT);
+            handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
+        } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
+            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+        }
+        if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT);
+            handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
+        } else if(node.jjtGetChild(1) instanceof ASTACCESS_ARRAY){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
+        } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
+            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+        }
+    }
+
+    public void handleAND(String function_name, int line, Node node){
+        if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.BOOLEAN);
+            handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTNOT){
+            handleNOT(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTLT){
+            handleLT(function_name, line, node.jjtGetChild(0));
+        } else if (!(node.jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(0) instanceof ASTFALSE)){
+            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+        }
+
+        if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.BOOLEAN);
+            handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
+        } else if(node.jjtGetChild(1) instanceof ASTNOT){
+            if(node.jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER) {
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.BOOLEAN);
+                handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
+            } else if (!(node.jjtGetChild(1).jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(1).jjtGetChild(0) instanceof ASTFALSE)){
+                semanticError("Bad operand types for binary operator '&&'", function_name, line);
+            }
+        } else if(node.jjtGetChild(1) instanceof ASTLT){
+            handleLT(function_name, line, node.jjtGetChild(1));
+        } else if (!(node.jjtGetChild(1) instanceof ASTTRUE || node.jjtGetChild(1) instanceof ASTFALSE)){
+            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+        }
     }
 
     public void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbols){

@@ -92,7 +92,7 @@ public class Symbol {
             case INT:
                 return "I";
             case BOOLEAN:
-                return "B";
+                return "Z";
             case INT_ARRAY:
                 return "[I";
             case STRING_ARRAY:
@@ -100,7 +100,12 @@ public class Symbol {
             case IDENTIFIER:
                 return "Ljava/lang/" + getIdentifier_name();
             default:
-                return "";
+                return "V";
         }
+    }
+
+    public int getLocalValue(){
+        
+        return local_value;
     }
 }

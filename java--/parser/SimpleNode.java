@@ -100,6 +100,12 @@ class SimpleNode implements Node {
   public String getName() {
     return name;
   }
+  public String getValueInt() {
+    return valueInt;
+  }
+  public String getValueBoolean() {
+    return valueBoolean;
+  }
 }
 
 /* JavaCC - OriginalChecksum=b715587beecfd28b0e03367f901ce94f (do not edit this line) */
