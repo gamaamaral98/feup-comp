@@ -89,12 +89,9 @@ public class JasminGenerator{
 		FunctionSymbolTable fst = this.symbolTable.getFunctions().get(methodName);
 		
 		manageMethodHeader(methodName, fst);
-
-		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
-		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
-
+		manageMethodLimits(fst);
 		manageMethodBody((SimpleNode) method.jjtGetChild(3), fst);
-		// manageMethodReturn((SimpleNode) method.jjtGetChild(4));
+		manageMethodReturn((SimpleNode) method.jjtGetChild(4), fst);
 
 		this.printWriter.println(".end method");
 	}
@@ -117,14 +114,17 @@ public class JasminGenerator{
 		this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
 	}
 
+	private void manageMethodLimits(FunctionSymbolTable fst){
+
+		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
+		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
+	}
+
 	private void manageMethodBody(SimpleNode body, FunctionSymbolTable fst){
 
 		for(int i = 0; i < body.jjtGetNumChildren(); i++){
 
-			if(body.jjtGetChild(i) instanceof ASTVAR_DECL)
-				manageVAR_DECL((SimpleNode) body.jjtGetChild(i));
-
-			else if(body.jjtGetChild(i) instanceof ASTASSIGN)
+			if(body.jjtGetChild(i) instanceof ASTASSIGN)
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
 
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION)
@@ -132,11 +132,53 @@ public class JasminGenerator{
 		}
 	}
 
-	private void manageVAR_DECL(SimpleNode node){
+	private void manageMethodReturn(SimpleNode returnAux, FunctionSymbolTable fst){
 
-		this.printWriter.println("VAR_DECL");
+		SimpleNode ret = (SimpleNode) returnAux.jjtGetChild(0);
+
+		if(ret instanceof ASTIDENTIFIER){
+
+			// There is no difference between being a boolean or an int
+			// Local/Param:  iload_X -> ireturn
+			// Global:       aload_0 -> getfield(banana) -> ireturn
+			
+			String retName = ret.getName();
+			if(isGlobal(retName)){
+
+				this.printWriter.println("\taload_0");
+
+				// NOT SURE ABOUT THE CLASS NAME
+				String getfieldStr = "\tgetfield ";
+				getfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + ret.getName() + " ";
+				getfieldStr += this.symbolTable.getGlobal_variables().get(ret.getName()).getTypeDescriptor();
+				this.printWriter.println(getfieldStr);
+			}
+			else{
+
+				int index = getNodeIndex(retName, fst);
+				this.printWriter.println("\tiload_" + Integer.toString(index));
+			}
+			this.printWriter.println("\tireturn\n");
+		}
+		else if(ret instanceof ASTINT){
+			
+			int value = Integer.parseInt(ret.getValueInt());
+			manageINT(value);
+			this.printWriter.println("\tireturn\n");
+		}
+		else if(ret instanceof ASTTRUE || ret instanceof ASTFALSE){
+			
+			String value = ret.getValueBoolean();
+			manageBoolean(value);
+
+			this.printWriter.println("\tireturn\n");
+		}
+		else{	// No return
+
+			this.printWriter.println("\treturn");
+		}
+		// add, sub, div, mul, and, not, this, <, (), 
 	}
-
 
 	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
@@ -145,8 +187,6 @@ public class JasminGenerator{
 		else
 			manageGlobalASSIGN(node, fst);
 	}
-
-
 	private void manageParamLocalASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
@@ -158,24 +198,11 @@ public class JasminGenerator{
 		if(rhs instanceof ASTINT){
 
 			int value = Integer.parseInt(rhs.getValueInt());
-
-			if(value >= 0 && value <= 5)
-				this.printWriter.println("\ticonst_" + Integer.toString(value));
-			else if(value == -1)
-				this.printWriter.println("\ticonst_m1");
-			else if(value >= -128 && value <= 127)
-				this.printWriter.println("\tbipush " + Integer.toString(value));
-			else if(value >= -32768 && value <= 32767)
-				this.printWriter.println("\tsipush " + Integer.toString(value));
-			else
-				this.printWriter.println("\tldc " + Integer.toString(value));
+			manageINT(value);
 		}
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
-			if(rhs.getValueBoolean().equals("true"))
-				this.printWriter.println("\ticonst_1");
-			else
-				this.printWriter.println("\ticonst_0");
+			manageBoolean(rhs.getValueBoolean());
 		}
 		else if(rhs instanceof ASTIDENTIFIER){
 
@@ -198,7 +225,6 @@ public class JasminGenerator{
 		}
 		this.printWriter.println("\tistore_" + Integer.toString(index) + "\n");
 	}
-
 	private void manageGlobalASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
@@ -206,21 +232,10 @@ public class JasminGenerator{
 
 		if(rhs instanceof ASTINT){
 
-			int value = Integer.parseInt(rhs.getValueInt());
-
 			this.printWriter.println("\taload_0");
 
-			if(value >= 0 && value <= 5)
-				this.printWriter.println("\ticonst_" + Integer.toString(value));
-			else if(value == -1)
-				this.printWriter.println("\ticonst_m1");
-			else if(value >= -128 && value <= 127)
-				this.printWriter.println("\tbipush " + Integer.toString(value));
-			else if(value >= -32768 && value <= 32767)
-				this.printWriter.println("\tsipush " + Integer.toString(value));
-			else
-				this.printWriter.println("\tldc " + Integer.toString(value));
-
+			int value = Integer.parseInt(rhs.getValueInt());
+			manageINT(value);
 
 			// NOT SURE ABOUT THE CLASS NAME
 			String putfieldStr = "\tputfield ";
@@ -231,12 +246,7 @@ public class JasminGenerator{
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
 			this.printWriter.println("\taload_0");
-
-			if(rhs.getValueBoolean().equals("true"))
-				this.printWriter.println("\ticonst_1");
-			else
-				this.printWriter.println("\ticonst_0");
-
+			manageBoolean(rhs.getValueBoolean());
 
 			// NOT SURE ABOUT THE CLASS NAME
 			String putfieldStr = "\tputfield ";
@@ -278,6 +288,27 @@ public class JasminGenerator{
 				this.printWriter.println(putfieldStr + "\n");
 			}
 		}
+	}
+
+	private void manageINT(int value){
+
+		if(value >= 0 && value <= 5)
+			this.printWriter.println("\ticonst_" + Integer.toString(value));
+		else if(value == -1)
+			this.printWriter.println("\ticonst_m1");
+		else if(value >= -128 && value <= 127)
+			this.printWriter.println("\tbipush " + Integer.toString(value));
+		else if(value >= -32768 && value <= 32767)
+			this.printWriter.println("\tsipush " + Integer.toString(value));
+		else
+			this.printWriter.println("\tldc " + Integer.toString(value));
+	}
+	private void manageBoolean(String value){
+
+		if(value.equals("true"))
+			this.printWriter.println("\ticonst_1");
+		else
+			this.printWriter.println("\ticonst_0");
 	}
 
 	private boolean isGlobal(String name){
