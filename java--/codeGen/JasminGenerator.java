@@ -1,7 +1,9 @@
 package codeGen;
 
-import symbol.*;
-import parser.*;
+import symbol.ClassSymbolTable;
+import symbol.FunctionSymbolTable;
+import symbol.Symbol;
+import parser.SimpleNode;
 
 import java.io.*;
 import java.util.*;
@@ -55,12 +57,13 @@ public class JasminGenerator{
 	// public static final float PI;   ->   .field public static final PI F
 	private void manageFields(){
 
-		this.printWriter.println("; global variables\n");
+		this.printWriter.println("; global variables");
 		Map<String, Symbol> map = symbolTable.getGlobal_variables();
 		map.forEach((key, value) -> {
 
 			String str = ".field ";
-			// str += "public"...idk se o .j precisa de ter isto na mesma
+			// Falta saber pela function symbol table se é public ou private + static
+			str += "public? ";
 			str += key + " ";
 			str += value.getTypeDescriptor();
 
@@ -68,27 +71,26 @@ public class JasminGenerator{
 		});
 	}
 
-
+	// .method <access-spec> <method-spec>
+ 	//        <statements>
+ 	//    .end method
 	private void manageMethods(){
 
 		this.printWriter.println("\n; methods");
 
-		SimpleNode methodsNode = (SimpleNode) this.rootNode.jjtGetChild(this.rootNode.jjtGetNumChildren() - 1);
-		for(int i = 0; i < methodsNode.jjtGetNumChildren(); i++){
+			String str = "\n.method ";
 
-			manageMethod((SimpleNode) methodsNode.jjtGetChild(i));
-		}
-	}
+			// Falta saber pela function symbol table se é public ou private + static
+			str += "public? ";
+			str += key;
+			str += getParametersInformation(value);
+			str += value.getReturnSymbol().getTypeDescriptor();
+			this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
 
-	// .method <access-spec> <method-spec>
- 	//     <statements>
- 	// .end method
-	private void manageMethod(SimpleNode method){
 
-		String methodName = ((SimpleNode) method.jjtGetChild(1)).getName();
-		FunctionSymbolTable fst = this.symbolTable.getFunctions().get(methodName);
-		
-		manageMethodHeader(methodName, fst);
+			// STATEMENTS
+			this.printWriter.println("\t<statements>");
+			
 
 		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
 		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");

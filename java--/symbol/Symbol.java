@@ -100,7 +100,7 @@ public class Symbol {
             case IDENTIFIER:
                 return "Ljava/lang/" + getIdentifier_name();
             default:
-                return "V";
+                return "";
         }
     }
 

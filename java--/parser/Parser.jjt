@@ -176,6 +176,7 @@ void Vars_Statement_Aux() #void : {Token t;}
     Type_1() t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER <PVIRG> #VAR_DECL(2) Vars_Statement_Aux()
     | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER Vars_Statement_1()
     | Statement_Aux() (Statement())*
+    | {}
 }
 
 void Vars_Statement_1() #void : {Token t;}
