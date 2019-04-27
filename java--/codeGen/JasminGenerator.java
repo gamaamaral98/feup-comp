@@ -71,7 +71,7 @@ public class JasminGenerator{
 
 	private void manageMethods(){
 
-		this.printWriter.println("\n\n; methods");
+		this.printWriter.println("\n; methods");
 
 		SimpleNode methodsNode = (SimpleNode) this.rootNode.jjtGetChild(this.rootNode.jjtGetNumChildren() - 1);
 		for(int i = 0; i < methodsNode.jjtGetNumChildren(); i++){
@@ -93,7 +93,7 @@ public class JasminGenerator{
 		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
 		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
 
-		manageMethodBody((SimpleNode) method.jjtGetChild(3));
+		manageMethodBody((SimpleNode) method.jjtGetChild(3), fst);
 		// manageMethodReturn((SimpleNode) method.jjtGetChild(4));
 
 		this.printWriter.println(".end method");
@@ -117,24 +117,207 @@ public class JasminGenerator{
 		this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
 	}
 
-	private void manageMethodBody(SimpleNode body){
+	private void manageMethodBody(SimpleNode body, FunctionSymbolTable fst){
 
 		for(int i = 0; i < body.jjtGetNumChildren(); i++){
 
-			if(body.jjtGetChild(i) instanceof ASTVAR_DECL){
-				System.out.println("ASTVAR_DECL");
-			} 
-			else if(body.jjtGetChild(i) instanceof ASTASSIGN){
-				System.out.println("ASTASSIGN");
+			if(body.jjtGetChild(i) instanceof ASTVAR_DECL)
+				manageVAR_DECL((SimpleNode) body.jjtGetChild(i));
+
+			else if(body.jjtGetChild(i) instanceof ASTASSIGN)
+				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
+
+			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION)
+				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i));
+		}
+	}
+
+	private void manageVAR_DECL(SimpleNode node){
+
+		this.printWriter.println("VAR_DECL");
+	}
+
+
+	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
+
+		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
+			manageParamLocalASSIGN(node, fst);
+		else
+			manageGlobalASSIGN(node, fst);
+	}
+
+
+	private void manageParamLocalASSIGN(SimpleNode node, FunctionSymbolTable fst){
+
+		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+		String lhsName = lhs.getName();
+		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
+
+		int index = getNodeIndex(lhsName, fst);
+
+		if(rhs instanceof ASTINT){
+
+			int value = Integer.parseInt(rhs.getValueInt());
+
+			if(value >= 0 && value <= 5)
+				this.printWriter.println("\ticonst_" + Integer.toString(value));
+			else if(value == -1)
+				this.printWriter.println("\ticonst_m1");
+			else if(value >= -128 && value <= 127)
+				this.printWriter.println("\tbipush " + Integer.toString(value));
+			else if(value >= -32768 && value <= 32767)
+				this.printWriter.println("\tsipush " + Integer.toString(value));
+			else
+				this.printWriter.println("\tldc " + Integer.toString(value));
+		}
+		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
+
+			if(rhs.getValueBoolean().equals("true"))
+				this.printWriter.println("\ticonst_1");
+			else
+				this.printWriter.println("\ticonst_0");
+		}
+		else if(rhs instanceof ASTIDENTIFIER){
+
+			String rhsName = rhs.getName(); 
+			if(isGlobal(rhsName)){
+
+				this.printWriter.println("\taload_0");
+
+				// NOT SURE ABOUT THE CLASS NAME
+				String getfieldStr = "\tgetfield ";
+				getfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + rhs.getName() + " ";
+				getfieldStr += this.symbolTable.getGlobal_variables().get(rhs.getName()).getTypeDescriptor();
+				this.printWriter.println(getfieldStr);
 			}
-			else if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY){
-				System.out.println("ASTASSIGN_ARRAY");
-			}
-			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
-				System.out.println("ASTCALL_FUNCTION");
+			else{
+
+				int index2 = getNodeIndex(rhsName, fst);
+				this.printWriter.println("\tiload_" + index2);
 			}
 		}
-		System.out.println("---");
+		this.printWriter.println("\tistore_" + Integer.toString(index) + "\n");
+	}
+
+	private void manageGlobalASSIGN(SimpleNode node, FunctionSymbolTable fst){
+
+		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
+
+		if(rhs instanceof ASTINT){
+
+			int value = Integer.parseInt(rhs.getValueInt());
+
+			this.printWriter.println("\taload_0");
+
+			if(value >= 0 && value <= 5)
+				this.printWriter.println("\ticonst_" + Integer.toString(value));
+			else if(value == -1)
+				this.printWriter.println("\ticonst_m1");
+			else if(value >= -128 && value <= 127)
+				this.printWriter.println("\tbipush " + Integer.toString(value));
+			else if(value >= -32768 && value <= 32767)
+				this.printWriter.println("\tsipush " + Integer.toString(value));
+			else
+				this.printWriter.println("\tldc " + Integer.toString(value));
+
+
+			// NOT SURE ABOUT THE CLASS NAME
+			String putfieldStr = "\tputfield ";
+			putfieldStr += this.symbolTable.getClassName() + "/" + lhs.getName() + " ";
+			putfieldStr += this.symbolTable.getGlobal_variables().get(lhs.getName()).getTypeDescriptor();
+			this.printWriter.println(putfieldStr + "\n");
+		}
+		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
+
+			this.printWriter.println("\taload_0");
+
+			if(rhs.getValueBoolean().equals("true"))
+				this.printWriter.println("\ticonst_1");
+			else
+				this.printWriter.println("\ticonst_0");
+
+
+			// NOT SURE ABOUT THE CLASS NAME
+			String putfieldStr = "\tputfield ";
+			putfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + lhs.getName() + " ";
+			putfieldStr += this.symbolTable.getGlobal_variables().get(lhs.getName()).getTypeDescriptor();
+			this.printWriter.println(putfieldStr + "\n");
+		}
+		else if(rhs instanceof ASTIDENTIFIER){
+
+			String rhsName = rhs.getName(); 
+			if(isGlobal(rhsName)){
+
+				this.printWriter.println("\taload_0");
+				this.printWriter.println("\taload_0");
+
+				// NOT SURE ABOUT THE CLASS NAME
+				String getfieldStr = "\tgetfield ";
+				getfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + rhs.getName() + " ";
+				getfieldStr += this.symbolTable.getGlobal_variables().get(rhs.getName()).getTypeDescriptor();
+				this.printWriter.println(getfieldStr);
+
+				// NOT SURE ABOUT THE CLASS NAME
+				String putfieldStr = "\tputfield ";
+				putfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + lhs.getName() + " ";
+				putfieldStr += this.symbolTable.getGlobal_variables().get(lhs.getName()).getTypeDescriptor();
+				this.printWriter.println(putfieldStr + "\n");
+			}
+			else{
+
+				int index2 = getNodeIndex(rhsName, fst);
+
+				this.printWriter.println("\taload_0");
+				this.printWriter.println("\tiload_" +  Integer.toString(index2));
+
+				// NOT SURE ABOUT THE CLASS NAME
+				String putfieldStr = "\tputfield ";
+				putfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + lhs.getName() + " ";
+				putfieldStr += this.symbolTable.getGlobal_variables().get(lhs.getName()).getTypeDescriptor();
+				this.printWriter.println(putfieldStr + "\n");
+			}
+		}
+	}
+
+	private boolean isGlobal(String name){
+
+		if(this.symbolTable.getGlobal_variables().get(name) != null)
+			return true;
+		else
+			return false;
+	}
+
+	private int getNodeIndex(String name, FunctionSymbolTable fst){
+
+		Map<String, Symbol> map;
+		int index;
+
+		// if(this.symbolTable.getGlobal_variables().get(name) != null){
+		// 	map = this.symbolTable.getGlobal_variables();
+		// 	index = 420;
+		// 	return index;
+		// }
+		if(fst.getParameters().get(name) != null){
+			map = fst.getParameters();
+			index = 1;
+		}
+		else{
+			map = fst.getLocalVariables();
+			index = 1 + fst.getParameters().size();
+		}
+
+		for (Map.Entry<String, Symbol> entry : map.entrySet()) {
+		    if(entry.getKey().equals(name))
+		    	break;
+		    index++;
+		}
+		return index;
+	}
+
+	private void manageCALL_FUNCTION(SimpleNode node){
+
+		this.printWriter.println("CALL_FUNCTION");
 	}
 
 	private String getParametersInformation(FunctionSymbolTable value){
