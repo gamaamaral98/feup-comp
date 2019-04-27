@@ -470,6 +470,7 @@ void Vars_Statement_Aux()       : {Token t;}
                      }
 /*@egen*/             Vars_Statement_1()
     | Statement_Aux() (Statement())*
+    | {}
 }
 
 void Vars_Statement_1()       : {Token t;}
