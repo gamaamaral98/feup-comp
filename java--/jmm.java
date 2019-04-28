@@ -830,6 +830,11 @@ public class jmm{
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTADD
+                || node.jjtGetChild(0) instanceof ASTSUB
+                || node.jjtGetChild(0) instanceof ASTMUL
+                || node.jjtGetChild(0) instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
         } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
             semanticError("Cannot add symbol", function_name, line);
         }
@@ -838,6 +843,11 @@ public class jmm{
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTADD
+                || node.jjtGetChild(0) instanceof ASTSUB
+                || node.jjtGetChild(0) instanceof ASTMUL
+                || node.jjtGetChild(0) instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
             semanticError("Cannot add symbol", function_name, line);
         }
