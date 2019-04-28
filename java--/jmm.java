@@ -61,10 +61,6 @@ public class jmm{
                 this.symbolTables = new ClassSymbolTable(class_name.name, extended_class_name.name);
                 i = 2;
             }
-            else{
-                // DELETE
-                System.out.println("WTF IS THIS?");
-            }
 
             for( ; i < node.jjtGetChild(0).jjtGetNumChildren(); i++){
 
@@ -92,16 +88,14 @@ public class jmm{
                                 semanticError("Redefinition of global variable.", variable_name, line);
                             }
                         }
-                        else{
-                            // DELETE
-                            System.out.println("WTF IS THIS?");
-                        }
                     }
                 }
 
                 //FUNCTIONS
                 else if(node.jjtGetChild(0).jjtGetChild(i) instanceof ASTMETHODS){
                     ASTMETHODS functions = (ASTMETHODS) node.jjtGetChild(0).jjtGetChild(i);
+
+                    // LOOP TO ADD ALL FUNCTIONS STRUCTURE (FUNCTION NAME, PARAMETERS AND RETURN TYPE)
                     for(int j = 0; j < functions.jjtGetNumChildren(); j++){
                         // NORMAL FUNCTION
                         if(functions.jjtGetChild(j) instanceof ASTMETHOD){
@@ -133,10 +127,6 @@ public class jmm{
                                     semanticError("Duplicated function return type definition", function_name, line);
                                 }
                             }
-                            else{
-                                // DELETE
-                                System.out.println("WTF IS THIS?");
-                            }
 
                             // FUNCTION PARAMETERS
                             ASTMETHOD_ARGS function_args = (ASTMETHOD_ARGS) function.jjtGetChild(2);
@@ -163,12 +153,33 @@ public class jmm{
                                         semanticError("Duplicated parameter in function arguments", function_name, line);
                                     }
                                 }
-                                else{
-                                    // DELETE
-                                    System.out.println("WTF IS THIS?");
-                                }
-
                             }
+                        } else if(functions.jjtGetChild(j) instanceof ASTMAIN){
+                            String function_name = "main";
+                            ASTMAIN function = (ASTMAIN) functions.jjtGetChild(j);
+                            String parameter = ((ASTARGV) function.jjtGetChild(0)).name;
+                            line = ((ASTARGV) function.jjtGetChild(0)).line;
+
+                            // ADDING MAIN FUNCTION
+                            if(!this.symbolTables.addFunction("main")){
+                                semanticError("Duplicated function definition", function_name, line);
+                            }
+
+                            // ADDING MAIN PARAMETERS
+                            if(!this.symbolTables.addFunctionParameter(function_name, parameter, Symbol.SymbolType.STRING_ARRAY)){
+                                semanticError("Parameter already defined", parameter, line);
+                            }
+                        }
+                    }
+
+                    // LOOP TO HANDLE FUNCTIONS BODY AND RETURN EXPRESSION
+                    for(int j = 0; j < functions.jjtGetNumChildren(); j++){
+                        // NORMAL FUNCTION
+                        if(functions.jjtGetChild(j) instanceof ASTMETHOD){
+                            ASTMETHOD function = (ASTMETHOD) functions.jjtGetChild(j);
+
+                            // FUNCTION NAME
+                            String function_name = ((ASTNAME) function.jjtGetChild(1)).name;
 
                             // FUNCTION BODY
                             ASTMETHOD_BODY function_body = (ASTMETHOD_BODY) function.jjtGetChild(3);
@@ -184,38 +195,18 @@ public class jmm{
                         else if(functions.jjtGetChild(j) instanceof ASTMAIN){
                             String function_name = "main";
                             ASTMAIN function = (ASTMAIN) functions.jjtGetChild(j);
-                            String parameter = ((ASTARGV) function.jjtGetChild(0)).name;
-                            line = ((ASTARGV) function.jjtGetChild(0)).line;
-
-                            // ADDING MAIN FUNCTION
-                            if(!this.symbolTables.addFunction("main")){
-                                semanticError("Duplicated function definition", function_name, line);
-                            }
-
-                            // ADDING MAIN PARAMETERS
-                            if(!this.symbolTables.addFunctionParameter(function_name, parameter, Symbol.SymbolType.STRING_ARRAY)){
-                                semanticError("Parameter already defined", parameter, line);
-                            }
 
                             // MAIN BODY
                             ASTMETHOD_BODY function_body = (ASTMETHOD_BODY) function.jjtGetChild(1);
                             handleMethodBody(function_name, function_body);
                         }
-                        else{
-                            // DELETE
-                            System.out.println("WTF IS THIS?");
-                        }
                     }
-                }
-                else{
-                    // DELETE
-                    System.out.println("WTF IS THIS?");
                 }
             }
         }
     }
 
-    public void handleMethodBody(String function_name, ASTMETHOD_BODY body){
+    private void handleMethodBody(String function_name, ASTMETHOD_BODY body){
         // TODO: FAZER ISTO
         for(int n = 0; n < body.jjtGetNumChildren(); n++){
             int local = 1;
@@ -596,7 +587,7 @@ public class jmm{
 
     }
 
-    public void handleParameterExpression(String function_name, Node expression, Symbol symbol, int line){
+    private void handleParameterExpression(String function_name, Node expression, Symbol symbol, int line){
         if(expression instanceof ASTNOT){
             if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
                 semanticError("Incompatible types: cannot be converted to boolean", function_name, line);
