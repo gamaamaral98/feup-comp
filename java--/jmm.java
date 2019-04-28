@@ -251,7 +251,8 @@ public class jmm{
                         return;
                     }
                     else{
-                        this.symbolTables.setInitVariable(function_name, assigned_variable_name);
+                        if(local == 1)
+                            this.symbolTables.setInitVariable(function_name, assigned_variable_name);
                     }
                 }
 
@@ -367,13 +368,14 @@ public class jmm{
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
-
-                // call handlemethodbody for if body and else body
+                int new_local = local + 1;
+                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
                 int line = ((ASTIF_ELSE_STATEMENT) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
-                
-                // call handlemethodbody for if body and else body
+                int new_local = local + 1;
+                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
+                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(2).jjtGetChild(0), new_local);
             }
         }
     }
@@ -828,12 +830,7 @@ public class jmm{
                 System.out.println("\t\t> Local Variables:");
 
             for (Map.Entry<String, Symbol> variable_entry : entry.getValue().getLocalVariables().entrySet()){
-                System.out.print("\t\t\t>Name: " + variable_entry.getValue().getAttribute() + "\tType: " + variable_entry.getValue().getTypeString() + "\tLocal: ");
-                int n = variable_entry.getValue().getLocalValue();
-                for(int i = 1; i < n; i++){
-                    System.out.print("1.");
-                }
-                System.out.println("1");
+                System.out.print("\t\t\t>Name: " + variable_entry.getValue().getAttribute() + "\tType: " + variable_entry.getValue().getTypeString());
             }
 
             if(!entry.getKey().equals("main")){
