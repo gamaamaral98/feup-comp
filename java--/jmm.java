@@ -211,28 +211,28 @@ public class jmm{
             if(body.jjtGetChild(n) instanceof ASTVAR_DECL){
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
                     if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)){
-                        semanticError("Redefinition of variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                        semanticError("Variable already defined", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     } else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.IDENTIFIER, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, local)){
                         semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
                
                 } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTBOOLEAN){
                     if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)){
-                        semanticError("Redefinition of variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                        semanticError("Variable already defined", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     } else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.BOOLEAN, local)){
                         semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
                
                 } else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT){
                     if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)){
-                        semanticError("Redefinition of variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                        semanticError("Variable already defined", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     } else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT, local)){
                         semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
                
                 }else if (body.jjtGetChild(n).jjtGetChild(0) instanceof ASTINT_ARRAY){
                     if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name)){
-                        semanticError("Redefinition of variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
+                        semanticError("Variable already defined", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     } else if(!this.symbolTables.getFunctions().get(function_name).addLocalVariable(((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, Symbol.SymbolType.INT_ARRAY, local)){
                         semanticError("Redefinition of local variable", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1)).line);
                     }
@@ -274,7 +274,7 @@ public class jmm{
                             semanticError("Function not found", function_call_name, line);
                         }
                         else if(this.symbolTables.getFunctionsReturnType(function_call_name) != this.symbolTables.getVariableType(function_name, assigned_variable_name)){
-                            semanticError("Incompatible types: cannot be converted to " + this.symbolTables.getVariableType(function_name, assigned_variable_name), function_call_name, line);
+                            semanticError("Incompatible assign types: cannot be converted to " + this.symbolTables.getVariableType(function_name, assigned_variable_name), function_call_name, line);
                         }
                         else{
                             handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(2));
@@ -298,131 +298,103 @@ public class jmm{
 
                 // Expression, "[", Expression, "]"
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTACCESS_ARRAY){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                    }else if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTINT)){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).line);                       
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
+                    if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTIDENTIFIER){
+                        ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                        symbols.add(Symbol.SymbolType.INT);
+                        handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1), symbols);
+                    } else if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTINT)){
+                        semanticError("Incompatible types: cannot be converted to int", function_name, line);
+                    }
+                    ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                    symbols.add(Symbol.SymbolType.INT_ARRAY);
+                    handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), symbols);
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTAND){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
 
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTBOOLEAN) && !(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTTRUE) && !(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTFALSE)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
-
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTBOOLEAN) && !(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTTRUE) && !(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTFALSE)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line); 
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name) != Symbol.SymbolType.BOOLEAN){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
+                    handleAND(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTLT){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
 
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).line); 
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name) != Symbol.SymbolType.INT){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
-
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTINT)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line); 
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name) != Symbol.SymbolType.INT){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
+                    handleLT(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
 
-                else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTADD || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTSUB || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTMUL || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTDIV){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTADD
+                        || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTSUB
+                        || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTMUL
+                        || body.jjtGetChild(n).jjtGetChild(1) instanceof ASTDIV){
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
 
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).line); 
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name) != Symbol.SymbolType.INT){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
-
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTINT)){
-                        if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTIDENTIFIER)){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line); 
-                        }else if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name) != Symbol.SymbolType.INT){
-                            semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                        }
-                    }
+                    handleMathOperationsReturnExpression(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTLENGTH){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name) != Symbol.SymbolType.INT_ARRAY){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTINT){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTTHIS){
-                    
-                    if(!this.symbolTables.getVariableIdentifierType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name).equals(this.symbolTables.getClassName())){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                    }  
+                    if(!this.symbolTables.getVariableIdentifierType(function_name, assigned_variable_name).equals(this.symbolTables.getClassName())){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
+                    }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTTRUE){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTFALSE){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.BOOLEAN){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNEW_CLASS){
                     String class_name = ((ASTCLASS)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name;
-                    if(!this.symbolTables.getClassName().equals(class_name)){
-                        semanticError("Class not found", class_name, line);
+                    if(!this.symbolTables.getVariableIdentifierType(function_name, assigned_variable_name).equals(class_name)){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNEW_INT_ARRAY){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != Symbol.SymbolType.INT_ARRAY){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
-                    } 
-
-                    if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
-                        semanticError("Incompatible types: cannot be converted to int", body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0).toString(), ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT_ARRAY){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
+                    }
+                    if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                        ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                        symbols.add(Symbol.SymbolType.INT);
+                        handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), symbols);
+                    } else if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
+                        semanticError("Incompatible types: cannot be converted to int", function_name, line);
                     }
                 }
 
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTNOT){
-                    if(this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name) != this.symbolTables.getVariableType(function_name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name)){
-                        semanticError("Incompatible assign type", ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).name, ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line);
+                    if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.BOOLEAN){
+                        semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
+                    handleNOT(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
 
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
@@ -433,11 +405,7 @@ public class jmm{
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
                 // handle condition
                 // call handlemethodbody for if body and else body
-            } else if(body.jjtGetChild(n) instanceof ASTCALL_FUNCTION){
-
             }
-            // FALTA { Statement }
-            // FALTA Expression ;
         }
     }
 
@@ -481,10 +449,20 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
                 semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
+            if(expression.jjtGetChild(1) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT);
+                handleIdentifier(function_name, line, expression.jjtGetChild(1), symbols);
+            } else if(!(expression.jjtGetChild(1) instanceof ASTINT)){
+                semanticError("Incompatible types: cannot be converted to int", function_name, line);
+            }
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
-        } else if (expression instanceof ASTADD){
+        } else if (expression instanceof ASTADD
+                || expression instanceof ASTSUB
+                || expression instanceof ASTMUL
+                || expression instanceof ASTDIV){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
                 semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
@@ -499,21 +477,6 @@ public class jmm{
                 semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
             handleLT(function_name, line, expression);
-        } else if (expression instanceof ASTSUB){
-            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
-            }
-            handleMathOperationsReturnExpression(function_name, line, expression);
-        } else if (expression instanceof ASTMUL){
-            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
-            }
-            handleMathOperationsReturnExpression(function_name, line, expression);
-        } else if (expression instanceof ASTDIV){
-            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
-            }
-            handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTLENGTH){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
                 semanticError("Incompatible return types: cannot be converted to int", function_name, line);
@@ -540,7 +503,7 @@ public class jmm{
                 symbols.add(Symbol.SymbolType.INT);
                 handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
             } else if(!(expression.jjtGetChild(0) instanceof ASTINT)){
-                semanticError("Incompatible types: cannot be converted to int", expression.jjtGetChild(0).toString(), line);
+                semanticError("Incompatible types: cannot be converted to int", function_name, line);
             }
         } else if (expression instanceof ASTCALL_FUNCTION){
             if(expression.jjtGetChild(0) instanceof ASTTHIS){
