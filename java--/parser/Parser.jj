@@ -887,14 +887,14 @@ void Multiple_Statements()                 : {/*@bgen(jjtree) STATEMENT_LIST */
 }
 
 void If_Else_Statement()                       : {/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
-  ASTIF_ELSE_STATEMENT jjtn000 = new ASTIF_ELSE_STATEMENT(JJTIF_ELSE_STATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                                  ASTIF_ELSE_STATEMENT jjtn000 = new ASTIF_ELSE_STATEMENT(JJTIF_ELSE_STATEMENT);
+                                                  boolean jjtc000 = true;
+                                                  jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
     try {
 /*@egen*/
-    <IF> <LPAR> Statement_COND() <RPAR>
+    <IF> t=<LPAR> {jjtn000.name = t.image; jjtn000.line = t.beginLine;} Statement_COND() <RPAR>
     If_Else_Statement_IF()
     <ELSE>
     If_Else_Statement_ELSE()/*@bgen(jjtree)*/
@@ -1014,15 +1014,15 @@ void If_Else_Statement_ELSE()            : {/*@bgen(jjtree) ELSE_BODY */
 }
 
 void While_Statement()           : {/*@bgen(jjtree) #WHILE( 2) */
-  ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                                    ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
+                                    boolean jjtc000 = true;
+                                    jjtree.openNodeScope(jjtn000);
+/*@egen*/Token t;}
 {/*@bgen(jjtree) #WHILE( 2) */
     try {
 /*@egen*/
     try{
-        <WHILE> <LPAR> Statement_COND() <RPAR>
+        <WHILE> t=<LPAR> {jjtn000.name = t.image; jjtn000.line = t.beginLine;} Statement_COND() <RPAR>
     }
     catch (ParseException e) {
         errors++;

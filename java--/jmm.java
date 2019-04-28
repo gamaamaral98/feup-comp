@@ -366,13 +366,13 @@ public class jmm{
 
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
-                //handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
-                // handle condition
+                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
+
                 // call handlemethodbody for if body and else body
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
                 int line = ((ASTIF_ELSE_STATEMENT) body.jjtGetChild(n)).line;
-                //handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
-                // handle condition
+                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
+                
                 // call handlemethodbody for if body and else body
             }
         }
