@@ -3,110 +3,79 @@ class FindMaximum extends ClassA {
 	boolean banana;
 	int pera;
 	random yoyo;
+	FindMaximum fm;
 
-//	public puta getYoyo(){
-//		return !yoyo;
-//	}
-//
-//	public puta getYoyo20(){
-//		return !!0;
-//	}
-
-	public random getYoyo2(int a, int b){
-		return yoyo;
-	}
-
-	// public random getYoyo2(){
-	// 	return !(a < b);
-	// }
-
-	// public puta getYoyo3(){
-	// 	return true;
-	// }
-
-	// public puta getYoyo4(){
-	// 	return 0;
-	// }
-
-	// public int[] getYoyo15(){
-	// 	return test_arr;
-	// }
-
-	// public int getYoyo16(){
-	// 	return test_arr[2];
-	// }
-
-	// public int getYoyo5(){
-	//  	return a + b;
-	//  }
-
-	public int getYoyo6(){
-		return 1 + 2;
-	}
-
-//	public puta getYoyo6(){
-//		return a && b;
-//	}
-//
-//	public puta getYoyo6(){
-//		return true && false;
-//	}
-//
-//	public puta getYoyo7(){
-//		return a < b;
-//	}
-	// int a;
-	// public int getYoyo7(){
-	// 	return a.length;
-	// }
-
-	// public puta getYoyo8(){
-	// 	return a - b;
-	// }
-
-	// public puta getYoyo9(){
-	// 	return a * b;
-	// }
-
-	// public puta getYoyo10(){
-	// 	return a / b;
+	// public ABC ab(ABC b, boolean a, int c){
+	// 	return b;
 	// }
 
 	// public puta getYoyo11(){
-	// 	return this.a;
+	// 	return this.ab(this.pita(), true, 1+1);
 	// }
 
-	// public puta getYoyo12(){
-	// 	return a.bananas(bananaboa, bananama);
+
+
+	// public int ab2(int a, int c){
+	// 	return rand1 + rand1 + rand2 + rand2;
 	// }
 
-	// public puta getYoyo13(){
-	// 	return new vinhoverde();
+	// public int add(int a){
+	// 	return a;
 	// }
 
-	// public puta getYoyo14(){
-	// 	return new int[pinar];
+
+	// public boolean teste2(int m){
+	// 	return true;
 	// }
 
-//	public int find_maximum(int[] arr, boolean preta, int verde, incolor cor) {
-//		int i;
-//		int maximum;
-//		int value;
-//		banana = false;
-//		i = 1;
-//		maximum = arr[0];
-//		while (i < arr.length) {
-//			value = arr[i];
-//			if (maximum < value) {
-//				maximum = value;
-//
-//			} else {
-//			}
-//			i = i + 1;
-//		}
-//
-//		return maximum;
-//	}
+	public boolean ad(int d){
+		int n;
+		int a;
+		n = 2;
+		while(true){
+			this.print(1);
+		}
+		if(a < 2){
+			n = 1;
+		} 
+		else{
+			b = 1;
+		}
+
+		n[2] = 2;
+		return false;
+	}
+
+
+
+
+
+
+
+	// public int find_maximum(int[] arr, boolean preta, int verde, incolor cor) {
+	// 	int i;
+	// 	int maximum;
+	// 	int value;
+	// 	// boolean ah;
+	// 	// ah = true;
+	// 	a = 2;
+
+	// 	return maximum;
+	// }
+
+
+
+
+
+
+
+
+
+	// public random teste(int i, int b){
+	// 	int i;
+	// 	return 2;
+	// }
+
 //
 //	public int build_test_arr() {
 //		test_arr = new int[5];

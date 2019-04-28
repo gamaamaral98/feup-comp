@@ -398,15 +398,24 @@ public class jmm{
                 }
 
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
+                System.out.println("ASSSSSSIGGN");
 
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
+                int line = ((ASTWHILE) body.jjtGetChild(n)).line;
+                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
                 // handle condition
                 // call handlemethodbody for if body and else body
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
+                int line = ((ASTIF_ELSE_STATEMENT) body.jjtGetChild(n)).line;
+                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
                 // handle condition
                 // call handlemethodbody for if body and else body
             }
         }
+    }
+
+    private void handleCondition(String function_name, Node expression, int line){
+
     }
 
     private void handleReturnExpression(String function_name, Node expression, int line){
