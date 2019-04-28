@@ -1,10 +1,13 @@
-class Fac extends ClassA{
-    public int ComputeFac(int i, int b){
+class Fac{
+    public int A(){
+        int n;
         int a;
-        int b;
-        while(a < 0) {
-            b = a;
+        n=2;
+        if(a<2){
+            n = 1;
         }
-        return 2;
+        n[2] = 2;
+
+        return false;
     }
 }
