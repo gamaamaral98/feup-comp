@@ -396,9 +396,21 @@ public class jmm{
                     }
                     handleNOT(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
-
+            // IDENTIFIER [ EXPRESSION1 ] = EXPRESSION2
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
-                System.out.println("ASSSSSSIGGN");
+
+                String assigned_variable_name = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).name;
+                int line = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).line;
+                
+                if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT_ARRAY){
+                   semanticError("Incompatible assign type", assigned_variable_name, line);
+                }
+
+                //HANDLE EXPRESSION1
+
+
+                //HANDLE EXPRESSION2
+
 
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
