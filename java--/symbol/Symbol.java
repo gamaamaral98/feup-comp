@@ -86,21 +86,6 @@ public class Symbol {
         return "";
     }
 
-    public String getTypeCapsString(){
-        if(type == Symbol.SymbolType.IDENTIFIER){
-            return "IDENTIFIER";
-        } else if(type == SymbolType.INT){
-            return "INT";
-        } else if(type == SymbolType.INT_ARRAY){
-            return "INT_ARRAY";
-        } else if(type == SymbolType.BOOLEAN){
-            return "BOOLEAN";
-        } else if(type == SymbolType.STRING_ARRAY){
-            return "STRING_ARRAY";
-        }
-        return "";
-    }
-
     public String getTypeDescriptor(){
 
         switch(getType()) {

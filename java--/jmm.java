@@ -461,72 +461,79 @@ public class jmm{
     public void handleReturnExpression(String function_name, Node expression, int line){
         if(expression instanceof ASTNOT){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
             handleNOT(function_name, line, expression);
         } else if (expression instanceof ASTIDENTIFIER){
             String name = ((ASTIDENTIFIER) expression).name;
-            if(!this.symbolTables.hasVariable(function_name, name)){
+            if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(name)){
+                if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctions().get(function_name).getParameters().get(name).getType()){
+                    semanticError("Incompatible return types", function_name, line);
+                }
+            } else if(this.symbolTables.hasVariable(function_name, name)){
+                if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getVariableType(function_name, name)){
+                    semanticError("Incompatible return types", function_name, line);
+                }
+                else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                    semanticError("Variable might not have been initialized", name, line);
+                }
+
+            } else {
                 semanticError("Cannot find symbol", name, line);
-            } else if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER
-                    || !this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getVariableIdentifierType(function_name, name))){
-                semanticError("Incompatible return types", function_name, line);
-            } else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
-                semanticError("Variable might not have been initialized", name, line);
             }
             this.symbolTables.setFunctionReturnAttribute(function_name, name);
         } else if (expression instanceof ASTTRUE){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
         } else if (expression instanceof ASTFALSE){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
         } else if (expression instanceof ASTINT){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
         } else if (expression instanceof ASTACCESS_ARRAY){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
         } else if (expression instanceof ASTADD){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTAND){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
             handleAND(function_name, line, expression);
         } else if (expression instanceof ASTLT){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.BOOLEAN){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to boolean", function_name, line);
             }
             handleLT(function_name, line, expression);
         } else if (expression instanceof ASTSUB){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTMUL){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTDIV){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTLENGTH){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.IDENTIFIER);
@@ -543,7 +550,7 @@ public class jmm{
             }
         } else if (expression instanceof ASTNEW_INT_ARRAY){
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT_ARRAY){
-                semanticError("Incompatible return types", function_name, line);
+                semanticError("Incompatible return types: cannot be converted to int[]", function_name, line);
             }
             if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
                 ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
@@ -560,10 +567,22 @@ public class jmm{
                 } else if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctions().get(function_call_name).getReturnType()){
                     semanticError("Incompatible return types for called function", function_name, line);
                 } else{
-                    handleFunctionArguments(function_call_name, line, expression.jjtGetChild(2));
+                    handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
                 }
             } else if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
-                // TODO:
+                String name = ((ASTIDENTIFIER) expression.jjtGetChild(0)).name;
+                String function_call_name = ((ASTFUNCTION) expression.jjtGetChild(1)).name;
+                if(this.symbolTables.hasVariable(function_name, name)
+                        && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
+                        && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
+                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                        semanticError("Function not found", function_call_name, line);
+                    } else if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctions().get(function_call_name).getReturnType()){
+                        semanticError("Incompatible return types for called function", function_name, line);
+                    } else{
+                        handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
+                    }
+                }
             }
         } else if(expression instanceof ASTTHIS){
             if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
@@ -577,75 +596,81 @@ public class jmm{
 
     }
 
-    public void handleParameterExpression(String function_name, Node expression, String type, int line){
+    public void handleParameterExpression(String function_name, Node expression, Symbol symbol, int line){
         if(expression instanceof ASTNOT){
-            if(!type.equals("BOOLEAN")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible types: cannot be converted to boolean", function_name, line);
             }
             handleNOT(function_name, line, expression);
         } else if (expression instanceof ASTIDENTIFIER){
-            // TODO:
-//            String name = ((ASTIDENTIFIER) expression).name;
-//            if(!this.symbolTables.hasVariable(function_name, name)){
-//                semanticError("Cannot find symbol", name, line);
-//            } else if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER
-//                    || !this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getVariableIdentifierType(function_name, name))){
-//                semanticError("Incompatible return types", function_name, line);
-//            } else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
-//                semanticError("Variable might not have been initialized", name, line);
-//            }
+            String name = ((ASTIDENTIFIER) expression).name;
+            if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(name)){
+                if(symbol.getType() != this.symbolTables.getFunctions().get(function_name).getParameters().get(name).getType()){
+                    semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+                }
+            } else if(this.symbolTables.hasVariable(function_name, name)){
+                if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getVariableType(function_name, name)){
+                    semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+                }
+                else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                    semanticError("Variable might not have been initialized", name, line);
+                }
+
+            } else {
+                semanticError("Cannot find symbol", name, line);
+            }
         } else if (expression instanceof ASTTRUE){
-            if(!type.equals("BOOLEAN")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
         } else if (expression instanceof ASTFALSE){
-            if(!type.equals("BOOLEAN")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
         } else if (expression instanceof ASTINT){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
         } else if (expression instanceof ASTACCESS_ARRAY){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
         } else if (expression instanceof ASTADD){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTAND){
-            if(!type.equals("BOOLEAN")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleAND(function_name, line, expression);
         } else if (expression instanceof ASTLT){
-            if(!type.equals("BOOLEAN")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.BOOLEAN){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleLT(function_name, line, expression);
         } else if (expression instanceof ASTSUB){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTMUL){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTDIV){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             handleMathOperationsReturnExpression(function_name, line, expression);
         } else if (expression instanceof ASTLENGTH){
-            if(!type.equals("INT")){
-                semanticError("Incompatible parameter types", function_name, line);
+            if(symbol.getType() != Symbol.SymbolType.INT){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.IDENTIFIER);
@@ -654,39 +679,49 @@ public class jmm{
                 handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
             }
         } else if (expression instanceof ASTNEW_CLASS){
-//            if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER){
-//                semanticError("Incompatible return types", function_name, line);
-//            }
-//            else if(!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(((ASTCLASS) expression.jjtGetChild(0)).name)){
-//                semanticError("Incompatible return types", function_name, line);
-//            }
+            if((symbol.getType() != Symbol.SymbolType.IDENTIFIER) || (!symbol.getIdentifier_name().equals(((ASTCLASS) expression.jjtGetChild(0)).name))){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+            }
         } else if (expression instanceof ASTNEW_INT_ARRAY){
-            // TODO:
-//            if(type.equals("INT_ARRAY")){
-//                semanticError("Incompatible parameter types", function_name, line);
-//            }
-//            if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
-//                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-//                symbols.add(Symbol.SymbolType.INT);
-//                handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
-//            } else if(!(expression.jjtGetChild(0) instanceof ASTINT)){
-//                semanticError("Incompatible types: cannot be converted to int", expression.jjtGetChild(0).toString(), line);
-//            }
+            if(symbol.getType() != Symbol.SymbolType.INT_ARRAY){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+            }
+            if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
+                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                symbols.add(Symbol.SymbolType.INT);
+                handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
+            } else if(!(expression.jjtGetChild(0) instanceof ASTINT)){
+                semanticError("Incompatible types: cannot be converted to int", expression.jjtGetChild(0).toString(), line);
+            }
         } else if (expression instanceof ASTCALL_FUNCTION){
-            //TODO:
+            if(expression.jjtGetChild(0) instanceof ASTTHIS){
+                if(!this.symbolTables.getFunctions().containsKey(((ASTFUNCTION) expression.jjtGetChild(1)).name)){
+                    semanticError("Function not found", ((ASTFUNCTION) expression.jjtGetChild(1)).name, line);
+                } else if(symbol.getType() != this.symbolTables.getFunctions().get(((ASTFUNCTION) expression.jjtGetChild(1)).name).getReturnType()){
+                    semanticError("Incompatible return types: cannot be converted to " + symbol.getTypeString(), ((ASTFUNCTION) expression.jjtGetChild(1)).name, line);
+                } else{
+                    handleFunctionArguments(function_name, ((ASTFUNCTION) expression.jjtGetChild(1)).name, line, expression.jjtGetChild(2));
+                }
+            } else if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
+                String name = ((ASTIDENTIFIER) expression.jjtGetChild(0)).name;
+                String function_call_name = ((ASTFUNCTION) expression.jjtGetChild(1)).name;
+                if(this.symbolTables.hasVariable(function_name, name)
+                        && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
+                        && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
+                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                        semanticError("Function not found", function_call_name, line);
+                    } else if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctions().get(function_call_name).getReturnType()){
+                        semanticError("Incompatible return types for called function", function_name, line);
+                    } else{
+                        handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
+                    }
+                }
+            }
 
-//            if(expression.jjtGetChild(0) instanceof ASTTHIS){
-//                if(!this.symbolTables.getFunctions().containsKey(((ASTFUNCTION) expression.jjtGetChild(1)).name)){
-//                    semanticError("Function not found", ((ASTFUNCTION) expression.jjtGetChild(1)).name, line);
-//                } else{
-//                    handleFunctionArguments(((ASTFUNCTION) expression.jjtGetChild(1)).name, line, expression.jjtGetChild(2));
-//                }
-//            }
         } else if(expression instanceof ASTTHIS){
-            // TODO:
-//            if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
-//                semanticError("Incompatible return types", function_name, line);
-//            }
+            if((symbol.getType() != Symbol.SymbolType.IDENTIFIER) || (!symbol.getIdentifier_name().equals(this.symbolTables.getClassName()))){
+                semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+            }
         }
         else{
             // DELETE
@@ -695,19 +730,19 @@ public class jmm{
 
     }
 
-    private void handleFunctionArguments(String function_name, int line, Node node) {
-        if(this.symbolTables.getFunctions().get(function_name).getParameters().entrySet().size() != node.jjtGetNumChildren()){
+    private void handleFunctionArguments(String function_name, String function_called_name, int line, Node node) {
+        if(this.symbolTables.getFunctions().get(function_called_name).getParameters().entrySet().size() != node.jjtGetNumChildren()){
             semanticError("Missing parameters", function_name, line);
         }
 
         int i = 0;
-        for (Map.Entry<String, Symbol> entry : this.symbolTables.getFunctions().get(function_name).getParameters().entrySet()){
-            handleParameterExpression(function_name, node.jjtGetChild(i), entry.getValue().getTypeCapsString(), line);
+        for (Map.Entry<String, Symbol> entry : this.symbolTables.getFunctions().get(function_called_name).getParameters().entrySet()){
+            handleParameterExpression(function_name, node.jjtGetChild(i), entry.getValue(), line);
             i++;
         }
     }
 
-    public void handleNOT(String function_name, int line, Node node){
+    private void handleNOT(String function_name, int line, Node node){
         if(node.jjtGetChild(0) instanceof ASTNOT){
             handleNOT(function_name, line, node.jjtGetChild(0));
         } else if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
@@ -723,7 +758,7 @@ public class jmm{
         }
     }
 
-    public void handleLT(String function_name, int line, Node node){
+    private void handleLT(String function_name, int line, Node node){
         if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
@@ -733,7 +768,7 @@ public class jmm{
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
-            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+            semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
         if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
@@ -744,11 +779,11 @@ public class jmm{
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
-            semanticError("Bad operand types for binary operator '&&'", function_name, line);
+            semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
     }
 
-    public void handleAND(String function_name, int line, Node node){
+    private void handleAND(String function_name, int line, Node node){
         if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.BOOLEAN);
@@ -780,20 +815,26 @@ public class jmm{
         }
     }
 
-    public void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbols){
+    private void handleIdentifier(String function_name, int line, Node node, ArrayList<Symbol.SymbolType> symbols){
         String variable_name = ((ASTIDENTIFIER) node).name;
-        if(!this.symbolTables.hasVariable(function_name, variable_name)){
+        if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(variable_name)){
+            if(!symbols.contains(this.symbolTables.getFunctions().get(function_name).getParameters().get(variable_name).getType())){
+                semanticError("Bad operand type", variable_name, line);
+            }
+        } else if(this.symbolTables.hasVariable(function_name, variable_name)){
+            if(!symbols.contains(this.symbolTables.getVariableType(function_name, variable_name))){
+                semanticError("Bad operand type", variable_name, line);
+            }
+            else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name)){
+                semanticError("Variable might not have been initialized", variable_name, line);
+            }
+
+        } else {
             semanticError("Cannot find symbol", variable_name, line);
-        }
-        else if(!symbols.contains(this.symbolTables.getVariableType(function_name, variable_name))){
-            semanticError("Bad operand type", variable_name, line);
-        }
-        else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name)){
-            semanticError("Variable might not have been initialized", variable_name, line);
         }
     }
 
-    public void handleMathOperationsReturnExpression(String function_name, int line, Node node){
+    private void handleMathOperationsReturnExpression(String function_name, int line, Node node){
         if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
@@ -811,7 +852,7 @@ public class jmm{
         }
     }
 
-    public void printSymbolTables(){
+    private void printSymbolTables(){
         if(this.symbolTables.getExtendedClassName().equals("")){
             System.out.println("> Class name: " + this.symbolTables.getClassName());
         }else{
@@ -841,7 +882,7 @@ public class jmm{
 
             for (Map.Entry<String, Symbol> variable_entry : entry.getValue().getLocalVariables().entrySet()){
                 System.out.print("\t\t\t>Name: " + variable_entry.getValue().getAttribute() + "\tType: " + variable_entry.getValue().getTypeString() + "\tLocal: ");
-                int n = 1;
+                int n = variable_entry.getValue().getLocalValue();
                 for(int i = 1; i < n; i++){
                     System.out.print("1.");
                 }
@@ -854,11 +895,11 @@ public class jmm{
         }
     }
 
-    public void semanticError(String error, String name, int line_number){
+    private void semanticError(String error, String name, int line_number){
         System.out.println("> " + ++number_errors + "º Semantic Error (line "+ line_number + "): " + error + " -> "+ name);
     }
 
-    public static void openFile(String filename){
+    private static void openFile(String filename){
         File file = new File(filename);
             
         try {
@@ -867,11 +908,10 @@ public class jmm{
             System.out.println("Error in file stream constructor: ");
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             e.printStackTrace();
-            return;
         }
     }
 
-    public static boolean readArgs(String args[]){
+    private static boolean readArgs(String args[]){
         if(args.length < 1){
             System.out.println("Usage: java -cp bin jmm <filePath> [-r=<n>] [-o]");
             return false;
@@ -884,13 +924,13 @@ public class jmm{
         }
 
         for(int i = 1; i < args.length; i++){
-            if(validArgs(args[i]) == false)
+            if(!validArgs(args[i]))
                 return false;
         }
         return true;
     }
 
-    public static boolean validArgs(String arg){
+    private static boolean validArgs(String arg){
         if(arg.equals("-o")) { 
             if(optO) {
                 System.out.println("ERROR: Option O has already been defined.");
