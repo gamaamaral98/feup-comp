@@ -970,20 +970,12 @@ if (jjtc000) {
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
-      try {
-        jj_consume_token(IF);
-        jj_consume_token(LPAR);
-        Statement_COND();
-        jj_consume_token(RPAR);
-      } catch (ParseException e) {
-error_skipto(e, "IF statement declaration", RPAR);
-      }
+      jj_consume_token(IF);
+      jj_consume_token(LPAR);
+      Statement_COND();
+      jj_consume_token(RPAR);
       If_Else_Statement_IF();
-      try {
-        jj_consume_token(ELSE);
-      } catch (ParseException e) {
-System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
-      }
+      jj_consume_token(ELSE);
       If_Else_Statement_ELSE();
     } catch (Throwable jjte000) {
 if (jjtc000) {

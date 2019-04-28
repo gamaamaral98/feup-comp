@@ -894,17 +894,9 @@ void If_Else_Statement()                       : {/*@bgen(jjtree) #IF_ELSE_STATE
 {/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
     try {
 /*@egen*/
-    try{
-        <IF> <LPAR> Statement_COND() <RPAR>
-    }catch(ParseException e){
-        error_skipto(e, "IF statement declaration", RPAR);
-    }
+    <IF> <LPAR> Statement_COND() <RPAR>
     If_Else_Statement_IF()
-    try{
-        <ELSE>
-    } catch(ParseException e){
-        System.out.println("Missing ELSE in IF_ELSE Statement." + e.toString());
-    }
+    <ELSE>
     If_Else_Statement_ELSE()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
