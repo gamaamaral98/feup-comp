@@ -369,13 +369,11 @@ public class jmm{
                 if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT_ARRAY){
                    semanticError("Incompatible assign type", assigned_variable_name, line);
                 }
-
                 //HANDLE EXPRESSION1
-
-
+                handleINT(function_name, body.jjtGetChild(n).jjtGetChild(1), line);
                 //HANDLE EXPRESSION2
-
-
+                handleINT(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(1), line);
+                
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
