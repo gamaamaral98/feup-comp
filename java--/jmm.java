@@ -361,10 +361,27 @@ public class jmm{
                     }
                     handleNOT(function_name, line, body.jjtGetChild(n).jjtGetChild(1));
                 }
-
+            // IDENTIFIER [ EXPRESSION1 ] = EXPRESSION2
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
 
+                String assigned_variable_name = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).name;
+                int line = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).line;
 
+                //Primeiro filho é garantido ser identifier no entanto verificamos se foi declarado ou não
+                if(body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                    if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
+                        semanticError("Cannot find symbol", assigned_variable_name, line);
+                        return;
+                    }
+                    else{
+                        this.symbolTables.setInitVariable(function_name, assigned_variable_name);
+                    }
+                }
+                //HANDLE EXPRESSION1
+                handleINT(function_name, body.jjtGetChild(n).jjtGetChild(1), line);
+                //HANDLE EXPRESSION2
+                handleINT(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(1), line);
+                
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
