@@ -365,9 +365,16 @@ public class jmm{
 
                 String assigned_variable_name = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).name;
                 int line = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0)).line;
-                
-                if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT_ARRAY){
-                   semanticError("Incompatible assign type", assigned_variable_name, line);
+
+                //Primeiro filho é garantido ser identifier no entanto verificamos se foi declarado ou não
+                if(body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                    if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
+                        semanticError("Cannot find symbol", assigned_variable_name, line);
+                        return;
+                    }
+                    else{
+                        this.symbolTables.setInitVariable(function_name, assigned_variable_name);
+                    }
                 }
                 //HANDLE EXPRESSION1
                 handleINT(function_name, body.jjtGetChild(n).jjtGetChild(1), line);
