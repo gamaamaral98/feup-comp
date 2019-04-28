@@ -258,9 +258,9 @@ void Multiple_Statements() #STATEMENT_LIST : {}
     <LCHAVETA> (Statement())* <RCHAVETA>
 }
 
-void If_Else_Statement() #IF_ELSE_STATEMENT(3) : {}
+void If_Else_Statement() #IF_ELSE_STATEMENT(3) : {Token t;}
 {
-    <IF> <LPAR> Statement_COND() <RPAR>
+    <IF> t=<LPAR> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} Statement_COND() <RPAR>
     If_Else_Statement_IF()
     <ELSE>
     If_Else_Statement_ELSE()
@@ -281,10 +281,10 @@ void If_Else_Statement_ELSE() #ELSE_BODY : {}
     Statement()
 }
 
-void While_Statement() #WHILE(2) : {}
+void While_Statement() #WHILE(2) : {Token t;}
 {
     try{
-        <WHILE> <LPAR> Statement_COND() <RPAR>
+        <WHILE> t=<LPAR> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} Statement_COND() <RPAR>
     }
     catch (ParseException e) {
         errors++;

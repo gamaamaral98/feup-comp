@@ -966,12 +966,13 @@ if (jjtc000) {
   }
 
   static final public void If_Else_Statement() throws ParseException {/*@bgen(jjtree) #IF_ELSE_STATEMENT( 3) */
-  ASTIF_ELSE_STATEMENT jjtn000 = new ASTIF_ELSE_STATEMENT(JJTIF_ELSE_STATEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+                                                  ASTIF_ELSE_STATEMENT jjtn000 = new ASTIF_ELSE_STATEMENT(JJTIF_ELSE_STATEMENT);
+                                                  boolean jjtc000 = true;
+                                                  jjtree.openNodeScope(jjtn000);Token t;
     try {
       jj_consume_token(IF);
-      jj_consume_token(LPAR);
+      t = jj_consume_token(LPAR);
+jjtn000.name = t.image; jjtn000.line = t.beginLine;
       Statement_COND();
       jj_consume_token(RPAR);
       If_Else_Statement_IF();
@@ -1080,13 +1081,14 @@ if (jjtc000) {
   }
 
   static final public void While_Statement() throws ParseException {/*@bgen(jjtree) #WHILE( 2) */
-  ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+                                    ASTWHILE jjtn000 = new ASTWHILE(JJTWHILE);
+                                    boolean jjtc000 = true;
+                                    jjtree.openNodeScope(jjtn000);Token t;
     try {
       try {
         jj_consume_token(WHILE);
-        jj_consume_token(LPAR);
+        t = jj_consume_token(LPAR);
+jjtn000.name = t.image; jjtn000.line = t.beginLine;
         Statement_COND();
         jj_consume_token(RPAR);
       } catch (ParseException e) {
