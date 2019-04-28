@@ -263,37 +263,7 @@ public class jmm{
 
                 // | Expression, ".", Identifier, "(", [ Expression { ",", Expression } ], ")"
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTCALL_FUNCTION){
-
-                    if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTTHIS){
-                        String function_call_name = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name;
-
-                        System.out.println(this.symbolTables.getFunctionsReturnType(function_call_name));
-                        System.out.println(this.symbolTables.getVariableType(function_name, assigned_variable_name));
-
-                        if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
-                            semanticError("Function not found", function_call_name, line);
-                        }
-                        else if(this.symbolTables.getFunctionsReturnType(function_call_name) != this.symbolTables.getVariableType(function_name, assigned_variable_name)){
-                            semanticError("Incompatible assign types: cannot be converted to " + this.symbolTables.getVariableType(function_name, assigned_variable_name), function_call_name, line);
-                        }
-                        else{
-                            handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(2));
-                        }
-                    } else if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                        String name = ((ASTIDENTIFIER) body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0)).name;
-                        String function_call_name = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1)).name;
-                        if(this.symbolTables.hasVariable(function_name, name)
-                                && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
-                                && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
-                            if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
-                                semanticError("Function not found", function_call_name, line);
-                            } else if(this.symbolTables.getVariableType(function_name,assigned_variable_name) != this.symbolTables.getFunctionsReturnType(function_call_name)){
-                                semanticError("Incompatible types for assigned variable and called function", function_name, line);
-                            } else{
-                                handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(2));
-                            }
-                        }
-                    }
+                    handleCalledFunction(function_name, body.jjtGetChild(n).jjtGetChild(1), this.symbolTables.getVariableType(function_name,assigned_variable_name), line);
                 }
 
                 // Expression, "[", Expression, "]"
@@ -301,13 +271,7 @@ public class jmm{
                     if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
                         semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
-                    if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTIDENTIFIER){
-                        ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                        symbols.add(Symbol.SymbolType.INT);
-                        handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1), symbols);
-                    } else if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1) instanceof ASTINT)){
-                        semanticError("Incompatible types: cannot be converted to int", function_name, line);
-                    }
+                    handleINT(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(1), line);
                     ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
                     symbols.add(Symbol.SymbolType.INT_ARRAY);
                     handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), symbols);
@@ -398,16 +362,16 @@ public class jmm{
                 }
 
             } else if(body.jjtGetChild(n) instanceof ASTASSIGN_ARRAY){
-                System.out.println("ASSSSSSIGGN");
+
 
             } else if(body.jjtGetChild(n) instanceof ASTWHILE){
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
-                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
+                //handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
                 // handle condition
                 // call handlemethodbody for if body and else body
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
                 int line = ((ASTIF_ELSE_STATEMENT) body.jjtGetChild(n)).line;
-                handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
+                //handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0), line);
                 // handle condition
                 // call handlemethodbody for if body and else body
             }
@@ -415,7 +379,34 @@ public class jmm{
     }
 
     private void handleCondition(String function_name, Node expression, int line){
-
+        if(expression instanceof ASTNOT){
+            handleNOT(function_name, line, expression);
+        } else if (expression instanceof ASTIDENTIFIER){
+            String name = ((ASTIDENTIFIER) expression).name;
+            if(this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(name)){
+                if(Symbol.SymbolType.BOOLEAN != this.symbolTables.getFunctions().get(function_name).getParameters().get(name).getType()){
+                    semanticError("Incompatible return types", function_name, line);
+                }
+            } else if(this.symbolTables.hasVariable(function_name, name)){
+                if(Symbol.SymbolType.BOOLEAN != this.symbolTables.getVariableType(function_name, name)){
+                    semanticError("Incompatible return types", function_name, line);
+                }
+                else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
+                    semanticError("Variable might not have been initialized", name, line);
+                }
+            } else {
+                semanticError("Cannot find symbol", name, line);
+            }
+            this.symbolTables.setFunctionReturnAttribute(function_name, name);
+        } else if (expression instanceof ASTAND){
+            handleAND(function_name, line, expression);
+        } else if (expression instanceof ASTLT){
+            handleLT(function_name, line, expression);
+        } else if (expression instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, expression, Symbol.SymbolType.BOOLEAN, line);
+        } else if(!(expression instanceof ASTTRUE) && !(expression instanceof ASTFALSE)){
+            semanticError("Incompatible types: cannot be converted to boolean", function_name, line);
+        }
     }
 
     private void handleReturnExpression(String function_name, Node expression, int line){
@@ -458,13 +449,7 @@ public class jmm{
             if(this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.INT){
                 semanticError("Incompatible return types: cannot be converted to int", function_name, line);
             }
-            if(expression.jjtGetChild(1) instanceof ASTIDENTIFIER){
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.INT);
-                handleIdentifier(function_name, line, expression.jjtGetChild(1), symbols);
-            } else if(!(expression.jjtGetChild(1) instanceof ASTINT)){
-                semanticError("Incompatible types: cannot be converted to int", function_name, line);
-            }
+            handleINT(function_name, expression.jjtGetChild(1), line);
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
@@ -515,32 +500,7 @@ public class jmm{
                 semanticError("Incompatible types: cannot be converted to int", function_name, line);
             }
         } else if (expression instanceof ASTCALL_FUNCTION){
-            if(expression.jjtGetChild(0) instanceof ASTTHIS){
-                String function_call_name = ((ASTFUNCTION) expression.jjtGetChild(1)).name;
-                if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
-                    semanticError("Function not found", function_call_name, line);
-                } else if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctionsReturnType(function_call_name)){
-                    semanticError("Incompatible return types for called function", function_name, line);
-                } else{
-                    handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
-                }
-            } else if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
-                String name = ((ASTIDENTIFIER) expression.jjtGetChild(0)).name;
-                String function_call_name = ((ASTFUNCTION) expression.jjtGetChild(1)).name;
-                if(this.symbolTables.hasVariable(function_name, name)
-                        && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
-                        && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
-                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
-                        semanticError("Function not found", function_call_name, line);
-                    } else if(this.symbolTables.getFunctionsReturnType(function_name) != this.symbolTables.getFunctions().get(function_call_name).getReturnType()){
-                        semanticError("Incompatible return types for called function", function_name, line);
-                    } else{
-                        handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
-                    }
-                } else if(this.symbolTables.hasVariable(function_name, name)){
-                    semanticError("Function not found", function_call_name, line);
-                }
-            }
+            handleCalledFunction(function_name, expression, this.symbolTables.getFunctionsReturnType(function_name), line);
         } else if(expression instanceof ASTTHIS){
             if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
                 semanticError("Incompatible return types", function_name, line);
@@ -587,6 +547,7 @@ public class jmm{
             if(symbol.getType() != Symbol.SymbolType.INT){
                 semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
             }
+            handleINT(function_name, expression.jjtGetChild(1), line);
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
@@ -646,34 +607,54 @@ public class jmm{
                 semanticError("Incompatible types: cannot be converted to int", expression.jjtGetChild(0).toString(), line);
             }
         } else if (expression instanceof ASTCALL_FUNCTION){
-            if(expression.jjtGetChild(0) instanceof ASTTHIS){
-                if(!this.symbolTables.getFunctions().containsKey(((ASTFUNCTION) expression.jjtGetChild(1)).name)){
-                    semanticError("Function not found", ((ASTFUNCTION) expression.jjtGetChild(1)).name, line);
-                } else if(symbol.getType() != this.symbolTables.getFunctionsReturnType(((ASTFUNCTION) expression.jjtGetChild(1)).name)){
-                    semanticError("Incompatible return types: cannot be converted to " + symbol.getTypeString(), ((ASTFUNCTION) expression.jjtGetChild(1)).name, line);
-                } else{
-                    handleFunctionArguments(function_name, ((ASTFUNCTION) expression.jjtGetChild(1)).name, line, expression.jjtGetChild(2));
-                }
-            } else if(expression.jjtGetChild(0) instanceof ASTIDENTIFIER){
-                String name = ((ASTIDENTIFIER) expression.jjtGetChild(0)).name;
-                String function_call_name = ((ASTFUNCTION) expression.jjtGetChild(1)).name;
-                if(this.symbolTables.hasVariable(function_name, name)
-                        && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
-                        && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
-                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
-                        semanticError("Function not found", function_call_name, line);
-                    } else if(this.symbolTables.getFunctionsReturnType(function_called_name) != this.symbolTables.getFunctionsReturnType(function_call_name)){
-                        semanticError("Incompatible return types for called function", function_name, line);
-                    } else{
-                        handleFunctionArguments(function_name, function_call_name, line, expression.jjtGetChild(2));
-                    }
-                } else if(this.symbolTables.hasVariable(function_name, name)){
-                    semanticError("Function not found", function_call_name, line);
-                }
-            }
+            handleCalledFunction(function_name,expression, symbol.getType(), line);
         } else if(expression instanceof ASTTHIS){
             if((symbol.getType() != Symbol.SymbolType.IDENTIFIER) || (!symbol.getIdentifier_name().equals(this.symbolTables.getClassName()))){
                 semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
+            }
+        }
+    }
+
+    private void handleINT(String function_name, Node expression, int line){
+        if(expression instanceof ASTIDENTIFIER){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT);
+            handleIdentifier(function_name, line, expression, symbols);
+        } else if(expression instanceof ASTADD
+                || expression instanceof ASTSUB
+                || expression instanceof ASTMUL
+                || expression instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, expression);
+        } else if(!(expression instanceof ASTINT)){
+            semanticError("Incompatible types: cannot be converted to int", function_name, line);
+        }
+    }
+
+    private void handleCalledFunction(String function_name, Node node, Symbol.SymbolType type, int line){
+        if(node.jjtGetChild(0) instanceof ASTTHIS){
+            String function_call_name = ((ASTFUNCTION) node.jjtGetChild(1)).name;
+            if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                semanticError("Function not found", function_call_name, line);
+            } else if(type != this.symbolTables.getFunctionsReturnType(function_call_name)){
+                semanticError("Incompatible return types for called function", function_name, line);
+            } else{
+                handleFunctionArguments(function_name, function_call_name, line, node.jjtGetChild(2));
+            }
+        } else if(node.jjtGetChild(0) instanceof ASTIDENTIFIER){
+            String name = ((ASTIDENTIFIER) node.jjtGetChild(0)).name;
+            String function_call_name = ((ASTFUNCTION) node.jjtGetChild(1)).name;
+            if(this.symbolTables.hasVariable(function_name, name)
+                    && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
+                    && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
+                if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                    semanticError("Function not found", function_call_name, line);
+                } else if(type != this.symbolTables.getFunctions().get(function_call_name).getReturnType()){
+                    semanticError("Incompatible return types for called function", function_name, line);
+                } else{
+                    handleFunctionArguments(function_name, function_call_name, line, node.jjtGetChild(2));
+                }
+            } else if(this.symbolTables.hasVariable(function_name, name)){
+                semanticError("Function not found", function_call_name, line);
             }
         }
     }
@@ -702,6 +683,8 @@ public class jmm{
             handleAND(function_name, line, node.jjtGetChild(0));
         } else if(node.jjtGetChild(0) instanceof ASTLT){
             handleLT(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.BOOLEAN, line);
         } else if (!(node.jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(0) instanceof ASTFALSE)){
             semanticError("Bad operand type for unary operator '!'", function_name, line);
         }
@@ -713,20 +696,27 @@ public class jmm{
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(0), symbols);
         } else if(node.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
+            handleINT(function_name, node.jjtGetChild(0).jjtGetChild(1), line);
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
-        } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
+        } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.INT, line);
+        }  else if(!(node.jjtGetChild(0) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
+
         if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
         } else if(node.jjtGetChild(1) instanceof ASTACCESS_ARRAY){
+            handleINT(function_name, node.jjtGetChild(0).jjtGetChild(1), line);
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.INT, line);
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
@@ -741,6 +731,8 @@ public class jmm{
             handleNOT(function_name, line, node.jjtGetChild(0));
         } else if(node.jjtGetChild(0) instanceof ASTLT){
             handleLT(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.BOOLEAN, line);
         } else if (!(node.jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(0) instanceof ASTFALSE)){
             semanticError("Bad operand types for binary operator '&&'", function_name, line);
         }
@@ -750,15 +742,11 @@ public class jmm{
             symbols.add(Symbol.SymbolType.BOOLEAN);
             handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
         } else if(node.jjtGetChild(1) instanceof ASTNOT){
-            if(node.jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER) {
-                ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                symbols.add(Symbol.SymbolType.BOOLEAN);
-                handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
-            } else if (!(node.jjtGetChild(1).jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(1).jjtGetChild(0) instanceof ASTFALSE)){
-                semanticError("Bad operand types for binary operator '&&'", function_name, line);
-            }
+            handleNOT(function_name, line, node.jjtGetChild(1));
         } else if(node.jjtGetChild(1) instanceof ASTLT){
             handleLT(function_name, line, node.jjtGetChild(1));
+        } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.BOOLEAN, line);
         } else if (!(node.jjtGetChild(1) instanceof ASTTRUE || node.jjtGetChild(1) instanceof ASTFALSE)){
             semanticError("Bad operand types for binary operator '&&'", function_name, line);
         }
