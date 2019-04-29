@@ -3,6 +3,12 @@ class Fac{
         int[] a;
         a = new int[5];
         bla[1] = 12;
+        1+1;
+        2-1;
+        3*2;
+        1/2;
+        a[2];
+        a.length;
         return 0;
     }
 }
