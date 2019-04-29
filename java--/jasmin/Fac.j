@@ -13,7 +13,11 @@
 
 .method public ComputeFac(I;)I
 
+<<<<<<< HEAD
 	.limit locals 2
+=======
+	.limit locals 3
+>>>>>>> 9211d199402c3ccdfe53621d4ee70b16b3d518f5
 
 	iload 2
 	ireturn
@@ -24,9 +28,18 @@
 
 	.limit locals 1
 
+<<<<<<< HEAD
 	bipush 10
 	invokevirtual java/lang/Fac/ComputeFac(I;)I
 	invokestatic io.println(I;)V
+=======
+	new Fac
+	dup
+	invokenonvirtual Fac<init>()V
+	bipush 10
+	invokevirtual Fac/ComputeFac(I;)I
+	invokestatic io/println(I;)V
+>>>>>>> 9211d199402c3ccdfe53621d4ee70b16b3d518f5
 	pop
 
 .end method
