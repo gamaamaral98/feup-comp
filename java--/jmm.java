@@ -355,17 +355,56 @@ public class jmm{
                 int line = ((ASTWHILE) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
                 int new_local = local + 1;
-                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
+
+                if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
+                else
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1), new_local);
+
             } else if(body.jjtGetChild(n) instanceof ASTIF_ELSE_STATEMENT){
                 int line = ((ASTIF_ELSE_STATEMENT) body.jjtGetChild(n)).line;
                 handleCondition(function_name, body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0), line);
                 int new_local = local + 1;
-                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
-                handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(2).jjtGetChild(0), new_local);
+
+                if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
+                else
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1), new_local);
+
+                if(body.jjtGetChild(n).jjtGetChild(2).jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(2).jjtGetChild(0), new_local);
+                else
+                    handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(2), new_local);
+            } else if(body.jjtGetChild(n) instanceof ASTCALL_FUNCTION){
+                if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTTHIS){
+                    String function_call_name = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).name;
+                    int line = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).line;
+                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                        semanticError("Function not found", function_call_name, line);
+                    } else{
+                        handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(2));
+                    }
+                } else if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
+                    String name = ((ASTIDENTIFIER) body.jjtGetChild(n).jjtGetChild(0)).name;
+                    String function_call_name = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).name;
+                    int line = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).line;
+                    if(this.symbolTables.hasVariable(function_name, name)
+                            && this.symbolTables.getVariableType(function_name, name) == Symbol.SymbolType.IDENTIFIER
+                            && this.symbolTables.getVariableIdentifierType(function_name, name).equals(this.symbolTables.getClassName())){
+                        if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                            semanticError("Function not found", function_call_name, line);
+                        } else{
+                            handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(2));
+                        }
+                    } else if(this.symbolTables.hasVariable(function_name, name)){
+                        semanticError("Function not found", function_call_name, line);
+                    }
+                }
             } else if(body.jjtGetChild(n) instanceof ASTACCESS_ARRAY) {
                 semanticError("Not a statement", function_name, ((SimpleNode)body.jjtGetChild(n).jjtGetChild(0)).line);
             }
             else{
+                System.out.println(body.jjtGetChild(n));
                 semanticError("Not a statement", function_name, ((SimpleNode)body.jjtGetChild(n)).line);
             }
         }
@@ -704,7 +743,7 @@ public class jmm{
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
         } else if(node.jjtGetChild(1) instanceof ASTACCESS_ARRAY){
-            handleINT(function_name, node.jjtGetChild(0).jjtGetChild(1), line);
+            handleINT(function_name, node.jjtGetChild(1).jjtGetChild(1), line);
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT_ARRAY);
             handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
@@ -758,7 +797,6 @@ public class jmm{
             else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name)){
                 semanticError("Variable might not have been initialized", variable_name, line);
             }
-
         } else {
             semanticError("Cannot find symbol", variable_name, line);
         }
@@ -774,21 +812,35 @@ public class jmm{
                 || node.jjtGetChild(0) instanceof ASTMUL
                 || node.jjtGetChild(0) instanceof ASTDIV){
             handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTACCESS_ARRAY){
+            handleINT(function_name, node.jjtGetChild(0).jjtGetChild(1), line);
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.INT, line);
         } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
-            semanticError("Cannot add symbol", function_name, line);
+            semanticError("Wrong symbol type", function_name, line);
         }
 
         if(node.jjtGetChild(1) instanceof ASTIDENTIFIER){
             ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
             symbols.add(Symbol.SymbolType.INT);
             handleIdentifier(function_name, line, node.jjtGetChild(1), symbols);
-        } else if(node.jjtGetChild(0) instanceof ASTADD
-                || node.jjtGetChild(0) instanceof ASTSUB
-                || node.jjtGetChild(0) instanceof ASTMUL
-                || node.jjtGetChild(0) instanceof ASTDIV){
-            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(1) instanceof ASTADD
+                || node.jjtGetChild(1) instanceof ASTSUB
+                || node.jjtGetChild(1) instanceof ASTMUL
+                || node.jjtGetChild(1) instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(1));
+        } else if(node.jjtGetChild(1) instanceof ASTACCESS_ARRAY){
+            handleINT(function_name, node.jjtGetChild(1).jjtGetChild(1), line);
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
+        } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.INT, line);
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
-            semanticError("Cannot add symbol", function_name, line);
+            semanticError("Wrong symbol type", function_name, line);
         }
     }
 

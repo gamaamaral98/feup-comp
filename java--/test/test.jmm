@@ -1,14 +1,22 @@
 class Fac{
-    public int A(){
+    public int ComputeFac(int num){
+        int num_aux ;
         int[] a;
-        a = new int[5];
-        bla[1] = 12;
-        1+1;
-        2-1;
-        3*2;
-        1/2;
-        a[2];
-        a.length;
-        return 0;
+        if (num < 1)
+            num_aux = 1;
+        else
+            num_aux = num * (this.ComputeFac(num - 1));
+
+        if(num < 1){
+            num_aux = 1;
+        } else{
+            num_aux = num * (this.ComputeFac(num - 1));
+            num_aux = num * a[2];
+        }
+        return num_aux;
+    }
+
+    public static void main(String[] a){
+        io.println(new Fac().ComputeFac(10));
     }
 }
