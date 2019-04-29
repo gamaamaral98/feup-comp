@@ -170,7 +170,7 @@ public class JasminGenerator{
 	private void manageMethodLimits(FunctionSymbolTable fst){
 
 		int size = fst.getParameters().size() + fst.getLocalVariables().size();
-		this.printWriter.println("\n\t.limit locals " + 9 + "\n");
+		this.printWriter.println("\n\t.limit locals " + 9);
 		this.printWriter.println("\t.limit stack " + 9 + "\n");
 	}
 
@@ -487,7 +487,8 @@ public class JasminGenerator{
 				String label2 = "label" + Integer.toString(rand2);
 
 				manageArithmeticExpression(lhs, fst);
-				this.printWriter.println("\tif_icmpge " + label1);
+				// this.printWriter.println("\tif_icmpge " + label1);
+				this.printWriter.println("\tifeq " + label1);
 				manageArithmeticExpression(rhs, fst);
 				this.printWriter.println("\tifeq " + label1);
 				this.printWriter.println("\ticonst_1");
