@@ -229,11 +229,11 @@ void Type() #void : {Token t;}
     | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER
 }
 
-void Type_1() #void : {}
+void Type_1() #void : {Token t1; Token t2; Token t3;}
 {
-    <INT> #INT
-    | <INT_ARRAY> #INT_ARRAY
-    | <BOOLEAN> #BOOLEAN
+    t1=<INT> {jjtThis.line = t1.beginLine;} #INT
+    | t2=<INT_ARRAY> {jjtThis.line = t2.beginLine;} #INT_ARRAY
+    | t3=<BOOLEAN> {jjtThis.line = t3.beginLine;} #BOOLEAN
 }
 
 void Statement() #void : {Token t;}
@@ -350,9 +350,9 @@ void Term() #void : {}
 
 void Term_Literal() #void : {Token t;}
 {
-    t=<INTEGER> {jjtThis.valueInt = t.image;} #INT(0) (Operator_5())*
-    | t=<TRUE> {jjtThis.valueBoolean = t.image;} #TRUE(0) (Operator_5())*
-    | t=<FALSE> {jjtThis.valueBoolean = t.image;} #FALSE(0) (Operator_5())*
+    t=<INTEGER> {jjtThis.valueInt = t.image; jjtThis.line = t.beginLine;} #INT(0) (Operator_5())*
+    | t=<TRUE> {jjtThis.valueBoolean = t.image; jjtThis.line = t.beginLine;} #TRUE(0) (Operator_5())*
+    | t=<FALSE> {jjtThis.valueBoolean = t.image; jjtThis.line = t.beginLine;} #FALSE(0) (Operator_5())*
     | <THIS> #THIS(0) (Operator_5())*
     | <LPAR> Expression() <RPAR> (Operator_5())*
     | Term_NEW() (Operator_5())*
@@ -364,9 +364,9 @@ void Term_Identifier() #void : {Token t;}
     t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #IDENTIFIER(0) (Operator_5())*
 }
 
-void Term_NOT() #NOT(1) : {}
+void Term_NOT() #NOT(1) : {Token t;}
 {
-    <NOT_OP> Term()
+    t=<NOT_OP> {jjtThis.line = t.beginLine;} Term()
 }
 
 void Term_NEW() #void : {}
@@ -380,26 +380,46 @@ void Term_NEW_1() #void : {Token t;}
     | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;}  #CLASS <LPAR> <RPAR> #NEW_CLASS(1)
 }
 
-void Operator_1() #AND(2) : {}
+void Operator_1() #AND(2) : {Token t;}
 {
-    <AND_OP> Expression1()
+    t=<AND_OP> {jjtThis.line = t.beginLine;} Expression1()
 }
 
-void Operator_2() #LT(2) : {}
+void Operator_2() #LT(2) : {Token t;}
 {
-    <LT_OP> Expression2()
+    t=<LT_OP> {jjtThis.line = t.beginLine;} Expression2()
 }
 
 void Operator_3() #void : {}
 {
-    <PLUS_OP> Expression3() #ADD(2)
-    | <MINUS_OP> Expression3() #SUB(2)
+    Operator_3_PLUS()
+    | Operator_3_MINUS()
 }
 
-void Operator_4() #void : {}
+void Operator_3_PLUS() #ADD(2): {Token t;}
 {
-    <TIMES_OP> Term() #MUL(2)
-    | <DIVIDE_OP> Term() #DIV(2)
+    t=<PLUS_OP> {jjtThis.line = t.beginLine;} Expression3()
+}   
+
+void Operator_3_MINUS() #SUB(2): {Token t;}
+{
+    t=<MINUS_OP> {jjtThis.line = t.beginLine;} Expression3()
+}   
+
+void Operator_4() #void : {Token t;}
+{
+    Operator_4_TIMES()
+    | Operator_4_DIVIDE()
+}
+
+void Operator_4_TIMES() #MUL(2) : {Token t;}
+{
+    t=<TIMES_OP> {jjtThis.line = t.beginLine;} Term()
+}
+
+void Operator_4_DIVIDE() #DIV(2) : {Token t;}
+{
+    t=<DIVIDE_OP> {jjtThis.line = t.beginLine;} Term()
 }
 
 void Operator_5() #void : {}
@@ -410,7 +430,7 @@ void Operator_5() #void : {}
 
 void Operator_5_ARRAY() #ACCESS_ARRAY(2) : {}
 {
-    <LPARRETO> Expression() <RPARRETO>
+    <LPARRETO> Expression() <RPARRETO> 
 }
 
 void Operator_5_DOT() #void : {}
@@ -420,8 +440,8 @@ void Operator_5_DOT() #void : {}
 
 void Operator_5_DOT_1() #void : {Token t;}
 {
-    <LENGTH> #LENGTH(1)
-    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;}  #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
+    t=<LENGTH> {jjtThis.line = t.beginLine;} #LENGTH(1)
+    | t=<IDENTIFIER> {jjtThis.name = t.image; jjtThis.line = t.beginLine;} #FUNCTION <LPAR> Operator_5_Call_Args() <RPAR> #CALL_FUNCTION(3)
 }
 
 void Operator_5_Call_Args() #CALL_ARGUMENTS : {}

@@ -241,7 +241,6 @@ public class jmm{
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
                     if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
                         semanticError("Cannot find symbol", assigned_variable_name, line);
-                        return;
                     }
                     else{
                         if(local == 1)
@@ -343,7 +342,6 @@ public class jmm{
                 if(body.jjtGetChild(n).jjtGetChild(0).jjtGetChild(0) instanceof ASTIDENTIFIER){
                     if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
                         semanticError("Cannot find symbol", assigned_variable_name, line);
-                        return;
                     } else if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT_ARRAY){
                         semanticError("Incompatible assign type", assigned_variable_name, line);
                     } else{
@@ -364,6 +362,11 @@ public class jmm{
                 int new_local = local + 1;
                 handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), new_local);
                 handleMethodBody(function_name, body.jjtGetChild(n).jjtGetChild(2).jjtGetChild(0), new_local);
+            } else if(body.jjtGetChild(n) instanceof ASTACCESS_ARRAY) {
+                semanticError("Not a statement", function_name, ((SimpleNode)body.jjtGetChild(n).jjtGetChild(0)).line);
+            }
+            else{
+                semanticError("Not a statement", function_name, ((SimpleNode)body.jjtGetChild(n)).line);
             }
         }
     }
