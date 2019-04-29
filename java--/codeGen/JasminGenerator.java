@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 // CTRL+F "FALTA:" para ver o que resta fazer
+// AND, NOT, <
 public class JasminGenerator{
 
 	private ClassSymbolTable symbolTable;
@@ -26,6 +27,7 @@ public class JasminGenerator{
 
 		createFileHeader();			// .class .super
 		manageFields();				// Global Variables
+		manageInit();
 		manageMethods();			// Methods
 
 		this.printWriter.close();
@@ -54,7 +56,6 @@ public class JasminGenerator{
 	/*
 	 * Writes to the .j file the .class and the .super
 	 */
-	// FALTA: ter a certeza se o super é so aquilo
 	private void createFileHeader(){
 
 		this.printWriter.println(".class public " + symbolTable.getClassName());
@@ -69,7 +70,6 @@ public class JasminGenerator{
 	// FALTA: testar para saber se nao preciso no .j do public/private/static mesmo que nao exista no .java
 	private void manageFields(){
 
-		this.printWriter.println("; global variables\n");
 		Map<String, Symbol> map = symbolTable.getGlobal_variables();
 		map.forEach((key, value) -> {
 
@@ -79,6 +79,15 @@ public class JasminGenerator{
 
 			this.printWriter.println(str);
 		});
+	}
+
+	private void manageInit(){
+
+		this.printWriter.println("\n.method public <init>()V");
+		this.printWriter.println("\taload_0");
+		this.printWriter.println("\tinvokenonvirtual java/lang/Object/<init>()V");
+		this.printWriter.println("\treturn");
+		this.printWriter.println(".end method\n");
 	}
 
 	/*
@@ -157,11 +166,11 @@ public class JasminGenerator{
 	 * .limit locals
 	 * .limit stack
 	 */
-	// FALTA: saber calcular os limites
 	private void manageMethodLimits(FunctionSymbolTable fst){
 
-		this.printWriter.println("\n\t.limit locals " + fst.getParameters().size() + " (not sure tambem)");
-		this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
+		int size = fst.getParameters().size() + fst.getLocalVariables().size();
+		this.printWriter.println("\n\t.limit locals " + size + "\n");
+		// this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
 	}
 
 	/*
@@ -169,9 +178,6 @@ public class JasminGenerator{
 	 *
 	 * <statements>
 	 */
-	// FALTA: 
-	// 1. true; / false; (isto faz sentido no .j?);
-	// expressions
 	private void manageMethodBody(SimpleNode body, FunctionSymbolTable fst){
 
 		for(int i = 0; i < body.jjtGetNumChildren(); i++){
@@ -189,29 +195,24 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for the method return
 	 */
-	// FALTA: pôr a funcionar com expressoes/funções
 	private void manageMethodReturn(SimpleNode returnAux, FunctionSymbolTable fst){
 
 		SimpleNode ret = (SimpleNode) returnAux.jjtGetChild(0);
 
 		if(ret instanceof ASTIDENTIFIER){
 
-			// There is no difference between being a boolean or an int
-			// Local/Param:  iload_X -> ireturn
-			// Global:       aload_0 -> getfield(banana) -> ireturn
-			
-			String retName = ret.getName();
-			if(isGlobal(retName)){
+			writeIDENTIFIER(ret, fst);
 
-				this.printWriter.println("\taload_0");
-				writeGetfield(ret);
-			}
-			else{
+			String type;
+			if(isGlobal(ret.getName()))
+				type = getGlobalType(ret);
+			else
+				type = getLocalType(ret, fst);
 
-				int index = getNodeIndex(retName, fst);
-				this.printWriter.println("\tiload_" + Integer.toString(index));
-			}
-			this.printWriter.println("\tireturn\n");
+			if(type.equals("int") || type.equals("boolean"))
+				this.printWriter.println("\tireturn\n");
+			else
+				this.printWriter.println("\tareturn\n");
 		}
 		else if(ret instanceof ASTINT){
 			
@@ -231,17 +232,24 @@ public class JasminGenerator{
 			manageCALL_FUNCTION(ret, fst);
 			this.printWriter.println("\tireturn\n");
 		}
+		else if(ret instanceof ASTADD || ret instanceof ASTSUB || 
+			ret instanceof ASTDIV || ret instanceof ASTMUL){
+			// ret instanceof ASTAND || ret instanceof ASTLT ||
+			// ret instanceof ASTNOT){
+
+			manageArithmeticExpression(ret, fst);
+			this.printWriter.println("\tireturn\n");
+		}
 		else{	// No return
 
 			this.printWriter.println("\treturn");
 		}
-		// add, sub, div, mul, and, not, this, <, (), 
 	}
 
 	/*
 	 * Manages the code generation for ASSIGN nodes
 	 */
-	// FALTA: pôr a funcionar com expressoes/new class por exemplo
+	// FALTA: pôr a funcionar com new class por exemplo
 	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
@@ -253,7 +261,6 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN nodes for parameters and local variables
 	 */
-	// FALTA: pôr a funcionar com expressoes
 	private void manageParamLocalASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
@@ -266,36 +273,44 @@ public class JasminGenerator{
 
 			int value = Integer.parseInt(rhs.getValueInt());
 			writeINT(value);
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
 			writeBOOLEAN(rhs.getValueBoolean());
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTIDENTIFIER){
 
-			String rhsName = rhs.getName(); 
-			if(isGlobal(rhsName)){
-
-				this.printWriter.println("\taload_0");
-				writeGetfield(rhs);
-			}
-			else{
-
-				int index2 = getNodeIndex(rhsName, fst);
-				this.printWriter.println("\tiload_" + index2);
-			}
+			String type = getLocalType(lhs, fst);
+			if(type.equals("int") || type.equals("boolean"))
+				this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
+			else
+				this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
 
 			manageCALL_FUNCTION(rhs, fst);
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
-		this.printWriter.println("\tistore_" + Integer.toString(index) + "\n");
+		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
+			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
+			// rhs instanceof ASTAND || rhs instanceof ASTLT ||
+			// rhs instanceof ASTNOT){
+
+			manageArithmeticExpression(rhs, fst);
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
+		}
+		else if(rhs instanceof ASTNEW_CLASS){
+
+			manageNEW_CLASS(rhs, fst);
+			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
+		}
 	}
 
 	/*
 	 * Manages the code generation for ASSIGN nodes for global variables
 	 */
-	// FALTA: pôr a funcionar com expressoes
 	private void manageGlobalASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
@@ -303,7 +318,7 @@ public class JasminGenerator{
 
 		if(rhs instanceof ASTINT){
 
-			this.printWriter.println("\taload_0");
+			this.printWriter.println("\tiload_0");
 
 			int value = Integer.parseInt(rhs.getValueInt());
 			writeINT(value);
@@ -311,7 +326,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
-			this.printWriter.println("\taload_0");
+			this.printWriter.println("\tiload_0");
 			writeBOOLEAN(rhs.getValueBoolean());
 			writePutfield(lhs);
 		}
@@ -331,7 +346,12 @@ public class JasminGenerator{
 				int index2 = getNodeIndex(rhsName, fst);
 
 				this.printWriter.println("\taload_0");
-				this.printWriter.println("\tiload_" +  Integer.toString(index2));
+
+				String type = getLocalType(rhs, fst);
+				if(type.equals("int") || type.equals("boolean"))
+					this.printWriter.println("\tiload " +  Integer.toString(index2));
+				else
+					this.printWriter.println("\taload " +  Integer.toString(index2));
 
 				writePutfield(lhs);
 			}
@@ -339,6 +359,19 @@ public class JasminGenerator{
 		else if(rhs instanceof ASTCALL_FUNCTION){
 
 			manageCALL_FUNCTION(rhs, fst);
+			writePutfield(lhs);
+		}
+		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
+			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
+			// rhs instanceof ASTAND || rhs instanceof ASTLT ||
+			// rhs instanceof ASTNOT){
+
+			manageArithmeticExpression(rhs, fst);
+			writePutfield(lhs);
+		}
+		else if(rhs instanceof ASTNEW_CLASS){
+
+			manageNEW_CLASS(rhs, fst);
 			writePutfield(lhs);
 		}
 		this.printWriter.println();
@@ -353,18 +386,7 @@ public class JasminGenerator{
 
 		if(child instanceof ASTIDENTIFIER){
 
-			String identifierName = child.getName();
-
-			if(isGlobal(identifierName)){
-
-				this.printWriter.println("\taload_0");
-				writeGetfield(child);
-			}
-			else{
-
-				int index = getNodeIndex(identifierName, fst);
-				this.printWriter.println("\taload_" + index);
-			}
+			writeIDENTIFIER(child, fst);
 		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
@@ -374,6 +396,9 @@ public class JasminGenerator{
 		manageFUNCTION((SimpleNode) node.jjtGetChild(1));
 	}
 
+	/*
+	 * Manages the code generation for CALL_ARGUMENTS nodes
+	 */
 	private void manageCALL_ARGUMENTS(SimpleNode node, FunctionSymbolTable fst){
 
 		// Args podem ser: int, true/false, call_function, identifier
@@ -394,29 +419,22 @@ public class JasminGenerator{
 			}
 			else if(child instanceof ASTIDENTIFIER){
 
-				String childName = child.getName();
-				if(isGlobal(childName)){
-
-					this.printWriter.println("\taload_0");
-					writeGetfield(child);
-				}
-				else{
-
-					int index = getNodeIndex(childName, fst);
-					this.printWriter.println("\taload_" + index);
-				}
+				writeIDENTIFIER(child, fst);
 			}
-			// else if(child instanceof ASTADD){ //expressions
-
-			// }
 			else if(child instanceof ASTCALL_FUNCTION){
 				
 				manageCALL_FUNCTION(child, fst);
 			}
+			else{
+
+				manageArithmeticExpression(child, fst);
+			}
 		}
 	}
 
-
+	/*
+	 * Manages the code generation for FUNCTION nodes
+	 */
 	private void manageFUNCTION(SimpleNode node){
 
 		String invokeStr = "\tinvokevirtual ";
@@ -427,7 +445,92 @@ public class JasminGenerator{
 	}
 
 	/*
-	 * Manages the code generation for the ASSIGN of INT's
+	 * Manages the code generation for Arithmetic Expressions
+	 */
+	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst){
+
+		if(node.jjtGetNumChildren() != 0){
+
+			SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
+
+			if(node instanceof ASTADD){
+
+				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\tiadd");
+			}
+			else if(node instanceof ASTSUB){
+
+				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\tisub");
+			}
+			else if(node instanceof ASTDIV){
+
+				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\tidiv");
+			}
+			else if(node instanceof ASTMUL){
+
+				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\timul");
+			}
+			// else if(node instanceof ASTAND){
+
+			// 	manageArithmeticExpression(lhs, fst);
+			// 	manageArithmeticExpression(rhs, fst);
+			// 	this.printWriter.println("\tiand");
+			// }
+			// else if(node instanceof ASTLT){
+
+			// 	// FALTA: saber qual é a instrução para o <
+			// 	manageArithmeticExpression(lhs, fst);
+			// 	manageArithmeticExpression(rhs, fst);
+			// 	this.printWriter.println("\tilt(isto nao é assim)");
+			// }
+			// else if(node instanceof ASTNOT){
+
+			// 	// FALTA: saber qual é a instrução para o not
+			// 	manageArithmeticExpression(lhs, fst);
+			// 	manageArithmeticExpression(rhs, fst);
+			// 	this.printWriter.println("\tif_icmpge(isto nao é assim)");
+			// }
+		}
+		else {
+
+			if(node instanceof ASTIDENTIFIER){
+
+				writeIDENTIFIER(node, fst);
+			}
+			else if(node instanceof ASTTRUE || node instanceof ASTFALSE){
+
+				String value = node.getValueBoolean();
+				writeBOOLEAN(value);
+			}
+			else if(node instanceof ASTINT){
+
+				int value = Integer.parseInt(node.getValueInt());
+				writeINT(value);
+			}
+			else if(node instanceof ASTCALL_FUNCTION){
+
+				manageCALL_FUNCTION(node, fst);
+			}
+		}
+	}
+
+	private void manageNEW_CLASS(SimpleNode node, FunctionSymbolTable fst){
+
+		this.printWriter.println("\tnew" + " java/lang/" + this.symbolTable.getClassName());
+		this.printWriter.println("\tdup");
+		this.printWriter.println("\tinvokenonvirtual java/lang/" + this.symbolTable.getClassName() + "<init>()V");
+	}
+
+	/*
+	 * Manages the code generation for the INT's
 	 */
 	private void writeINT(int value){
 
@@ -443,7 +546,7 @@ public class JasminGenerator{
 			this.printWriter.println("\tldc " + Integer.toString(value));
 	}
 	/*
-	 * Manages the code generation for the ASSIGN of BOOLEAN's
+	 * Manages the code generation for the BOOLEAN's
 	 */
 	private void writeBOOLEAN(String value){
 
@@ -451,6 +554,29 @@ public class JasminGenerator{
 			this.printWriter.println("\ticonst_1");
 		else
 			this.printWriter.println("\ticonst_0");
+	}
+	/*
+	 * Manages the code generation for the IDENTIFIER's
+	 */
+	private void writeIDENTIFIER(SimpleNode node, FunctionSymbolTable fst){
+
+		String nodeName = node.getName();
+		if(isGlobal(nodeName)){
+
+			this.printWriter.println("\taload_0");
+			writeGetfield(node);
+		}
+		else{
+
+			int index = getNodeIndex(nodeName, fst);
+			String type = getLocalType(node, fst);
+			if(type.equals("int") || type.equals("boolean")){
+				this.printWriter.println("\tiload " + Integer.toString(index));
+			}
+			else{
+				this.printWriter.println("\taload " + Integer.toString(index));
+			}
+		}
 	}
 
 	/*
@@ -529,5 +655,23 @@ public class JasminGenerator{
 
 		str += ")";
 		return str;
+	}
+
+	/*
+	 * Returns a string with the type of the global nodes
+	 */
+	private String getGlobalType(SimpleNode node){
+
+		return this.symbolTable.getGlobal_variables().get(node.getName()).getTypeString();
+	}
+	/*
+	 * Returns a string with the type of the parameter ou local nodes
+	 */
+	private String getLocalType(SimpleNode node, FunctionSymbolTable fst){
+		
+		if(fst.getParameters().get(node.getName()) != null)
+			return fst.getParameters().get(node.getName()).getTypeString();
+		else
+			return fst.getLocalVariables().get(node.getName()).getTypeString();
 	}
 }
