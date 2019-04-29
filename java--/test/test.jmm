@@ -1,19 +1,11 @@
-class Fac{
+class Fac {
     public int ComputeFac(int num){
-        num_aux = 2;
-        a[2] = 1;
-        // int[] a;
-        // if (num < 1)
-        //     num_aux = 1;
-        // else
-        //     num_aux = num * (this.ComputeFac(num - 1));
+        int num_aux ;
+        if (num < 1)
+            num_aux = 1;
+        else
+            num_aux = num * (this.ComputeFac(num-1));
 
-        // if(num < 1){
-        //     num_aux = 1;
-        // } else{
-        //     num_aux = num * (this.ComputeFac(num - 1));
-        //     num_aux = num * a[2];
-        // }
         return num_aux;
     }
 

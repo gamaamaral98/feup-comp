@@ -567,7 +567,7 @@ public class JasminGenerator{
 
 		this.printWriter.println("\tnew " + this.symbolTable.getClassName());
 		this.printWriter.println("\tdup");
-		this.printWriter.println("\tinvokenonvirtual " + this.symbolTable.getClassName() + "<init>()V");
+		this.printWriter.println("\tinvokenonvirtual " + this.symbolTable.getClassName() + "/<init>()V");
 	}
 
 	/*
@@ -706,7 +706,11 @@ public class JasminGenerator{
 
 		Map<String, Symbol> map2 = value.getParameters();
 		for (Map.Entry<String, Symbol> entry : map2.entrySet()) {
-		    str += entry.getValue().getTypeDescriptor();
+
+			String type = entry.getValue().getTypeDescriptor();
+			str += type;
+			if(!(type.equals("I") || type.equals("Z") || type.equals("[I")))
+				str += ";";
 		}
 
 		str += ")";
