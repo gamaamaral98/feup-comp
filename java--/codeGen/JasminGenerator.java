@@ -383,17 +383,27 @@ public class JasminGenerator{
 	private void manageCALL_FUNCTION(SimpleNode node, FunctionSymbolTable fst){
 
 		SimpleNode child = (SimpleNode) node.jjtGetChild(0);
+		boolean flag = true;
 
 		if(child instanceof ASTIDENTIFIER){
 
-			writeIDENTIFIER(child, fst);
+			flag = writeIDENTIFIER(child, fst);
 		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
 			manageCALL_FUNCTION(child, fst);
 		}
+
 		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst);
-		manageFUNCTION((SimpleNode) node.jjtGetChild(1));
+
+		if(flag)
+			manageFUNCTION((SimpleNode) node.jjtGetChild(1));
+		else{
+
+			this.printWriter.print("\tinvokestatic " + child.getName());
+			this.printWriter.print("." + ((SimpleNode) node.jjtGetChild(1)).getName());
+			this.printWriter.println("(I;)V");
+		}
 	}
 
 	/*
@@ -401,8 +411,6 @@ public class JasminGenerator{
 	 */
 	private void manageCALL_ARGUMENTS(SimpleNode node, FunctionSymbolTable fst){
 
-		// Args podem ser: int, true/false, call_function, identifier
-		// expressions
 		for(int i = 0; i < node.jjtGetNumChildren(); i++){
 
 			SimpleNode child = (SimpleNode) node.jjtGetChild(i);
@@ -558,15 +566,16 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for the IDENTIFIER's
 	 */
-	private void writeIDENTIFIER(SimpleNode node, FunctionSymbolTable fst){
+	private boolean writeIDENTIFIER(SimpleNode node, FunctionSymbolTable fst){
 
 		String nodeName = node.getName();
 		if(isGlobal(nodeName)){
 
 			this.printWriter.println("\taload_0");
 			writeGetfield(node);
+			return true;
 		}
-		else{
+		else if(isLocal(nodeName, fst)){
 
 			int index = getNodeIndex(nodeName, fst);
 			String type = getLocalType(node, fst);
@@ -576,6 +585,11 @@ public class JasminGenerator{
 			else{
 				this.printWriter.println("\taload " + Integer.toString(index));
 			}
+			return true;
+		}
+		else{
+
+			return false;
 		}
 	}
 
@@ -611,8 +625,18 @@ public class JasminGenerator{
 
 		if(this.symbolTable.getGlobal_variables().get(name) != null)
 			return true;
-		else
-			return false;
+		return false;
+	}
+
+	/*
+	 * Checks whether a variable is local or not
+	 * Returns true if it is local, false if not
+	 */
+	private boolean isLocal(String name, FunctionSymbolTable fst){
+
+		if(fst.getParameters().get(name) != null || fst.getLocalVariables().get(name) != null)
+			return true;
+		return false;
 	}
 
 	/*
