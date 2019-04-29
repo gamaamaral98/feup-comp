@@ -14,7 +14,10 @@ JAVAC_DEBUG := -g
 JAVAC_FLAGS := -d $(JAVAC_DIR)
 
 TEST_DIR := test
-TEST_FILE := test.jmm
+TEST_FILE := test.java
+
+JASMIN_DIR := jasmin
+JASMIN_JAR := $(JASMIN_DIR)/jasmin.jar
 
 all:
 	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java codeGen/*.java $(SRC).java
@@ -37,3 +40,4 @@ clean:
 
 run:
 	java -cp ${JAVAC_DIR} ${SRC} ${TEST_DIR}/${TEST_FILE}
+	java -jar $(JASMIN_JAR) $(JASMIN_DIR)/*.j

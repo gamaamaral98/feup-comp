@@ -11,35 +11,31 @@
 
 ; methods
 
-.method public ComputeFac(I;)I
+.method public ComputeFac(I)I
 
-<<<<<<< HEAD
-	.limit locals 2
-=======
-	.limit locals 3
->>>>>>> 9211d199402c3ccdfe53621d4ee70b16b3d518f5
+	.limit locals 9
 
-	iload 2
+	.limit stack 9
+
+	iconst_1
+	iconst_2
+	iadd
 	ireturn
 
 .end method
 
 .method public static main([Ljava/lang/String;)V
 
-	.limit locals 1
+	.limit locals 9
 
-<<<<<<< HEAD
-	bipush 10
-	invokevirtual java/lang/Fac/ComputeFac(I;)I
-	invokestatic io.println(I;)V
-=======
+	.limit stack 9
+
 	new Fac
 	dup
-	invokenonvirtual Fac<init>()V
+	invokenonvirtual Fac/<init>()V
 	bipush 10
-	invokevirtual Fac/ComputeFac(I;)I
-	invokestatic io/println(I;)V
->>>>>>> 9211d199402c3ccdfe53621d4ee70b16b3d518f5
-	pop
+	invokevirtual Fac/ComputeFac(I)I
+	invokestatic io/println(I)V
+	return
 
 .end method

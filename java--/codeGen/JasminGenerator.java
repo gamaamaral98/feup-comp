@@ -121,6 +121,7 @@ public class JasminGenerator{
 			manageMethodHeader(methodName, fst);
 			manageMethodLimits(fst);
 			manageMethodBody((SimpleNode) method.jjtGetChild(1), fst);
+			this.printWriter.println("\treturn\n");
 		}
 		else{
 
@@ -169,8 +170,8 @@ public class JasminGenerator{
 	private void manageMethodLimits(FunctionSymbolTable fst){
 
 		int size = fst.getParameters().size() + fst.getLocalVariables().size();
-		this.printWriter.println("\n\t.limit locals " + size + "\n");
-		// this.printWriter.println("\t.limit stack " + "(idk calcular isto)\n");
+		this.printWriter.println("\n\t.limit locals " + 9 + "\n");
+		this.printWriter.println("\t.limit stack " + 9 + "\n");
 	}
 
 	/*
@@ -187,7 +188,6 @@ public class JasminGenerator{
 
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst);
-				this.printWriter.println("\tpop\n");
 			}
 		}
 	}
