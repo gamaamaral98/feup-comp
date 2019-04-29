@@ -241,12 +241,14 @@ public class jmm{
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
                     if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
                         semanticError("Cannot find symbol", assigned_variable_name, line);
+                        continue;
                     }
                     else{
                         if(local == 1)
                             this.symbolTables.setInitVariable(function_name, assigned_variable_name);
                     }
                 }
+
                 if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTIDENTIFIER){
                     ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
                     symbols.add(this.symbolTables.getVariableType(function_name, assigned_variable_name));
