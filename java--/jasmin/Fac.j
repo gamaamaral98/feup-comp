@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 .class public Fac
 .super java/lang/Object
 
@@ -39,3 +41,4 @@
 	return
 
 .end method
+>>>>>>> b60074a0094209230cfd6047a177516aa9dfd522
