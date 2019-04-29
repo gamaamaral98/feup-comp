@@ -6,8 +6,6 @@ import parser.*;
 import java.io.*;
 import java.util.*;
 
-// CTRL+F "FALTA:" para ver o que resta fazer
-// AND, NOT, <
 public class JasminGenerator{
 
 	private ClassSymbolTable symbolTable;
@@ -67,7 +65,6 @@ public class JasminGenerator{
 	 *
 	 * .field <access-spec> <field-name> <descriptor>
 	 */
-	// FALTA: testar para saber se nao preciso no .j do public/private/static mesmo que nao exista no .java
 	private void manageFields(){
 
 		Map<String, Symbol> map = symbolTable.getGlobal_variables();
@@ -81,6 +78,9 @@ public class JasminGenerator{
 		});
 	}
 
+	/*
+	 * Writes the class initiator
+	 */
 	private void manageInit(){
 
 		this.printWriter.println("\n.method public <init>()V");
@@ -233,9 +233,9 @@ public class JasminGenerator{
 			this.printWriter.println("\tireturn\n");
 		}
 		else if(ret instanceof ASTADD || ret instanceof ASTSUB || 
-			ret instanceof ASTDIV || ret instanceof ASTMUL){
-			// ret instanceof ASTAND || ret instanceof ASTLT ||
-			// ret instanceof ASTNOT){
+			ret instanceof ASTDIV || ret instanceof ASTMUL ||
+			ret instanceof ASTAND || ret instanceof ASTLT ||
+			ret instanceof ASTNOT){
 
 			manageArithmeticExpression(ret, fst);
 			this.printWriter.println("\tireturn\n");
@@ -249,7 +249,6 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN nodes
 	 */
-	// FALTA: pôr a funcionar com new class por exemplo
 	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
 		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
@@ -294,17 +293,12 @@ public class JasminGenerator{
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
-			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
-			// rhs instanceof ASTAND || rhs instanceof ASTLT ||
-			// rhs instanceof ASTNOT){
+			rhs instanceof ASTDIV || rhs instanceof ASTMUL ||
+			rhs instanceof ASTAND || rhs instanceof ASTLT ||
+			rhs instanceof ASTNOT){
 
 			manageArithmeticExpression(rhs, fst);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
-		}
-		else if(rhs instanceof ASTNEW_CLASS){
-
-			manageNEW_CLASS(rhs, fst);
-			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
 	}
 
@@ -362,16 +356,11 @@ public class JasminGenerator{
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
-			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
-			// rhs instanceof ASTAND || rhs instanceof ASTLT ||
-			// rhs instanceof ASTNOT){
+			rhs instanceof ASTDIV || rhs instanceof ASTMUL ||
+			rhs instanceof ASTAND || rhs instanceof ASTLT ||
+			rhs instanceof ASTNOT){
 
 			manageArithmeticExpression(rhs, fst);
-			writePutfield(lhs);
-		}
-		else if(rhs instanceof ASTNEW_CLASS){
-
-			manageNEW_CLASS(rhs, fst);
 			writePutfield(lhs);
 		}
 		this.printWriter.println();
@@ -389,6 +378,10 @@ public class JasminGenerator{
 
 			flag = writeIDENTIFIER(child, fst);
 		}
+		else if(child instanceof ASTNEW_CLASS){
+
+			manageNEW_CLASS(child, fst);
+		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
 			manageCALL_FUNCTION(child, fst);
@@ -401,7 +394,7 @@ public class JasminGenerator{
 		else{
 
 			this.printWriter.print("\tinvokestatic " + child.getName());
-			this.printWriter.print("." + ((SimpleNode) node.jjtGetChild(1)).getName());
+			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
 			this.printWriter.println("(I;)V");
 		}
 	}
@@ -446,7 +439,7 @@ public class JasminGenerator{
 	private void manageFUNCTION(SimpleNode node){
 
 		String invokeStr = "\tinvokevirtual ";
-		invokeStr += "java/lang/" + this.symbolTable.getClassName() + "/" + node.getName();
+		invokeStr += this.symbolTable.getClassName() + "/" + node.getName();
 		invokeStr += getParametersInformation(this.symbolTable.getFunctions().get(node.getName()));
 		invokeStr += this.symbolTable.getFunctions().get(node.getName()).getReturnSymbol().getTypeDescriptor();
 		this.printWriter.println(invokeStr);
@@ -457,7 +450,7 @@ public class JasminGenerator{
 	 */
 	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst){
 
-		if(node.jjtGetNumChildren() != 0){
+		if(node.jjtGetNumChildren() == 2){
 
 			SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
 			SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
@@ -486,26 +479,62 @@ public class JasminGenerator{
 				manageArithmeticExpression(rhs, fst);
 				this.printWriter.println("\timul");
 			}
-			// else if(node instanceof ASTAND){
+			else if(node instanceof ASTAND){
 
-			// 	manageArithmeticExpression(lhs, fst);
-			// 	manageArithmeticExpression(rhs, fst);
-			// 	this.printWriter.println("\tiand");
-			// }
-			// else if(node instanceof ASTLT){
+				int rand1 = getRandomNumber();
+				int rand2 = rand1 + 1;
+				String label1 = "label" + Integer.toString(rand1);
+				String label2 = "label" + Integer.toString(rand2);
 
-			// 	// FALTA: saber qual é a instrução para o <
-			// 	manageArithmeticExpression(lhs, fst);
-			// 	manageArithmeticExpression(rhs, fst);
-			// 	this.printWriter.println("\tilt(isto nao é assim)");
-			// }
-			// else if(node instanceof ASTNOT){
+				manageArithmeticExpression(lhs, fst);
+				this.printWriter.println("\tif_icmpge " + label1);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\tifeq " + label1);
+				this.printWriter.println("\ticonst_1");
+				this.printWriter.println("\tgoto " + label2);
+				this.printWriter.println("\t" + label1 + ":");
+				this.printWriter.println("\ticonst_0");
+				this.printWriter.println("\t" + label2 + ":");
+			}
+			else if(node instanceof ASTLT){
 
-			// 	// FALTA: saber qual é a instrução para o not
-			// 	manageArithmeticExpression(lhs, fst);
-			// 	manageArithmeticExpression(rhs, fst);
-			// 	this.printWriter.println("\tif_icmpge(isto nao é assim)");
-			// }
+				int rand1 = getRandomNumber();
+				int rand2 = rand1 + 1;
+				String label1 = "label" + Integer.toString(rand1);
+				String label2 = "label" + Integer.toString(rand2);
+
+				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpression(rhs, fst);
+				this.printWriter.println("\tif_icmpge " + label1);
+				this.printWriter.println("\ticonst_1");
+				this.printWriter.println("\tgoto " + label2);
+				this.printWriter.println("\t" + label1 + ":");
+				this.printWriter.println("\ticonst_0");
+				this.printWriter.println("\t" + label2 + ":");
+			}
+		}
+		else if(node.jjtGetNumChildren() == 1){
+
+			if(node instanceof ASTNEW_CLASS)
+				manageNEW_CLASS(node, fst);
+
+			else if(node instanceof ASTNOT){
+
+				SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
+
+				int rand1 = getRandomNumber();
+				int rand2 = rand1 + 1;
+				String label1 = "label" + Integer.toString(rand1);
+				String label2 = "label" + Integer.toString(rand2);
+
+				manageArithmeticExpression(lhs, fst);
+				this.printWriter.println("\tifne " + label1);
+				this.printWriter.println("\ticonst_1");
+				this.printWriter.println("\tgoto " + label2);
+				this.printWriter.println("\t" + label1 + ":");
+				this.printWriter.println("\ticonst_0");
+				this.printWriter.println("\t" + label2 + ":");
+			}
 		}
 		else {
 
@@ -530,16 +559,20 @@ public class JasminGenerator{
 		}
 	}
 
+
+	/*
+	 * Manages the code generation for the NEW_CLASS's
+	 */ 
 	private void manageNEW_CLASS(SimpleNode node, FunctionSymbolTable fst){
 
-		this.printWriter.println("\tnew" + " java/lang/" + this.symbolTable.getClassName());
+		this.printWriter.println("\tnew " + this.symbolTable.getClassName());
 		this.printWriter.println("\tdup");
-		this.printWriter.println("\tinvokenonvirtual java/lang/" + this.symbolTable.getClassName() + "<init>()V");
+		this.printWriter.println("\tinvokenonvirtual " + this.symbolTable.getClassName() + "<init>()V");
 	}
 
 	/*
 	 * Manages the code generation for the INT's
-	 */
+	 */ 
 	private void writeINT(int value){
 
 		if(value >= 0 && value <= 5)
@@ -600,7 +633,7 @@ public class JasminGenerator{
 
 		// FALTA: NOT SURE ABOUT THE CLASS NAME
 		String getfieldStr = "\tgetfield ";
-		getfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + var.getName() + " ";
+		getfieldStr += this.symbolTable.getClassName() + "/" + var.getName() + " ";
 		getfieldStr += this.symbolTable.getGlobal_variables().get(var.getName()).getTypeDescriptor();
 		this.printWriter.println(getfieldStr);
 	}
@@ -612,7 +645,7 @@ public class JasminGenerator{
 
 		// FALTA: NOT SURE ABOUT THE CLASS NAME
 		String putfieldStr = "\tputfield ";
-		putfieldStr += "java/lang/" + this.symbolTable.getClassName() + "/" + var.getName() + " ";
+		putfieldStr += this.symbolTable.getClassName() + "/" + var.getName() + " ";
 		putfieldStr += this.symbolTable.getGlobal_variables().get(var.getName()).getTypeDescriptor();
 		this.printWriter.println(putfieldStr);
 	}
@@ -697,5 +730,14 @@ public class JasminGenerator{
 			return fst.getParameters().get(node.getName()).getTypeString();
 		else
 			return fst.getLocalVariables().get(node.getName()).getTypeString();
+	}
+
+	/*
+	 * Generates a random number between 0 and 100
+	 */
+	private int getRandomNumber(){
+
+		Random rand = new Random();
+		return rand.nextInt(101);
 	}
 }
