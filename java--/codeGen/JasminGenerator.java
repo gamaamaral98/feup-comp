@@ -395,7 +395,7 @@ public class JasminGenerator{
 
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
-			this.printWriter.println("(I;)V");
+			this.printWriter.println("(I)V");
 		}
 	}
 
@@ -707,7 +707,6 @@ public class JasminGenerator{
 		Map<String, Symbol> map2 = value.getParameters();
 		for (Map.Entry<String, Symbol> entry : map2.entrySet()) {
 		    str += entry.getValue().getTypeDescriptor();
-		    str += ";";
 		}
 
 		str += ")";
