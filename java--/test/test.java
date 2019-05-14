@@ -5,15 +5,15 @@ class Fac {
 
         a=true;
         b=false;
-        // if (num < 1)
-        //     num_aux = 1;
-        // else
-        //     num_aux = num * (this.ComputeFac(num-1));
+        if (num < 1)
+            a = false;
+        else
+            b = true;
 
         return a && b;
     }
 
     public static void main(String[] a){
-        io.println(new Fac().ComputeFac(10));
+        new Fac().ComputeFac(10);
     }
 }

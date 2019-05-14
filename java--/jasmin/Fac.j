@@ -22,15 +22,21 @@
 	iconst_0
 	istore 3
 
-	iload 2
-	ifeq label19
-	iload 3
-	ifeq label19
-	iconst_1
-	goto label20
-	label19:
 	iconst_0
-	label20:
+	istore 2
+
+	iconst_1
+	istore 3
+
+	iload 2
+	ifeq label66
+	iload 3
+	ifeq label66
+	iconst_1
+	goto label67
+	label66:
+	iconst_0
+	label67:
 	ireturn
 
 .end method
@@ -45,7 +51,6 @@
 	invokenonvirtual Fac/<init>()V
 	bipush 10
 	invokevirtual Fac/ComputeFac(I)Z
-	invokestatic io/println(I)V
 	return
 
 .end method

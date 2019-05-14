@@ -189,6 +189,10 @@ public class JasminGenerator{
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst);
 			}
+
+			else if(body.jjtGetChild(i) instanceof ASTIF_ELSE_STATEMENT){
+				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst);
+			}
 		}
 	}
 
@@ -397,6 +401,25 @@ public class JasminGenerator{
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
 			this.printWriter.println("(I)V");
 		}
+	}
+
+	/*
+	*  Manages the code generation for IF_ELSE_STATEMENT nodes
+	*/
+
+	//CHECKAR 1
+	private void manageIF_ELSE(SimpleNode node, FunctionSymbolTable fst){
+		
+		SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
+		SimpleNode if_body = (SimpleNode) node.jjtGetChild(1);
+		SimpleNode else_body = (SimpleNode) node.jjtGetChild(2);
+
+		manageArithmeticExpression(condition, fst);
+
+		manageMethodBody(if_body, fst);
+
+		manageMethodBody(else_body, fst);
+
 	}
 
 	/*
