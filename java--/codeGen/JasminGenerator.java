@@ -13,6 +13,8 @@ public class JasminGenerator{
 
 	private PrintWriter printWriter;
 
+	private int labelCounter = 0;
+
 	/*
 	 * Constructor of the class
 	 */
@@ -404,9 +406,8 @@ public class JasminGenerator{
 	}
 
 	/*
-	*  Manages the code generation for IF_ELSE_STATEMENT nodes
-	*/
-
+	 *  Manages the code generation for IF_ELSE_STATEMENT nodes
+	 */
 	//CHECKAR 1
 	private void manageIF_ELSE(SimpleNode node, FunctionSymbolTable fst){
 		
@@ -414,13 +415,36 @@ public class JasminGenerator{
 		SimpleNode if_body = (SimpleNode) node.jjtGetChild(1);
 		SimpleNode else_body = (SimpleNode) node.jjtGetChild(2);
 
-		manageArithmeticExpression(condition, fst);
+		if(condition.jjtGetChild(0) instanceof ASTLT){
 
-		manageMethodBody(if_body, fst);
+			SimpleNode lt = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode lhs = (SimpleNode) lt.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) lt.jjtGetChild(1);
 
-		manageMethodBody(else_body, fst);
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
 
+			manageArithmeticExpression(lhs, fst);
+			manageArithmeticExpression(rhs, fst);
+			this.printWriter.println("\tif_icmplt " + label1);
+			manageIfBody(if_body, fst);
+			this.printWriter.println("\tgoto " + label2);
+			this.printWriter.println("\t" + label1 + ":");
+			manageIfBody(else_body, fst);
+			this.printWriter.println("\t" + label2 + ":");
+		}
 	}
+
+	private void manageIfBody(SimpleNode node, FunctionSymbolTable fst){
+
+		if(node.jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
+			manageMethodBody((SimpleNode) node.jjtGetChild(0), fst);
+		else
+			manageMethodBody(node, fst);
+	}
+
 
 	/*
 	 * Manages the code generation for CALL_ARGUMENTS nodes
@@ -504,13 +528,12 @@ public class JasminGenerator{
 			}
 			else if(node instanceof ASTAND){
 
-				int rand1 = getRandomNumber();
-				int rand2 = rand1 + 1;
-				String label1 = "label" + Integer.toString(rand1);
-				String label2 = "label" + Integer.toString(rand2);
+				String label1 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
+				String label2 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
 
 				manageArithmeticExpression(lhs, fst);
-				// this.printWriter.println("\tif_icmpge " + label1);
 				this.printWriter.println("\tifeq " + label1);
 				manageArithmeticExpression(rhs, fst);
 				this.printWriter.println("\tifeq " + label1);
@@ -522,14 +545,14 @@ public class JasminGenerator{
 			}
 			else if(node instanceof ASTLT){
 
-				int rand1 = getRandomNumber();
-				int rand2 = rand1 + 1;
-				String label1 = "label" + Integer.toString(rand1);
-				String label2 = "label" + Integer.toString(rand2);
+				String label1 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
+				String label2 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
 
 				manageArithmeticExpression(lhs, fst);
 				manageArithmeticExpression(rhs, fst);
-				this.printWriter.println("\tif_icmpge " + label1);
+				this.printWriter.println("\tif_icmplt " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
 				this.printWriter.println("\t" + label1 + ":");
@@ -546,10 +569,10 @@ public class JasminGenerator{
 
 				SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
 
-				int rand1 = getRandomNumber();
-				int rand2 = rand1 + 1;
-				String label1 = "label" + Integer.toString(rand1);
-				String label2 = "label" + Integer.toString(rand2);
+				String label1 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
+				String label2 = "label_" + Integer.toString(labelCounter);
+				labelCounter++;
 
 				manageArithmeticExpression(lhs, fst);
 				this.printWriter.println("\tifne " + label1);
