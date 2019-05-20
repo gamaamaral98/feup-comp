@@ -298,6 +298,11 @@ public class JasminGenerator{
 			manageCALL_FUNCTION(rhs, fst);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
+		else if(rhs instanceof ASTNEW_CLASS){
+
+			manageNEW_CLASS(rhs, fst);
+			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
+		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
 			rhs instanceof ASTDIV || rhs instanceof ASTMUL ||
 			rhs instanceof ASTAND || rhs instanceof ASTLT ||
@@ -359,6 +364,11 @@ public class JasminGenerator{
 		else if(rhs instanceof ASTCALL_FUNCTION){
 
 			manageCALL_FUNCTION(rhs, fst);
+			writePutfield(lhs);
+		}
+		else if(rhs instanceof ASTNEW_CLASS){
+
+			manageNEW_CLASS(rhs, fst);
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
@@ -435,8 +445,73 @@ public class JasminGenerator{
 			manageIfBody(else_body, fst);
 			this.printWriter.println("\t" + label2 + ":");
 		}
+		else if(condition.jjtGetChild(0) instanceof ASTNOT){
+
+			SimpleNode not = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) not.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			manageArithmeticExpression(rhs, fst);
+			this.printWriter.println("\tifne " + label1);
+			manageIfBody(if_body, fst);
+			this.printWriter.println("\tgoto " + label2);
+			this.printWriter.println("\t" + label1 + ":");
+			manageIfBody(else_body, fst);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTTRUE){
+
+			manageIfBody(if_body, fst);
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTFALSE){
+
+			manageIfBody(else_body, fst);
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+
+			SimpleNode call_function = (SimpleNode) condition.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			manageCALL_FUNCTION(call_function, fst);
+			this.printWriter.println("\tifeq " + label1);
+			manageIfBody(if_body, fst);
+			this.printWriter.println("\tgoto " + label2);
+			this.printWriter.println("\t" + label1 + ":");
+			manageIfBody(else_body, fst);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTIDENTIFIER){
+
+			SimpleNode ident = (SimpleNode) condition.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			manageArithmeticExpression(ident, fst);
+			this.printWriter.println("\tifeq " + label1);
+			manageIfBody(if_body, fst);
+			this.printWriter.println("\tgoto " + label2);
+			this.printWriter.println("\t" + label1 + ":");
+			manageIfBody(else_body, fst);
+			this.printWriter.println("\t" + label2 + ":");
+		}
 	}
 
+	/*
+	 * Manages the code generation for the if body
+	 *
+	 * <statements>
+	 */
 	private void manageIfBody(SimpleNode node, FunctionSymbolTable fst){
 
 		if(node.jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
@@ -614,7 +689,7 @@ public class JasminGenerator{
 
 		this.printWriter.println("\tnew " + this.symbolTable.getClassName());
 		this.printWriter.println("\tdup");
-		this.printWriter.println("\tinvokenonvirtual " + this.symbolTable.getClassName() + "/<init>()V");
+		this.printWriter.println("\tinvokespecial " + this.symbolTable.getClassName() + "/<init>()V");
 	}
 
 	/*
