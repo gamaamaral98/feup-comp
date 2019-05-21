@@ -16,12 +16,28 @@
 	.limit locals 9
 	.limit stack 999
 
-	iconst_0
+	iload 1
+	iconst_1
+	if_icmplt label_0
+	iload 1
+	invokestatic io/println(I)V
+	iconst_1
 	istore 2
 
+	goto label_1
+	label_0:
+	iload 1
+	invokestatic io/println(I)V
+	iload 1
+	aload_0
+	iload 1
 	iconst_1
-	istore 3
+	isub
+	invokevirtual Fac/ComputeFac(I)I
+	imul
+	istore 2
 
+	label_1:
 	iload 2
 	ireturn
 
@@ -34,8 +50,10 @@
 
 	new Fac
 	dup
-	invokenonvirtual Fac/<init>()V
-	invokestatic ioPlus/println(Fac)V
+	invokespecial Fac/<init>()V
+	bipush 10
+	invokevirtual Fac/ComputeFac(I)I
+	invokestatic io/println(I)V
 	return
 
 .end method

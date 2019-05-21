@@ -402,6 +402,10 @@ public class JasminGenerator{
 
 			manageCALL_FUNCTION(child, fst);
 		}
+		else if(child instanceof ASTTHIS){
+
+			this.printWriter.print("\taload_0\n");
+		}
 
 		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst);
 
