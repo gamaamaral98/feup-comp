@@ -404,6 +404,8 @@ public class jmm{
                 }
             } else if(body.jjtGetChild(n) instanceof ASTACCESS_ARRAY) {
                 semanticError("Not a statement", function_name, ((SimpleNode)body.jjtGetChild(n).jjtGetChild(0)).line);
+            } else if(body.jjtGetChild(n) instanceof ASTNEW_CLASS) {
+
             }
             else{
                 System.out.println(body.jjtGetChild(n));

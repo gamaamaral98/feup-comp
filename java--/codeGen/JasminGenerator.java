@@ -190,10 +190,18 @@ public class JasminGenerator{
 
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst);
+				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
+				String rhs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(1)).getName();
+				if(lhs instanceof ASTTHIS) {
+					if(this.symbolTable.getFunctions().get(rhs).getReturnSymbol().getTypeDescriptor() != "V") {
+						this.printWriter.println("\tpop\n");
+					}
+				}
 			}
-
 			else if(body.jjtGetChild(i) instanceof ASTIF_ELSE_STATEMENT){
 				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst);
+			} else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
+				manageNEW_CLASS((SimpleNode) body.jjtGetChild(i), fst, true);
 			}
 		}
 	}
@@ -300,7 +308,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
 
-			manageNEW_CLASS(rhs, fst);
+			manageNEW_CLASS(rhs, fst, false);
 			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
@@ -321,9 +329,9 @@ public class JasminGenerator{
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
 
+		this.printWriter.println("\taload_0");
+		
 		if(rhs instanceof ASTINT){
-
-			this.printWriter.println("\taload_0");
 
 			int value = Integer.parseInt(rhs.getValueInt());
 			writeINT(value);
@@ -331,7 +339,6 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
-			this.printWriter.println("\taload_0");
 			writeBOOLEAN(rhs.getValueBoolean());
 			writePutfield(lhs);
 		}
@@ -341,7 +348,6 @@ public class JasminGenerator{
 			if(isGlobal(rhsName)){
 
 				this.printWriter.println("\taload_0");
-				this.printWriter.println("\taload_0");
 
 				writeGetfield(rhs);
 				writePutfield(lhs);
@@ -349,8 +355,6 @@ public class JasminGenerator{
 			else{
 
 				int index2 = getNodeIndex(rhsName, fst);
-
-				this.printWriter.println("\taload_0");
 
 				String type = getLocalType(rhs, fst);
 				if(type.equals("int") || type.equals("boolean"))
@@ -368,7 +372,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
 
-			manageNEW_CLASS(rhs, fst);
+			manageNEW_CLASS(rhs, fst, false);
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
@@ -396,7 +400,7 @@ public class JasminGenerator{
 		}
 		else if(child instanceof ASTNEW_CLASS){
 
-			manageNEW_CLASS(child, fst);
+			manageNEW_CLASS(child, fst, false);
 		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
@@ -692,7 +696,7 @@ public class JasminGenerator{
 		else if(node.jjtGetNumChildren() == 1){
 
 			if(node instanceof ASTNEW_CLASS)
-				manageNEW_CLASS(node, fst);
+				manageNEW_CLASS(node, fst, false);
 
 			else if(node instanceof ASTNOT){
 
@@ -739,10 +743,12 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for the NEW_CLASS's
 	 */ 
-	private void manageNEW_CLASS(SimpleNode node, FunctionSymbolTable fst){
+	private void manageNEW_CLASS(SimpleNode node, FunctionSymbolTable fst, boolean remove){
 
 		this.printWriter.println("\tnew " + this.symbolTable.getClassName());
-		this.printWriter.println("\tdup");
+		if(!remove) {
+			this.printWriter.println("\tdup");
+		}
 		this.printWriter.println("\tinvokespecial " + this.symbolTable.getClassName() + "/<init>()V");
 	}
 
