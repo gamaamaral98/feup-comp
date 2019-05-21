@@ -171,7 +171,7 @@ public class JasminGenerator{
 
 		int size = fst.getParameters().size() + fst.getLocalVariables().size();
 		this.printWriter.println("\n\t.limit locals " + 9);
-		this.printWriter.println("\t.limit stack " + 9 + "\n");
+		this.printWriter.println("\t.limit stack " + 999 + "\n");
 	}
 
 	/*
@@ -392,10 +392,60 @@ public class JasminGenerator{
 		if(flag)
 			manageFUNCTION((SimpleNode) node.jjtGetChild(1));
 		else{
-
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
-			this.printWriter.println("(I)V");
+			this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst) + ")V");
+		}
+	}
+
+	private String getCALL_ARGUMENTS_Descriptor(SimpleNode node, FunctionSymbolTable fst){
+		String ret = "";
+		for(int i = 0; i < node.jjtGetNumChildren(); i++){
+			SimpleNode child = (SimpleNode) node.jjtGetChild(i);
+
+			if(child instanceof ASTINT || child instanceof ASTADD || child instanceof ASTSUB
+			|| child instanceof ASTDIV || child instanceof ASTMUL ){
+				ret += "I";
+			}
+			else if(child instanceof ASTTRUE || child instanceof ASTFALSE
+			|| child instanceof ASTLT || child instanceof ASTNOT || child instanceof ASTAND ){
+				ret += "Z";
+			}
+			else if(child instanceof ASTIDENTIFIER){
+				String type = child.getName();
+				if(isGlobal(child.getName()))
+					type = getGlobalDescriptor(child);
+				else
+					type = getLocalDescriptor(child, fst);
+				ret += type;
+				if(!(type.equals("I") || type.equals("Z") || type.equals("[I")))
+					ret += ";";
+			}
+			else if(child instanceof ASTCALL_FUNCTION){
+				ret += getCALL_FUNCTION_RetDesc(child, fst);
+			}
+			else if(child instanceof ASTNEW_CLASS){
+				ret += this.symbolTable.getClassName() + ";";
+			}
+		}
+		return ret;
+	}
+
+	private String getCALL_FUNCTION_RetDesc(SimpleNode node, FunctionSymbolTable fst){
+		SimpleNode child = (SimpleNode) node.jjtGetChild(0);
+		boolean flag = true;
+
+		if(child instanceof ASTIDENTIFIER){
+			String nodeName = child.getName();
+			if(!isGlobal(nodeName) && !isLocal(nodeName, fst)){
+				flag = false;
+			}
+		}
+		if(flag) {
+			return this.symbolTable.getFunctions().get(((SimpleNode) node.jjtGetChild(1)).getName()).getReturnSymbol().getTypeDescriptor();
+		} else{
+			return "V";
+
 		}
 	}
 
@@ -722,25 +772,34 @@ public class JasminGenerator{
 	 * Returns a string with the type of the global nodes
 	 */
 	private String getGlobalType(SimpleNode node){
-
 		return this.symbolTable.getGlobal_variables().get(node.getName()).getTypeString();
 	}
+
+	private String getGlobalDescriptor(SimpleNode node){
+		return this.symbolTable.getGlobal_variables().get(node.getName()).getTypeDescriptor();
+	}
+
 	/*
 	 * Returns a string with the type of the parameter ou local nodes
 	 */
 	private String getLocalType(SimpleNode node, FunctionSymbolTable fst){
-		
 		if(fst.getParameters().get(node.getName()) != null)
 			return fst.getParameters().get(node.getName()).getTypeString();
 		else
 			return fst.getLocalVariables().get(node.getName()).getTypeString();
 	}
 
+	private String getLocalDescriptor(SimpleNode node, FunctionSymbolTable fst){
+		if(fst.getParameters().get(node.getName()) != null)
+			return fst.getParameters().get(node.getName()).getTypeDescriptor();
+		else
+			return fst.getLocalVariables().get(node.getName()).getTypeDescriptor();
+	}
+
 	/*
 	 * Generates a random number between 0 and 100
 	 */
 	private int getRandomNumber(){
-
 		Random rand = new Random();
 		return rand.nextInt(101);
 	}

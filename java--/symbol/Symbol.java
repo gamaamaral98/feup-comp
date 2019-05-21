@@ -98,7 +98,7 @@ public class Symbol {
             case STRING_ARRAY:
                 return "[Ljava/lang/String";
             case IDENTIFIER:
-                return "Ljava/lang/" + getIdentifier_name();
+                return getIdentifier_name();
             default:
                 return "V";
         }
