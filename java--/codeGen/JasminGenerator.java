@@ -323,7 +323,7 @@ public class JasminGenerator{
 
 		if(rhs instanceof ASTINT){
 
-			this.printWriter.println("\tiload_0");
+			this.printWriter.println("\taload_0");
 
 			int value = Integer.parseInt(rhs.getValueInt());
 			writeINT(value);
@@ -331,7 +331,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTTRUE || rhs instanceof ASTFALSE){
 
-			this.printWriter.println("\tiload_0");
+			this.printWriter.println("\taload_0");
 			writeBOOLEAN(rhs.getValueBoolean());
 			writePutfield(lhs);
 		}

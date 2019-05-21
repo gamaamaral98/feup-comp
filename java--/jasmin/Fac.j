@@ -1,6 +1,7 @@
 .class public Fac
 .super java/lang/Object
 
+.field a I
 
 .method public <init>()V
 	aload_0
@@ -16,29 +17,12 @@
 	.limit locals 9
 	.limit stack 999
 
-	iload 1
-	iconst_1
-	if_icmplt label_0
-	iload 1
-	invokestatic io/println(I)V
-	iconst_1
-	istore 2
-
-	goto label_1
-	label_0:
-	iload 1
-	invokestatic io/println(I)V
-	iload 1
 	aload_0
-	iload 1
-	iconst_1
-	isub
-	invokevirtual Fac/ComputeFac(I)I
-	imul
-	istore 2
+	bipush 14
+	putfield Fac/a I
 
-	label_1:
-	iload 2
+	aload_0
+	getfield Fac/a I
 	ireturn
 
 .end method
