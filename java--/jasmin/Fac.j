@@ -16,6 +16,12 @@
 	.limit locals 9
 	.limit stack 999
 
+	iconst_0
+	istore 2
+
+	iconst_1
+	istore 3
+
 	iload 2
 	ireturn
 
