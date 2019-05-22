@@ -284,8 +284,10 @@ public class JasminGenerator{
 	}
 
 	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
-		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
+
+		if(!isGlobal(((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getName())){
 			manageParamLocalASSIGN_ARRAY(node, fst);
+		}
 		else{
 			manageGlobalASSIGN_ARRAY(node, fst);
 		}		
@@ -295,40 +297,27 @@ public class JasminGenerator{
 	 * Manages the code generation for ASSIGN_ARRAY nodes for global variables
 	 */
 	private void manageGlobalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
-		//AST_ACCESS_ARRAY 
-		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
-		//AST_IDENTIFIER
-		SimpleNode lhs_1 = ((SimpleNode) lhs.jjtGetChild(0));
-		//AST_INT
-		SimpleNode lhs_2 = ((SimpleNode) lhs.jjtGetChild(1));
 
-		String lhsName = lhs_1.getName();
+		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+		SimpleNode lhs_ident = ((SimpleNode) lhs.jjtGetChild(0));
+		SimpleNode lhs_type = ((SimpleNode) lhs.jjtGetChild(1));
+
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
 
-		int index = Integer.parseInt(lhs_2.getValueInt());
-
 		this.printWriter.println("\taload_0");
+		writeGetfield(lhs_ident);
+		manageArithmeticExpressionAux(lhs_type, fst, "I");
 
-		if(rhs instanceof ASTINT){
-			writeGetfield(lhs_1);
-			manageArithmeticExpressionAux(lhs_2, fst, "I");
-			int value = Integer.parseInt(rhs.getValueInt());
-			writeINT(value);
-			writePutfield(lhs_1);
-		}/*
-		else if(rhs instanceof ASTIDENTIFIER){
-			String rhsName = rhs.getName();
-			if(isGlobal(rhsName)){
-				this.printWriter.println("\taload_0");
+		if(rhs instanceof ASTLENGTH){
 
-				writeGetfield(rhs);
-				writePutfield(lhs_1);
-			}
-			else{
-				this.printWriter.println("\tiastore");
-				writePutfield(lhs);
-			}
-		}*/
+			writeIDENTIFIER((SimpleNode) rhs.jjtGetChild(0), fst);
+			this.printWriter.println("\tarraylength");
+		}
+		else{
+
+			manageArithmeticExpressionAux(rhs, fst, "I");
+		}
+		this.printWriter.println("\tiastore\n");
 	}
 
 	/*
