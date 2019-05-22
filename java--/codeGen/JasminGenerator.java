@@ -188,6 +188,9 @@ public class JasminGenerator{
 			if(body.jjtGetChild(i) instanceof ASTASSIGN)
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
 
+			if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY)
+				manageASSIGN_ARRAY((SimpleNode) body.jjtGetChild(i), fst);
+
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V");
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
@@ -200,7 +203,8 @@ public class JasminGenerator{
 			}
 			else if(body.jjtGetChild(i) instanceof ASTIF_ELSE_STATEMENT){
 				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst);
-			} else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
+			} 
+			else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
 				manageNEW_CLASS((SimpleNode) body.jjtGetChild(i), fst, true);
 			}
 		}
@@ -271,6 +275,90 @@ public class JasminGenerator{
 			manageGlobalASSIGN(node, fst);
 	}
 
+	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
+			manageParamLocalASSIGN_ARRAY(node, fst);
+		else{
+			manageGlobalASSIGN_ARRAY(node, fst);
+		}		
+	}
+
+	/*
+	 * Manages the code generation for ASSIGN_ARRAY nodes for global variables
+	 */
+	private void manageGlobalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+		//AST_ACCESS_ARRAY 
+		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+		//AST_IDENTIFIER
+		SimpleNode lhs_1 = ((SimpleNode) lhs.jjtGetChild(0));
+		//AST_INT
+		SimpleNode lhs_2 = ((SimpleNode) lhs.jjtGetChild(1));
+
+		String lhsName = lhs_1.getName();
+		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
+
+		int index = Integer.parseInt(lhs_2.getValueInt());
+		System.out.println(index);
+
+		this.printWriter.println("\taload_0");
+
+		if(rhs instanceof ASTINT){
+			writeINT(index);
+			int value = Integer.parseInt(rhs.getValueInt());
+			writeINT(value);
+			writePutfield(lhs_1);
+		}/*
+		else if(rhs instanceof ASTIDENTIFIER){
+			String rhsName = rhs.getName();
+			if(isGlobal(rhsName)){
+				this.printWriter.println("\taload_0");
+
+				writeGetfield(rhs);
+				writePutfield(lhs_1);
+			}
+			else{
+				this.printWriter.println("\tiastore");
+				writePutfield(lhs);
+			}
+		}*/
+	}
+
+	/*
+	 * Manages the code generation for ASSIGN_ARRAY nodes for parameters and local variables
+	 */
+	private void manageParamLocalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+		//AST_ACCESS_ARRAY 
+		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+		//AST_IDENTIFIER
+		SimpleNode lhs_1 = ((SimpleNode) lhs.jjtGetChild(0));
+		//AST_INT
+		SimpleNode lhs_2 = ((SimpleNode) lhs.jjtGetChild(1));
+
+		String lhsName = lhs_1.getName();
+		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
+
+		if(rhs instanceof ASTINT){
+			int value = Integer.parseInt(rhs.getValueInt());
+			writeINT(value);
+			this.printWriter.println("\tiastore " + "\n");
+		}
+		else if(rhs instanceof ASTIDENTIFIER){
+			writeIDENTIFIER(rhs, fst);
+			this.printWriter.println("\tiastore " + "\n");
+		}
+		else if(rhs instanceof ASTCALL_FUNCTION){
+			String type = getLocalDescriptor(lhs_1, fst);
+			manageCALL_FUNCTION(rhs, fst, type);
+			this.printWriter.println("\tiastore" + "\n");
+		}
+		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
+			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
+
+			manageArithmeticExpression(rhs, fst);
+			this.printWriter.println("\tiastore " + "\n");
+		}
+	}
+
 	/*
 	 * Manages the code generation for ASSIGN nodes for parameters and local variables
 	 */
@@ -317,6 +405,14 @@ public class JasminGenerator{
 
 			manageArithmeticExpression(rhs, fst);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
+		}
+		else if(rhs instanceof ASTNEW_INT_ARRAY){
+
+			SimpleNode size = ((SimpleNode) rhs.jjtGetChild(0));
+
+			int value = Integer.parseInt(size.getValueInt());
+			writeINT(value);
+			this.printWriter.println("\tnewarray int" + "\n");
 		}
 	}
 
@@ -380,6 +476,14 @@ public class JasminGenerator{
 			rhs instanceof ASTNOT){
 
 			manageArithmeticExpression(rhs, fst);
+			writePutfield(lhs);
+		}
+		else if(rhs instanceof ASTNEW_INT_ARRAY){
+			SimpleNode size = ((SimpleNode) rhs.jjtGetChild(0));
+
+			int value = Integer.parseInt(size.getValueInt());
+			writeINT(value);
+			this.printWriter.println("\tnewarray int" + "\n");
 			writePutfield(lhs);
 		}
 		this.printWriter.println();

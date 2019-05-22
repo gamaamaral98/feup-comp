@@ -1,19 +1,15 @@
 class Fac {
 
+	int[] test_arr;
 	public static void main(String[] a){
 		io.println(new Fac().ComputeFac(0));
 	}
 
 	public int ComputeFac(int num){
 
-		io.println(num);
+		test_arr = new int[5];
+		test_arr[0] = 14;
 
-		while(num < 5){
-
-			io.println(num);
-			num = num + 1;
-		}
-
-		return num;
+		return 0;
 	}
 }
