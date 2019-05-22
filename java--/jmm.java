@@ -738,7 +738,12 @@ public class jmm{
             handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.INT, line);
-        }  else if(!(node.jjtGetChild(0) instanceof ASTINT)){
+        } else if(node.jjtGetChild(0) instanceof ASTADD
+                || node.jjtGetChild(0) instanceof ASTSUB
+                || node.jjtGetChild(0) instanceof ASTMUL
+                || node.jjtGetChild(0) instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
+        } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
 
@@ -753,6 +758,11 @@ public class jmm{
             handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
         } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.INT, line);
+        } else if(node.jjtGetChild(1) instanceof ASTADD
+                || node.jjtGetChild(1) instanceof ASTSUB
+                || node.jjtGetChild(1) instanceof ASTMUL
+                || node.jjtGetChild(1) instanceof ASTDIV){
+            handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(1));
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
@@ -767,6 +777,8 @@ public class jmm{
             handleNOT(function_name, line, node.jjtGetChild(0));
         } else if(node.jjtGetChild(0) instanceof ASTLT){
             handleLT(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTAND){
+            handleAND(function_name, line, node.jjtGetChild(0));
         } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.BOOLEAN, line);
         } else if (!(node.jjtGetChild(0) instanceof ASTTRUE || node.jjtGetChild(0) instanceof ASTFALSE)){
@@ -781,6 +793,8 @@ public class jmm{
             handleNOT(function_name, line, node.jjtGetChild(1));
         } else if(node.jjtGetChild(1) instanceof ASTLT){
             handleLT(function_name, line, node.jjtGetChild(1));
+        } else if(node.jjtGetChild(1) instanceof ASTAND){
+            handleAND(function_name, line, node.jjtGetChild(1));
         } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.BOOLEAN, line);
         } else if (!(node.jjtGetChild(1) instanceof ASTTRUE || node.jjtGetChild(1) instanceof ASTFALSE)){
