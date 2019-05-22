@@ -192,7 +192,7 @@ public class JasminGenerator{
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V");
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
 				String rhs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(1)).getName();
-				if(lhs instanceof ASTTHIS) {
+				if(lhs instanceof ASTTHIS || lhs instanceof ASTNEW_CLASS) {
 					if(this.symbolTable.getFunctions().get(rhs).getReturnSymbol().getTypeDescriptor() != "V") {
 						this.printWriter.println("\tpop\n");
 					}

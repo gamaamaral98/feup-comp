@@ -12,18 +12,18 @@
 
 ; methods
 
-.method public ComputeFac(IFac;)Fac
+.method public ComputeFac(I)I
 
-	.limit locals 4
+	.limit locals 3
 	.limit stack 999
 
-	ldc 123456
-	invokestatic io/println(I)Z
-	ifne label_0
+	iload 2
+	iconst_1
+	if_icmpge label_0
 	ldc 123456
 	invokestatic io/println(I)V
 	iconst_1
-	istore 3
+	istore 2
 
 	goto label_1
 	label_0:
@@ -32,13 +32,12 @@
 	iload 1
 	iconst_1
 	isub
-	invokevirtual Fac/ComputeFac(IFac;)Fac
+	invokevirtual Fac/ComputeFac(I)I
 	imul
-	istore 3
+	istore 2
 
 	label_1:
-	ldc 123456
-	invokestatic io/println(I)Fac
+	iload 2
 	ireturn
 
 .end method
@@ -52,8 +51,15 @@
 	dup
 	invokespecial Fac/<init>()V
 	bipush 10
-	invokevirtual Fac/ComputeFac(IFac;)Fac
-	invokestatic io/println(Fac;)V
+	invokevirtual Fac/ComputeFac(I)I
+	pop
+
+	new Fac
+	dup
+	invokespecial Fac/<init>()V
+	bipush 10
+	invokevirtual Fac/ComputeFac(I)I
+	invokestatic io/println(I)V
 	return
 
 .end method
