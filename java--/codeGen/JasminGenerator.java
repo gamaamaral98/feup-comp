@@ -189,7 +189,7 @@ public class JasminGenerator{
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
 
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
-				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst);
+				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V");
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
 				String rhs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(1)).getName();
 				if(lhs instanceof ASTTHIS) {
@@ -243,7 +243,7 @@ public class JasminGenerator{
 		}
 		else if(ret instanceof ASTCALL_FUNCTION){
 
-			manageCALL_FUNCTION(ret, fst);
+			manageCALL_FUNCTION(ret, fst, fst.getReturnSymbol().getTypeDescriptor());
 			this.printWriter.println("\tireturn\n");
 		}
 		else if(ret instanceof ASTADD || ret instanceof ASTSUB || 
@@ -302,12 +302,11 @@ public class JasminGenerator{
 				this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
-
-			manageCALL_FUNCTION(rhs, fst);
+			String type = getLocalDescriptor(lhs, fst);
+			manageCALL_FUNCTION(rhs, fst, type);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
-
 			manageNEW_CLASS(rhs, fst, false);
 			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
@@ -366,8 +365,8 @@ public class JasminGenerator{
 			}
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
-
-			manageCALL_FUNCTION(rhs, fst);
+			String type = getGlobalDescriptor(lhs);
+			manageCALL_FUNCTION(rhs, fst, type);
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
@@ -389,7 +388,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for CALL_FUNCTION nodes
 	 */
-	private void manageCALL_FUNCTION(SimpleNode node, FunctionSymbolTable fst){
+	private void manageCALL_FUNCTION(SimpleNode node, FunctionSymbolTable fst, String staticRet){
 
 		SimpleNode child = (SimpleNode) node.jjtGetChild(0);
 		boolean flag = true;
@@ -404,7 +403,7 @@ public class JasminGenerator{
 		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
-			manageCALL_FUNCTION(child, fst);
+			manageCALL_FUNCTION(child, fst, staticRet);
 		}
 		else if(child instanceof ASTTHIS){
 
@@ -418,7 +417,7 @@ public class JasminGenerator{
 		else{
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
-			this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst) + ")V");
+			this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst) + ")" + staticRet);
 		}
 	}
 
@@ -466,7 +465,10 @@ public class JasminGenerator{
 			}
 		}
 		if(flag) {
-			return this.symbolTable.getFunctions().get(((SimpleNode) node.jjtGetChild(1)).getName()).getReturnSymbol().getTypeDescriptor();
+			String ret = this.symbolTable.getFunctions().get(((SimpleNode) node.jjtGetChild(1)).getName()).getReturnSymbol().getTypeDescriptor();
+			if(!(ret.equals("I") || ret.equals("Z") || ret.equals("[I")))
+				ret += ";";
+			return ret;
 		} else{
 			return "V";
 
@@ -494,8 +496,8 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpression(lhs, fst);
-			manageArithmeticExpression(rhs, fst);
+			manageArithmeticExpressionAux(lhs, fst, "I");
+			manageArithmeticExpressionAux(rhs, fst, "I");
 			this.printWriter.println("\tif_icmpge " + label1);
 			manageIfBody(if_body, fst);
 			this.printWriter.println("\tgoto " + label2);
@@ -513,7 +515,7 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpression(rhs, fst);
+			manageArithmeticExpressionAux(rhs, fst, "Z");
 			this.printWriter.println("\tifne " + label1);
 			manageIfBody(if_body, fst);
 			this.printWriter.println("\tgoto " + label2);
@@ -538,7 +540,7 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageCALL_FUNCTION(call_function, fst);
+			manageCALL_FUNCTION(call_function, fst, "Z");
 			this.printWriter.println("\tifeq " + label1);
 			manageIfBody(if_body, fst);
 			this.printWriter.println("\tgoto " + label2);
@@ -555,7 +557,7 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpression(ident, fst);
+			manageArithmeticExpressionAux(ident, fst, "Z");
 			this.printWriter.println("\tifeq " + label1);
 			manageIfBody(if_body, fst);
 			this.printWriter.println("\tgoto " + label2);
@@ -603,8 +605,14 @@ public class JasminGenerator{
 				writeIDENTIFIER(child, fst);
 			}
 			else if(child instanceof ASTCALL_FUNCTION){
-				
-				manageCALL_FUNCTION(child, fst);
+				String type = "V";
+				if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
+					Set<String> params = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().keySet();
+					Object[] temp = params.toArray();
+					String correspondingParam = (String) temp[i];
+					type = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().get(correspondingParam).getTypeDescriptor();
+				}
+				manageCALL_FUNCTION(child, fst, type);
 			}
 			else{
 
@@ -625,10 +633,14 @@ public class JasminGenerator{
 		this.printWriter.println(invokeStr);
 	}
 
+	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst) {
+		manageArithmeticExpressionAux(node, fst, "");
+	}
+
 	/*
 	 * Manages the code generation for Arithmetic Expressions
 	 */
-	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst){
+	private void manageArithmeticExpressionAux(SimpleNode node, FunctionSymbolTable fst, String arithmeticType){
 
 		if(node.jjtGetNumChildren() == 2){
 
@@ -637,26 +649,26 @@ public class JasminGenerator{
 
 			if(node instanceof ASTADD){
 
-				manageArithmeticExpression(lhs, fst);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "I");
+				manageArithmeticExpressionAux(rhs, fst, "I");
 				this.printWriter.println("\tiadd");
 			}
 			else if(node instanceof ASTSUB){
 
-				manageArithmeticExpression(lhs, fst);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "I");
+				manageArithmeticExpressionAux(rhs, fst, "I");
 				this.printWriter.println("\tisub");
 			}
 			else if(node instanceof ASTDIV){
 
-				manageArithmeticExpression(lhs, fst);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "I");
+				manageArithmeticExpressionAux(rhs, fst, "I");
 				this.printWriter.println("\tidiv");
 			}
 			else if(node instanceof ASTMUL){
 
-				manageArithmeticExpression(lhs, fst);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "I");
+				manageArithmeticExpressionAux(rhs, fst, "I");
 				this.printWriter.println("\timul");
 			}
 			else if(node instanceof ASTAND){
@@ -666,9 +678,9 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "Z");
 				this.printWriter.println("\tifeq " + label1);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(rhs, fst, "Z");
 				this.printWriter.println("\tifeq " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -683,8 +695,8 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpression(lhs, fst);
-				manageArithmeticExpression(rhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "I");
+				manageArithmeticExpressionAux(rhs, fst, "I");
 				this.printWriter.println("\tif_icmplt " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -707,7 +719,7 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpression(lhs, fst);
+				manageArithmeticExpressionAux(lhs, fst, "Z");
 				this.printWriter.println("\tifne " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -734,7 +746,7 @@ public class JasminGenerator{
 			}
 			else if(node instanceof ASTCALL_FUNCTION){
 
-				manageCALL_FUNCTION(node, fst);
+				manageCALL_FUNCTION(node, fst, arithmeticType);
 			}
 		}
 	}

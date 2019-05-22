@@ -1,17 +1,16 @@
 class Fac {
 	int a;
 
-	public int ComputeFac(int num){
+	public Fac ComputeFac(int num, Fac a){
 		int num_aux;
-		io.println(num);
-		if (num < 1) {
+		if (!io.println(123456)) {
 			io.println(123456);
 			num_aux = 1;
 		}
 		else {
 			num_aux = num * (this.ComputeFac(num-1));
 		}
-		return num_aux;
+		return io.println(123456);
 	}
 	public static void main(String[] a){
 		io.println(new Fac().ComputeFac(10));
