@@ -1,7 +1,6 @@
 .class public Fac
 .super java/lang/Object
 
-.field a I
 
 .method public <init>()V
 	aload_0
@@ -17,7 +16,9 @@
 	.limit locals 3
 	.limit stack 999
 
-	iload 2
+	iload 1
+	invokestatic io/println(I)V
+	iload 1
 	iconst_1
 	if_icmpge label_0
 	ldc 123456
@@ -46,13 +47,6 @@
 
 	.limit locals 2
 	.limit stack 999
-
-	new Fac
-	dup
-	invokespecial Fac/<init>()V
-	bipush 10
-	invokevirtual Fac/ComputeFac(I)I
-	pop
 
 	new Fac
 	dup
