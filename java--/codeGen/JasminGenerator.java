@@ -189,10 +189,10 @@ public class JasminGenerator{
 
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
 			}
+			else if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY){
 
-			if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY)
 				manageASSIGN_ARRAY((SimpleNode) body.jjtGetChild(i), fst);
-
+			}
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V");
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
@@ -421,7 +421,28 @@ public class JasminGenerator{
 
 			int value = Integer.parseInt(size.getValueInt());
 			writeINT(value);
-			this.printWriter.println("\tnewarray int" + "\n");
+			this.printWriter.println("\tnewarray int");
+			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
+		}
+		else if(rhs instanceof ASTACCESS_ARRAY){
+
+			SimpleNode ident = (SimpleNode) rhs.jjtGetChild(0);
+			String identName = ident.getName();
+
+			if(isGlobal(identName)){
+
+				this.printWriter.println("\taload_0");
+				writeGetfield(ident);
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				this.printWriter.println("\tiaload");
+			}
+			else{
+
+				writeIDENTIFIER(ident, fst);
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				this.printWriter.println("\tiaload");
+			}
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 	}
 
@@ -492,7 +513,27 @@ public class JasminGenerator{
 
 			int value = Integer.parseInt(size.getValueInt());
 			writeINT(value);
-			this.printWriter.println("\tnewarray int" + "\n");
+			this.printWriter.println("\tnewarray int");
+			writePutfield(lhs);
+		}
+		else if(rhs instanceof ASTACCESS_ARRAY){
+
+			SimpleNode child = (SimpleNode) rhs.jjtGetChild(0);
+
+			String childName = child.getName(); 
+			if(isGlobal(childName)){
+
+				this.printWriter.println("\taload_0");
+				writeGetfield(child);
+			}
+			else{
+
+				int index2 = getNodeIndex(childName, fst);
+				this.printWriter.println("\taload " +  Integer.toString(index2));
+			}
+
+			manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+			this.printWriter.println("\tiaload");
 			writePutfield(lhs);
 		}
 		this.printWriter.println();
@@ -1057,7 +1098,6 @@ public class JasminGenerator{
 	 */
 	private void writeGetfield(SimpleNode var){
 
-		// FALTA: NOT SURE ABOUT THE CLASS NAME
 		String getfieldStr = "\tgetfield ";
 		getfieldStr += this.symbolTable.getClassName() + "/" + var.getName() + " ";
 		getfieldStr += this.symbolTable.getGlobal_variables().get(var.getName()).getTypeDescriptor();
@@ -1069,7 +1109,6 @@ public class JasminGenerator{
 	 */
 	private void writePutfield(SimpleNode var){
 
-		// FALTA: NOT SURE ABOUT THE CLASS NAME
 		String putfieldStr = "\tputfield ";
 		putfieldStr += this.symbolTable.getClassName() + "/" + var.getName() + " ";
 		putfieldStr += this.symbolTable.getGlobal_variables().get(var.getName()).getTypeDescriptor();
