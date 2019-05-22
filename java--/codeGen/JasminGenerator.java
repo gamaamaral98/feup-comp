@@ -185,7 +185,8 @@ public class JasminGenerator{
 
 		for(int i = 0; i < body.jjtGetNumChildren(); i++){
 
-			if(body.jjtGetChild(i) instanceof ASTASSIGN)
+			if(body.jjtGetChild(i) instanceof ASTASSIGN){
+
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
 
 			if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY)
@@ -202,10 +203,15 @@ public class JasminGenerator{
 				}
 			}
 			else if(body.jjtGetChild(i) instanceof ASTIF_ELSE_STATEMENT){
+
 				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst);
 			} 
 			else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
 				manageNEW_CLASS((SimpleNode) body.jjtGetChild(i), fst, true);
+			}
+			else if(body.jjtGetChild(i) instanceof ASTWHILE){
+
+				manageWHILE((SimpleNode) body.jjtGetChild(i), fst);
 			}
 		}
 	}
@@ -383,6 +389,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTIDENTIFIER){
 
+			writeIDENTIFIER(rhs ,fst);
 			String type = getLocalType(lhs, fst);
 			if(type.equals("int") || type.equals("boolean"))
 				this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
@@ -647,8 +654,6 @@ public class JasminGenerator{
 			this.printWriter.println("\t" + label1 + ":");
 			manageIfBody(else_body, fst);
 			this.printWriter.println("\t" + label2 + ":");
-
-
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTTRUE){
 
@@ -705,6 +710,104 @@ public class JasminGenerator{
 			manageMethodBody((SimpleNode) node.jjtGetChild(0), fst);
 		else
 			manageMethodBody(node, fst);
+	}
+
+	/*
+	 *  Manages the code generation for WHILE nodes
+	 */
+	private void manageWHILE(SimpleNode node, FunctionSymbolTable fst){
+
+		SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
+		SimpleNode while_body = (SimpleNode) node.jjtGetChild(1);
+
+		if(condition.jjtGetChild(0) instanceof ASTLT){
+
+			SimpleNode lt = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode lhs = (SimpleNode) lt.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) lt.jjtGetChild(1);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageArithmeticExpressionAux(lhs, fst, "I");
+			manageArithmeticExpressionAux(rhs, fst, "I");
+			this.printWriter.println("\tif_icmpge " + label2);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			this.printWriter.println("\tgoto " + label1);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTNOT){
+
+			SimpleNode not = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) not.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageArithmeticExpressionAux(rhs, fst, "Z");
+			this.printWriter.println("\tifne " + label2);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			this.printWriter.println("\tgoto " + label1);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTAND){
+
+			SimpleNode and = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode lhs = (SimpleNode) and.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) and.jjtGetChild(1);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageArithmeticExpressionAux(lhs, fst, "Z");
+			this.printWriter.println("\tifeq " + label2);
+			manageArithmeticExpressionAux(rhs, fst, "Z");
+			this.printWriter.println("\tifeq " + label2);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			this.printWriter.println("\tgoto " + label1);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
+
+			SimpleNode call_function = (SimpleNode) condition.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageCALL_FUNCTION(call_function, fst, "Z");
+			this.printWriter.println("\tifeq " + label2);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			this.printWriter.println("\tgoto " + label1);
+			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTIDENTIFIER){
+
+			SimpleNode ident = (SimpleNode) condition.jjtGetChild(0);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageArithmeticExpressionAux(ident, fst, "Z");
+			this.printWriter.println("\tifeq " + label2);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			this.printWriter.println("\tgoto " + label1);
+			this.printWriter.println("\t" + label2 + ":");
+		}
 	}
 
 
@@ -824,7 +927,7 @@ public class JasminGenerator{
 
 				manageArithmeticExpressionAux(lhs, fst, "I");
 				manageArithmeticExpressionAux(rhs, fst, "I");
-				this.printWriter.println("\tif_icmplt " + label1);
+				this.printWriter.println("\tif_icmpge " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
 				this.printWriter.println("\t" + label1 + ":");
