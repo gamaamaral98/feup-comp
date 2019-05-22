@@ -478,7 +478,6 @@ public class JasminGenerator{
 	/*
 	 *  Manages the code generation for IF_ELSE_STATEMENT nodes
 	 */
-	//CHECKAR 1
 	private void manageIF_ELSE(SimpleNode node, FunctionSymbolTable fst){
 		
 		SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
@@ -522,6 +521,30 @@ public class JasminGenerator{
 			this.printWriter.println("\t" + label1 + ":");
 			manageIfBody(else_body, fst);
 			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTAND){
+
+			SimpleNode and = (SimpleNode) condition.jjtGetChild(0);
+			SimpleNode lhs = (SimpleNode) and.jjtGetChild(0);
+			SimpleNode rhs = (SimpleNode) and.jjtGetChild(1);
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+			String label2 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			manageArithmeticExpressionAux(lhs, fst, "Z");
+			this.printWriter.println("\tifeq " + label1);
+			manageArithmeticExpressionAux(rhs, fst, "Z");
+			this.printWriter.println("\tifeq " + label1);
+
+			manageIfBody(if_body, fst);
+			this.printWriter.println("\tgoto " + label2);
+			this.printWriter.println("\t" + label1 + ":");
+			manageIfBody(else_body, fst);
+			this.printWriter.println("\t" + label2 + ":");
+
+
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTTRUE){
 
