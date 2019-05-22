@@ -169,8 +169,10 @@ public class ClassSymbolTable {
     public Symbol.SymbolType getVariableType(String functionName, String variableName){
         if(functions.get(functionName).getLocalVariables().containsKey(variableName))
             return functions.get(functionName).getLocalVariables().get(variableName).getType();
-        else
+        else if (global_variables.containsKey(variableName))
             return global_variables.get(variableName).getType();
+        else
+            return functions.get(functionName).getParameters().get(variableName).getType();
     }
 
     public String getClassName() {

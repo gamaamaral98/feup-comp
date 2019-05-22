@@ -239,11 +239,11 @@ public class jmm{
                 int line = ((ASTIDENTIFIER)body.jjtGetChild(n).jjtGetChild(0)).line;
 
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTIDENTIFIER){
-                    if(!this.symbolTables.hasVariable(function_name, assigned_variable_name)){
+                    if(!this.symbolTables.hasVariable(function_name, assigned_variable_name) && !this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(assigned_variable_name)){
                         semanticError("Cannot find symbol", assigned_variable_name, line);
                         continue;
                     }
-                    else{
+                    else if(!this.symbolTables.getFunctions().get(function_name).getParameters().containsKey(assigned_variable_name)){
                         if(local == 1)
                             this.symbolTables.setInitVariable(function_name, assigned_variable_name);
                     }
