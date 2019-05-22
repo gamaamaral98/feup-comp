@@ -306,12 +306,12 @@ public class JasminGenerator{
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
 
 		int index = Integer.parseInt(lhs_2.getValueInt());
-		System.out.println(index);
 
 		this.printWriter.println("\taload_0");
 
 		if(rhs instanceof ASTINT){
-			writeINT(index);
+			writeGetfield(lhs_1);
+			manageArithmeticExpressionAux(lhs_2, fst, "I");
 			int value = Integer.parseInt(rhs.getValueInt());
 			writeINT(value);
 			writePutfield(lhs_1);
@@ -337,13 +337,20 @@ public class JasminGenerator{
 	private void manageParamLocalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
 		//AST_ACCESS_ARRAY 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
+
 		//AST_IDENTIFIER
 		SimpleNode lhs_1 = ((SimpleNode) lhs.jjtGetChild(0));
+		String lhsName = lhs_1.getName();
+		int index = getNodeIndex(lhsName, fst);
+
 		//AST_INT
 		SimpleNode lhs_2 = ((SimpleNode) lhs.jjtGetChild(1));
 
-		String lhsName = lhs_1.getName();
+		//Int, identifier, call function ...
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
+
+		writeIDENTIFIER(lhs_1, fst);
+		manageArithmeticExpressionAux(lhs_2, fst, "I");
 
 		if(rhs instanceof ASTINT){
 			int value = Integer.parseInt(rhs.getValueInt());
@@ -363,6 +370,31 @@ public class JasminGenerator{
 			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
 
 			manageArithmeticExpression(rhs, fst);
+			this.printWriter.println("\tiastore " + "\n");
+		}
+		else if(rhs instanceof ASTACCESS_ARRAY){
+			SimpleNode ident = (SimpleNode) rhs.jjtGetChild(0);
+			String identName = ident.getName();
+
+			if(isGlobal(identName)){
+
+				this.printWriter.println("\taload_0");
+				writeGetfield(ident);
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				this.printWriter.println("\tiaload");
+			}
+			else{
+
+				writeIDENTIFIER(ident, fst);
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				this.printWriter.println("\tiaload");
+			}
+			this.printWriter.println("\tiastore " + "\n");
+		}
+		else if(rhs instanceof ASTLENGTH){
+
+			writeIDENTIFIER((SimpleNode) rhs.jjtGetChild(0), fst);
+			this.printWriter.println("\tarraylength");
 			this.printWriter.println("\tiastore " + "\n");
 		}
 	}
