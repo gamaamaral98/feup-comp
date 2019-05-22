@@ -188,6 +188,7 @@ public class JasminGenerator{
 			if(body.jjtGetChild(i) instanceof ASTASSIGN){
 
 				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
+			}
 
 			if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY)
 				manageASSIGN_ARRAY((SimpleNode) body.jjtGetChild(i), fst);
@@ -215,6 +216,7 @@ public class JasminGenerator{
 			}
 		}
 	}
+
 
 	/*
 	 * Manages the code generation for the method return
