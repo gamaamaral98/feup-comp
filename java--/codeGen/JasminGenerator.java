@@ -157,8 +157,14 @@ public class JasminGenerator{
 
 		if(fst.getReturnSymbol() == null)
 			str += "V";
-		else
+		else{
 			str += fst.getReturnSymbol().getTypeDescriptor();
+			String type = fst.getReturnSymbol().getTypeString();
+			if(!(type == "int" || type == "boolean" || type == "int[]")){
+				
+				str += ";";
+			}
+		}
 
 		this.printWriter.println(str);		// Contains .method <access-spec> <method-spec>
 	}
