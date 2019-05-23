@@ -266,6 +266,11 @@ public class JasminGenerator{
 			manageArithmeticExpression(ret, fst);
 			this.printWriter.println("\tireturn\n");
 		}
+		else if(ret instanceof ASTACCESS_ARRAY){
+			
+			manageArithmeticExpression(ret, fst);
+			this.printWriter.println("\tireturn\n");
+		}
 		else{	// No return
 
 			this.printWriter.println("\treturn");
@@ -998,6 +1003,9 @@ public class JasminGenerator{
 				this.printWriter.println("\ticonst_0");
 				this.printWriter.println("\t" + label2 + ":");
 			}
+			else if(node instanceof ASTACCESS_ARRAY){
+				manageACCESS_ARRAY(node, fst);
+			}
 		}
 		else if(node.jjtGetNumChildren() == 1){
 
@@ -1023,7 +1031,7 @@ public class JasminGenerator{
 			}
 		}
 		else {
-
+			
 			if(node instanceof ASTIDENTIFIER){
 
 				writeIDENTIFIER(node, fst);
@@ -1042,6 +1050,25 @@ public class JasminGenerator{
 
 				manageCALL_FUNCTION(node, fst, arithmeticType);
 			}
+		}
+	}
+
+	private void manageACCESS_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+		SimpleNode ident = (SimpleNode) node.jjtGetChild(0);
+		String identName = ident.getName();
+
+		if(isGlobal(identName)){
+
+			this.printWriter.println("\taload_0");
+			writeGetfield(ident);
+			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I");
+			this.printWriter.println("\tiaload");
+		}
+		else{
+
+			writeIDENTIFIER(ident, fst);
+			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I");
+			this.printWriter.println("\tiaload");
 		}
 	}
 
