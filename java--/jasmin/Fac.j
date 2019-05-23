@@ -2,6 +2,7 @@
 .super java/lang/Object
 
 .field test_arr1 [I
+.field sup I
 
 .method public <init>()V
 	aload_0
@@ -42,18 +43,11 @@
 	.limit locals 3
 	.limit stack 999
 
+	aload_0
 	iconst_2
-	newarray int
-	astore 2
+	putfield Fac/sup I
 
-	aload 2
 	iconst_0
-	bipush 10
-	iastore 
-
-	aload 2
-	iconst_0
-	iaload
 	ireturn
 
 .end method
