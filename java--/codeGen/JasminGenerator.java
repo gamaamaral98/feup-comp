@@ -617,7 +617,7 @@ public class JasminGenerator{
 			SimpleNode child = (SimpleNode) node.jjtGetChild(i);
 
 			if(child instanceof ASTINT || child instanceof ASTADD || child instanceof ASTSUB
-			|| child instanceof ASTDIV || child instanceof ASTMUL ){
+			|| child instanceof ASTDIV || child instanceof ASTMUL || child instanceof ASTACCESS_ARRAY){
 				ret += "I";
 			}
 			else if(child instanceof ASTTRUE || child instanceof ASTFALSE
@@ -914,12 +914,18 @@ public class JasminGenerator{
 				writeIDENTIFIER(child, fst);
 			}
 			else if(child instanceof ASTCALL_FUNCTION){
+
 				String type = "V";
 				if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
+					
 					Set<String> params = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().keySet();
+					
 					Object[] temp = params.toArray();
-					String correspondingParam = (String) temp[i];
-					type = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().get(correspondingParam).getTypeDescriptor();
+					
+					if(params.size() != 0){
+						String correspondingParam = (String) temp[i];
+						type = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().get(correspondingParam).getTypeDescriptor();
+					}
 				}
 				manageCALL_FUNCTION(child, fst, type);
 			}
@@ -1038,6 +1044,12 @@ public class JasminGenerator{
 				this.printWriter.println("\t" + label1 + ":");
 				this.printWriter.println("\ticonst_0");
 				this.printWriter.println("\t" + label2 + ":");
+			}
+
+			else if(node instanceof ASTLENGTH){
+
+				writeIDENTIFIER((SimpleNode) node.jjtGetChild(0), fst);
+				this.printWriter.println("\tarraylength");
 			}
 		}
 		else {
