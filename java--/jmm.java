@@ -292,6 +292,9 @@ public class jmm{
                     if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
                         semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
+                    ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                    symbols.add(Symbol.SymbolType.INT_ARRAY);
+                    handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), symbols);
                 }
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTINT){
                     if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
@@ -743,6 +746,10 @@ public class jmm{
                 || node.jjtGetChild(0) instanceof ASTMUL
                 || node.jjtGetChild(0) instanceof ASTDIV){
             handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(0));
+        } else if(node.jjtGetChild(0) instanceof ASTLENGTH){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
@@ -763,6 +770,10 @@ public class jmm{
                 || node.jjtGetChild(1) instanceof ASTMUL
                 || node.jjtGetChild(1) instanceof ASTDIV){
             handleMathOperationsReturnExpression(function_name, line, node.jjtGetChild(1));
+        } else if(node.jjtGetChild(1) instanceof ASTLENGTH){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
             semanticError("Bad operand types for binary operator '<'", function_name, line);
         }
