@@ -1,6 +1,7 @@
 class Fac {
 
 	int[] test_arr1;
+	int sup;
 
 	public static void main(String[] a){
 		io.println(new Fac().ComputeFac(10));
@@ -14,10 +15,8 @@ class Fac {
 
 		int[] test_arr2;
 
-		//test_arr1 = new int[5];			
-		test_arr2 = new int[2];				
-		test_arr2[0] = 10;
+		sup = 2;
 
-		return test_arr2[0];
+		return 0;
 	}
 }

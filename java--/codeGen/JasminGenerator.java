@@ -288,19 +288,23 @@ public class JasminGenerator{
 	 */
 	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
 
-		if(!isGlobal(((SimpleNode) node.jjtGetChild(0)).getName()))
-			manageParamLocalASSIGN(node, fst);
-		else
+		String name = ((SimpleNode) node.jjtGetChild(0)).getName();
+
+		if(!isLocal(name, fst))
 			manageGlobalASSIGN(node, fst);
+		else
+			manageParamLocalASSIGN(node, fst);
 	}
 
 	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
 
-		if(!isGlobal(((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getName())){
-			manageParamLocalASSIGN_ARRAY(node, fst);
+		String name = ((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getName();
+
+		if(!isLocal(name, fst)){
+			manageGlobalASSIGN_ARRAY(node, fst);
 		}
 		else{
-			manageGlobalASSIGN_ARRAY(node, fst);
+			manageParamLocalASSIGN_ARRAY(node, fst);
 		}		
 	}
 
