@@ -118,8 +118,9 @@ public class JasminGenerator{
 		if(!(method instanceof ASTMETHOD)){		// Main
 			
 			String methodName = "main";
-			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName, 1);
-
+			int numberArgs = 1;
+			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName, numberArgs);
+			
 			manageMethodHeader(methodName, fst);
 			manageMethodLimits(fst);
 			manageMethodBody((SimpleNode) method.jjtGetChild(1), fst, 1);
@@ -128,11 +129,12 @@ public class JasminGenerator{
 		else{
 
 			String methodName = ((SimpleNode) method.jjtGetChild(1)).getName();
-			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName,  method.jjtGetChild(2).jjtGetNumChildren());
-			
+			int numberArgs = method.jjtGetChild(2).jjtGetNumChildren();
+			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName, numberArgs);
+
 			manageMethodHeader(methodName, fst);
 			manageMethodLimits(fst);
-			manageMethodBody((SimpleNode) method.jjtGetChild(3), fst, method.jjtGetChild(2).jjtGetNumChildren());
+			manageMethodBody((SimpleNode) method.jjtGetChild(3), fst, numberArgs);
 			manageMethodReturn((SimpleNode) method.jjtGetChild(4), fst, method.jjtGetChild(2).jjtGetNumChildren());
 		}
 
@@ -603,7 +605,7 @@ public class JasminGenerator{
 		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst, num_parameters);
 
 		if(flag)
-			manageFUNCTION((SimpleNode) node.jjtGetChild(1), num_parameters);
+			manageFUNCTION((SimpleNode) node.jjtGetChild(1), ((SimpleNode) node.jjtGetChild(2)).jjtGetNumChildren());
 		else{
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
@@ -916,17 +918,17 @@ public class JasminGenerator{
 			else if(child instanceof ASTCALL_FUNCTION){
 
 				String type = "V";
-				if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
+				// if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
 					
-					Set<String> params = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().keySet();
+				// 	Set<String> params = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().keySet();
 					
-					Object[] temp = params.toArray();
+				// 	Object[] temp = params.toArray();
 					
-					if(params.size() != 0){
-						String correspondingParam = (String) temp[i];
-						type = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().get(correspondingParam).getTypeDescriptor();
-					}
-				}
+				// 	if(params.size() != 0){
+				// 		String correspondingParam = (String) temp[i];
+				// 		type = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().get(correspondingParam).getTypeDescriptor();
+				// 	}
+				// }
 				manageCALL_FUNCTION(child, fst, type, num_parameters);
 			}
 			else{
@@ -942,6 +944,7 @@ public class JasminGenerator{
 	private void manageFUNCTION(SimpleNode node, int num_parameters){
 
 		String invokeStr = "\tinvokevirtual ";
+
 		invokeStr += this.symbolTable.getClassName() + "/" + node.getName();
 		invokeStr += getParametersInformation(this.symbolTable.getFunction(node.getName(), num_parameters));
 		invokeStr += this.symbolTable.getFunction(node.getName(), num_parameters).getReturnSymbol().getTypeDescriptor();
@@ -1235,7 +1238,7 @@ public class JasminGenerator{
 	/*
 	 * Creates a string with the code needed for the parameters
 	 */
-	private String getParametersInformation(FunctionSymbolTable value){
+	private String getParametersInformation(FunctionSymbolTable value) {
 
 		String str = "(";
 
