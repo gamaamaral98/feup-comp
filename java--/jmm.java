@@ -257,7 +257,6 @@ public class jmm{
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTCALL_FUNCTION){
                     handleCalledFunction(function_name, body.jjtGetChild(n).jjtGetChild(1), this.symbolTables.getVariableType(function_name,assigned_variable_name), line);
                 }
-
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTACCESS_ARRAY){
                     if(this.symbolTables.getVariableType(function_name, assigned_variable_name) != Symbol.SymbolType.INT){
                         semanticError("Incompatible assign type", assigned_variable_name, line);
@@ -302,7 +301,10 @@ public class jmm{
                     }
                 }
                 else if(body.jjtGetChild(n).jjtGetChild(1) instanceof ASTTHIS){
-                    if(!this.symbolTables.getVariableIdentifierType(function_name, assigned_variable_name).equals(this.symbolTables.getClassName())){
+                    if(function_name.equals("main")){
+                        semanticError("Non-static variable this cannot be referenced from a static context", function_name, line);
+                    }
+                    else if(!this.symbolTables.getVariableIdentifierType(function_name, assigned_variable_name).equals(this.symbolTables.getClassName())){
                         semanticError("Incompatible assign type", assigned_variable_name, line);
                     }
                 }
@@ -328,8 +330,12 @@ public class jmm{
                     }
                     if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTIDENTIFIER){
                         ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
-                        symbols.add(Symbol.SymbolType.INT);
+                        symbols.add(Symbol.SymbolType.INT_ARRAY);
                         handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0), symbols);
+                    } else if(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTLENGTH){
+                        ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+                        symbols.add(Symbol.SymbolType.INT_ARRAY);
+                        handleIdentifier(function_name, line, body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0).jjtGetChild(0), symbols);
                     } else if(!(body.jjtGetChild(n).jjtGetChild(1).jjtGetChild(0) instanceof ASTINT)){
                         semanticError("Incompatible types: cannot be converted to int", function_name, line);
                     }
@@ -384,7 +390,9 @@ public class jmm{
                 if(body.jjtGetChild(n).jjtGetChild(0) instanceof ASTTHIS){
                     String function_call_name = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).name;
                     int line = ((ASTFUNCTION) body.jjtGetChild(n).jjtGetChild(1)).line;
-                    if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
+                    if(function_name.equals("main")){
+                        semanticError("Non-static variable this cannot be referenced from a static context", function_name, line);
+                    } else if(!this.symbolTables.getFunctions().containsKey(function_call_name)){
                         semanticError("Function not found", function_call_name, line);
                     } else{
                         handleFunctionArguments(function_name, function_call_name, line, body.jjtGetChild(n).jjtGetChild(2));
@@ -541,7 +549,9 @@ public class jmm{
         } else if (expression instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, expression, this.symbolTables.getFunctionsReturnType(function_name), line);
         } else if(expression instanceof ASTTHIS){
-            if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
+            if(function_name.equals("main")){
+                semanticError("Non-static variable this cannot be referenced from a static context", function_name, line);
+            } else if((this.symbolTables.getFunctionsReturnType(function_name) != Symbol.SymbolType.IDENTIFIER) || (!this.symbolTables.getFunctionsReturnIdentifierType(function_name).equals(this.symbolTables.getClassName()))){
                 semanticError("Incompatible return types", function_name, line);
             }
         }
@@ -560,7 +570,7 @@ public class jmm{
                     semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
                 }
             } else if(this.symbolTables.hasVariable(function_name, name)){
-                if(this.symbolTables.getFunctionsReturnType(function_called_name) != this.symbolTables.getVariableType(function_name, name)){
+                if(symbol.getType() != this.symbolTables.getVariableType(function_name, name)){
                     semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
                 }
                 else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name)){
@@ -664,6 +674,13 @@ public class jmm{
                 || expression instanceof ASTMUL
                 || expression instanceof ASTDIV){
             handleMathOperationsReturnExpression(function_name, line, expression);
+        } else if(expression instanceof ASTACCESS_ARRAY){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, expression.jjtGetChild(0), symbols);
+            handleINT(function_name, expression.jjtGetChild(1), line);
+        } else if(expression instanceof ASTCALL_FUNCTION){
+            handleCalledFunction(function_name, expression, Symbol.SymbolType.INT, line);
         } else if(!(expression instanceof ASTINT)){
             semanticError("Incompatible types: cannot be converted to int", function_name, line);
         }
@@ -848,6 +865,10 @@ public class jmm{
             handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if(node.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(0), Symbol.SymbolType.INT, line);
+        } else if(node.jjtGetChild(0) instanceof ASTLENGTH){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(0).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(0) instanceof ASTINT)){
             semanticError("Wrong symbol type", function_name, line);
         }
@@ -868,6 +889,10 @@ public class jmm{
             handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
         } else if(node.jjtGetChild(1) instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, node.jjtGetChild(1), Symbol.SymbolType.INT, line);
+        } else if(node.jjtGetChild(1) instanceof ASTLENGTH){
+            ArrayList<Symbol.SymbolType> symbols = new ArrayList<>();
+            symbols.add(Symbol.SymbolType.INT_ARRAY);
+            handleIdentifier(function_name, line, node.jjtGetChild(1).jjtGetChild(0), symbols);
         } else if(!(node.jjtGetChild(1) instanceof ASTINT)){
             semanticError("Wrong symbol type", function_name, line);
         }

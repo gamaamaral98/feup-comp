@@ -142,7 +142,7 @@ public class ClassSymbolTable {
     }
 
     public boolean hasVariable(String functionName, String variableName){
-        return functions.get(functionName).getLocalVariables().containsKey(variableName) || global_variables.containsKey(variableName);
+        return functions.get(functionName).getLocalVariables().containsKey(variableName) || global_variables.containsKey(variableName) || functions.get(functionName).getParameters().containsKey(variableName);
     }
 
     public boolean hasVariableBeenInitialized(String functionName, String variableName){
@@ -155,8 +155,10 @@ public class ClassSymbolTable {
     public void setInitVariable(String functionName, String variableName){
         if(functions.get(functionName).getLocalVariables().containsKey(variableName))
             functions.get(functionName).getLocalVariables().get(variableName).setInit(true);
-        else
+        else if (global_variables.containsKey(variableName))
             global_variables.get(variableName).setInit(true);
+        else
+            functions.get(functionName).getParameters().get(variableName).setInit(true);
     }
 
     public String getVariableIdentifierType(String functionName, String variableName){
