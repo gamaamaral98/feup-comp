@@ -11,10 +11,13 @@ public class FunctionSymbolTable {
 
     private Symbol returnSymbol;
 
-    public FunctionSymbolTable() {
+    private int num_parameters;
+
+    public FunctionSymbolTable(int num_parameters) {
         this.parameters = new LinkedHashMap<>();
         this.local_variables = new LinkedHashMap<>();
         this.returnSymbol = null;
+        this.num_parameters = num_parameters;
     }
 
     public LinkedHashMap<String, Symbol> getParameters() {
@@ -33,6 +36,7 @@ public class FunctionSymbolTable {
         if(parameters.containsKey(atr))
             return false;
         Symbol s = new Symbol(atr, type);
+        s.setInit(true);
         parameters.put(atr, s);
         return true;
     }
@@ -86,5 +90,9 @@ public class FunctionSymbolTable {
 
     public void setReturnAttribute(String atr){
         this.returnSymbol.setAttribute(atr);
+    }
+
+    public int getNum_parameters() {
+        return num_parameters;
     }
 }

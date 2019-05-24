@@ -118,22 +118,22 @@ public class JasminGenerator{
 		if(!(method instanceof ASTMETHOD)){		// Main
 			
 			String methodName = "main";
-			FunctionSymbolTable fst = this.symbolTable.getFunctions().get(methodName);
+			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName, 1);
 
 			manageMethodHeader(methodName, fst);
 			manageMethodLimits(fst);
-			manageMethodBody((SimpleNode) method.jjtGetChild(1), fst);
+			manageMethodBody((SimpleNode) method.jjtGetChild(1), fst, 1);
 			this.printWriter.println("\treturn\n");
 		}
 		else{
 
 			String methodName = ((SimpleNode) method.jjtGetChild(1)).getName();
-			FunctionSymbolTable fst = this.symbolTable.getFunctions().get(methodName);
+			FunctionSymbolTable fst = this.symbolTable.getFunction(methodName,  method.jjtGetChild(2).jjtGetNumChildren());
 			
 			manageMethodHeader(methodName, fst);
 			manageMethodLimits(fst);
-			manageMethodBody((SimpleNode) method.jjtGetChild(3), fst);
-			manageMethodReturn((SimpleNode) method.jjtGetChild(4), fst);
+			manageMethodBody((SimpleNode) method.jjtGetChild(3), fst, method.jjtGetChild(2).jjtGetNumChildren());
+			manageMethodReturn((SimpleNode) method.jjtGetChild(4), fst, method.jjtGetChild(2).jjtGetNumChildren());
 		}
 
 		this.printWriter.println(".end method");
@@ -187,38 +187,38 @@ public class JasminGenerator{
 	 *
 	 * <statements>
 	 */
-	private void manageMethodBody(SimpleNode body, FunctionSymbolTable fst){
+	private void manageMethodBody(SimpleNode body, FunctionSymbolTable fst, int num_parameters){
 
 		for(int i = 0; i < body.jjtGetNumChildren(); i++){
 
 			if(body.jjtGetChild(i) instanceof ASTASSIGN){
 
-				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst);
+				manageASSIGN((SimpleNode) body.jjtGetChild(i), fst, num_parameters);
 			}
 			else if(body.jjtGetChild(i) instanceof ASTASSIGN_ARRAY){
 
-				manageASSIGN_ARRAY((SimpleNode) body.jjtGetChild(i), fst);
+				manageASSIGN_ARRAY((SimpleNode) body.jjtGetChild(i), fst, num_parameters);
 			}
 			else if(body.jjtGetChild(i) instanceof ASTCALL_FUNCTION){
-				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V");
+				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V", num_parameters);
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
 				String rhs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(1)).getName();
 				if(lhs instanceof ASTTHIS || lhs instanceof ASTNEW_CLASS) {
-					if(this.symbolTable.getFunctions().get(rhs).getReturnSymbol().getTypeDescriptor() != "V") {
+					if(this.symbolTable.getFunction(rhs, num_parameters).getReturnSymbol().getTypeDescriptor() != "V") {
 						this.printWriter.println("\tpop\n");
 					}
 				}
 			}
 			else if(body.jjtGetChild(i) instanceof ASTIF_ELSE_STATEMENT){
 
-				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst);
+				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst, num_parameters);
 			} 
 			else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
 				manageNEW_CLASS((SimpleNode) body.jjtGetChild(i), fst, true);
 			}
 			else if(body.jjtGetChild(i) instanceof ASTWHILE){
 
-				manageWHILE((SimpleNode) body.jjtGetChild(i), fst);
+				manageWHILE((SimpleNode) body.jjtGetChild(i), fst, num_parameters);
 			}
 		}
 	}
@@ -227,7 +227,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for the method return
 	 */
-	private void manageMethodReturn(SimpleNode returnAux, FunctionSymbolTable fst){
+	private void manageMethodReturn(SimpleNode returnAux, FunctionSymbolTable fst, int num_parameters){
 
 		SimpleNode ret = (SimpleNode) returnAux.jjtGetChild(0);
 
@@ -261,7 +261,7 @@ public class JasminGenerator{
 		}
 		else if(ret instanceof ASTCALL_FUNCTION){
 
-			manageCALL_FUNCTION(ret, fst, fst.getReturnSymbol().getTypeDescriptor());
+			manageCALL_FUNCTION(ret, fst, fst.getReturnSymbol().getTypeDescriptor(), num_parameters);
 			this.printWriter.println("\tireturn\n");
 		}
 		else if(ret instanceof ASTADD || ret instanceof ASTSUB || 
@@ -269,12 +269,12 @@ public class JasminGenerator{
 			ret instanceof ASTAND || ret instanceof ASTLT ||
 			ret instanceof ASTNOT){
 
-			manageArithmeticExpression(ret, fst);
+			manageArithmeticExpression(ret, fst, num_parameters);
 			this.printWriter.println("\tireturn\n");
 		}
 		else if(ret instanceof ASTACCESS_ARRAY){
 			
-			manageArithmeticExpression(ret, fst);
+			manageArithmeticExpression(ret, fst, num_parameters);
 			this.printWriter.println("\tireturn\n");
 		}
 		else{	// No return
@@ -286,32 +286,32 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN nodes
 	 */
-	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst){
+	private void manageASSIGN(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		String name = ((SimpleNode) node.jjtGetChild(0)).getName();
 
 		if(!isLocal(name, fst))
-			manageGlobalASSIGN(node, fst);
+			manageGlobalASSIGN(node, fst, num_parameters);
 		else
-			manageParamLocalASSIGN(node, fst);
+			manageParamLocalASSIGN(node, fst, num_parameters);
 	}
 
-	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		String name = ((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getName();
 
 		if(!isLocal(name, fst)){
-			manageGlobalASSIGN_ARRAY(node, fst);
+			manageGlobalASSIGN_ARRAY(node, fst, num_parameters);
 		}
 		else{
-			manageParamLocalASSIGN_ARRAY(node, fst);
+			manageParamLocalASSIGN_ARRAY(node, fst, num_parameters);
 		}		
 	}
 
 	/*
 	 * Manages the code generation for ASSIGN_ARRAY nodes for global variables
 	 */
-	private void manageGlobalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+	private void manageGlobalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
 		SimpleNode lhs_ident = ((SimpleNode) lhs.jjtGetChild(0));
@@ -321,7 +321,7 @@ public class JasminGenerator{
 
 		this.printWriter.println("\taload_0");
 		writeGetfield(lhs_ident);
-		manageArithmeticExpressionAux(lhs_type, fst, "I");
+		manageArithmeticExpressionAux(lhs_type, fst, "I", num_parameters);
 
 		if(rhs instanceof ASTLENGTH){
 
@@ -330,7 +330,7 @@ public class JasminGenerator{
 		}
 		else{
 
-			manageArithmeticExpressionAux(rhs, fst, "I");
+			manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 		}
 		this.printWriter.println("\tiastore\n");
 	}
@@ -338,7 +338,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN_ARRAY nodes for parameters and local variables
 	 */
-	private void manageParamLocalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+	private void manageParamLocalASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 		//AST_ACCESS_ARRAY 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
 
@@ -354,7 +354,7 @@ public class JasminGenerator{
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
 
 		writeIDENTIFIER(lhs_1, fst);
-		manageArithmeticExpressionAux(lhs_2, fst, "I");
+		manageArithmeticExpressionAux(lhs_2, fst, "I", num_parameters);
 
 		if(rhs instanceof ASTINT){
 			int value = Integer.parseInt(rhs.getValueInt());
@@ -367,13 +367,13 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
 			String type = getLocalDescriptor(lhs_1, fst);
-			manageCALL_FUNCTION(rhs, fst, type);
+			manageCALL_FUNCTION(rhs, fst, type, num_parameters);
 			this.printWriter.println("\tiastore" + "\n");
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
 			rhs instanceof ASTDIV || rhs instanceof ASTMUL){
 
-			manageArithmeticExpression(rhs, fst);
+			manageArithmeticExpression(rhs, fst, num_parameters);
 			this.printWriter.println("\tiastore " + "\n");
 		}
 		else if(rhs instanceof ASTACCESS_ARRAY){
@@ -384,13 +384,13 @@ public class JasminGenerator{
 
 				this.printWriter.println("\taload_0");
 				writeGetfield(ident);
-				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			else{
 
 				writeIDENTIFIER(ident, fst);
-				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			this.printWriter.println("\tiastore " + "\n");
@@ -406,7 +406,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN nodes for parameters and local variables
 	 */
-	private void manageParamLocalASSIGN(SimpleNode node, FunctionSymbolTable fst){
+	private void manageParamLocalASSIGN(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
 		String lhsName = lhs.getName();
@@ -436,7 +436,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
 			String type = getLocalDescriptor(lhs, fst);
-			manageCALL_FUNCTION(rhs, fst, type);
+			manageCALL_FUNCTION(rhs, fst, type, num_parameters);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
@@ -448,7 +448,7 @@ public class JasminGenerator{
 			rhs instanceof ASTAND || rhs instanceof ASTLT ||
 			rhs instanceof ASTNOT){
 
-			manageArithmeticExpression(rhs, fst);
+			manageArithmeticExpression(rhs, fst, num_parameters);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTNEW_INT_ARRAY){
@@ -469,13 +469,13 @@ public class JasminGenerator{
 
 				this.printWriter.println("\taload_0");
 				writeGetfield(ident);
-				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			else{
 
 				writeIDENTIFIER(ident, fst);
-				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
@@ -485,7 +485,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for ASSIGN nodes for global variables
 	 */
-	private void manageGlobalASSIGN(SimpleNode node, FunctionSymbolTable fst){
+	private void manageGlobalASSIGN(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		SimpleNode lhs = ((SimpleNode) node.jjtGetChild(0));
 		SimpleNode rhs = ((SimpleNode) node.jjtGetChild(1));
@@ -528,7 +528,7 @@ public class JasminGenerator{
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
 			String type = getGlobalDescriptor(lhs);
-			manageCALL_FUNCTION(rhs, fst, type);
+			manageCALL_FUNCTION(rhs, fst, type, num_parameters);
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
@@ -541,7 +541,7 @@ public class JasminGenerator{
 			rhs instanceof ASTAND || rhs instanceof ASTLT ||
 			rhs instanceof ASTNOT){
 
-			manageArithmeticExpression(rhs, fst);
+			manageArithmeticExpression(rhs, fst, num_parameters);
 			writePutfield(lhs);
 		}
 		else if(rhs instanceof ASTNEW_INT_ARRAY){
@@ -568,7 +568,7 @@ public class JasminGenerator{
 				this.printWriter.println("\taload " +  Integer.toString(index2));
 			}
 
-			manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I");
+			manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 			this.printWriter.println("\tiaload");
 			writePutfield(lhs);
 		}
@@ -578,7 +578,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for CALL_FUNCTION nodes
 	 */
-	private void manageCALL_FUNCTION(SimpleNode node, FunctionSymbolTable fst, String staticRet){
+	private void manageCALL_FUNCTION(SimpleNode node, FunctionSymbolTable fst, String staticRet, int num_parameters){
 
 		SimpleNode child = (SimpleNode) node.jjtGetChild(0);
 		boolean flag = true;
@@ -593,25 +593,25 @@ public class JasminGenerator{
 		}
 		else if(child instanceof ASTCALL_FUNCTION){
 
-			manageCALL_FUNCTION(child, fst, staticRet);
+			manageCALL_FUNCTION(child, fst, staticRet, num_parameters);
 		}
 		else if(child instanceof ASTTHIS){
 
 			this.printWriter.print("\taload_0\n");
 		}
 
-		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst);
+		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst, num_parameters);
 
 		if(flag)
-			manageFUNCTION((SimpleNode) node.jjtGetChild(1));
+			manageFUNCTION((SimpleNode) node.jjtGetChild(1), num_parameters);
 		else{
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
-			this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst) + ")" + staticRet);
+			this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst, num_parameters) + ")" + staticRet);
 		}
 	}
 
-	private String getCALL_ARGUMENTS_Descriptor(SimpleNode node, FunctionSymbolTable fst){
+	private String getCALL_ARGUMENTS_Descriptor(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 		String ret = "";
 		for(int i = 0; i < node.jjtGetNumChildren(); i++){
 			SimpleNode child = (SimpleNode) node.jjtGetChild(i);
@@ -635,7 +635,7 @@ public class JasminGenerator{
 					ret += ";";
 			}
 			else if(child instanceof ASTCALL_FUNCTION){
-				ret += getCALL_FUNCTION_RetDesc(child, fst);
+				ret += getCALL_FUNCTION_RetDesc(child, fst, num_parameters);
 			}
 			else if(child instanceof ASTNEW_CLASS){
 				ret += this.symbolTable.getClassName() + ";";
@@ -644,7 +644,7 @@ public class JasminGenerator{
 		return ret;
 	}
 
-	private String getCALL_FUNCTION_RetDesc(SimpleNode node, FunctionSymbolTable fst){
+	private String getCALL_FUNCTION_RetDesc(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 		SimpleNode child = (SimpleNode) node.jjtGetChild(0);
 		boolean flag = true;
 
@@ -655,7 +655,7 @@ public class JasminGenerator{
 			}
 		}
 		if(flag) {
-			String ret = this.symbolTable.getFunctions().get(((SimpleNode) node.jjtGetChild(1)).getName()).getReturnSymbol().getTypeDescriptor();
+			String ret = this.symbolTable.getFunction(((SimpleNode) node.jjtGetChild(1)).getName(), num_parameters).getReturnSymbol().getTypeDescriptor();
 			if(!(ret.equals("I") || ret.equals("Z") || ret.equals("[I")))
 				ret += ";";
 			return ret;
@@ -668,7 +668,7 @@ public class JasminGenerator{
 	/*
 	 *  Manages the code generation for IF_ELSE_STATEMENT nodes
 	 */
-	private void manageIF_ELSE(SimpleNode node, FunctionSymbolTable fst){
+	private void manageIF_ELSE(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 		
 		SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
 		SimpleNode if_body = (SimpleNode) node.jjtGetChild(1);
@@ -685,13 +685,13 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpressionAux(lhs, fst, "I");
-			manageArithmeticExpressionAux(rhs, fst, "I");
+			manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+			manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 			this.printWriter.println("\tif_icmpge " + label1);
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 			this.printWriter.println("\tgoto " + label2);
 			this.printWriter.println("\t" + label1 + ":");
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 			this.printWriter.println("\t" + label2 + ":");
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTNOT){
@@ -704,12 +704,12 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpressionAux(rhs, fst, "Z");
+			manageArithmeticExpressionAux(rhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifne " + label1);
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 			this.printWriter.println("\tgoto " + label2);
 			this.printWriter.println("\t" + label1 + ":");
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 			this.printWriter.println("\t" + label2 + ":");
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTAND){
@@ -723,24 +723,24 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpressionAux(lhs, fst, "Z");
+			manageArithmeticExpressionAux(lhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label1);
-			manageArithmeticExpressionAux(rhs, fst, "Z");
+			manageArithmeticExpressionAux(rhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label1);
 
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 			this.printWriter.println("\tgoto " + label2);
 			this.printWriter.println("\t" + label1 + ":");
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 			this.printWriter.println("\t" + label2 + ":");
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTTRUE){
 
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTFALSE){
 
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTCALL_FUNCTION){
 
@@ -751,12 +751,12 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageCALL_FUNCTION(call_function, fst, "Z");
+			manageCALL_FUNCTION(call_function, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label1);
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 			this.printWriter.println("\tgoto " + label2);
 			this.printWriter.println("\t" + label1 + ":");
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 			this.printWriter.println("\t" + label2 + ":");
 		}
 		else if(condition.jjtGetChild(0) instanceof ASTIDENTIFIER){
@@ -768,12 +768,12 @@ public class JasminGenerator{
 			String label2 = "label_" + Integer.toString(labelCounter);
 			labelCounter++;
 
-			manageArithmeticExpressionAux(ident, fst, "Z");
+			manageArithmeticExpressionAux(ident, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label1);
-			manageIfBody(if_body, fst);
+			manageIfBody(if_body, fst, num_parameters);
 			this.printWriter.println("\tgoto " + label2);
 			this.printWriter.println("\t" + label1 + ":");
-			manageIfBody(else_body, fst);
+			manageIfBody(else_body, fst, num_parameters);
 			this.printWriter.println("\t" + label2 + ":");
 		}
 	}
@@ -783,18 +783,18 @@ public class JasminGenerator{
 	 *
 	 * <statements>
 	 */
-	private void manageIfBody(SimpleNode node, FunctionSymbolTable fst){
+	private void manageIfBody(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		if(node.jjtGetChild(0) instanceof ASTSTATEMENT_LIST)
-			manageMethodBody((SimpleNode) node.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) node.jjtGetChild(0), fst, num_parameters);
 		else
-			manageMethodBody(node, fst);
+			manageMethodBody(node, fst, num_parameters);
 	}
 
 	/*
 	 *  Manages the code generation for WHILE nodes
 	 */
-	private void manageWHILE(SimpleNode node, FunctionSymbolTable fst){
+	private void manageWHILE(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		SimpleNode condition = (SimpleNode) node.jjtGetChild(0);
 		SimpleNode while_body = (SimpleNode) node.jjtGetChild(1);
@@ -811,10 +811,10 @@ public class JasminGenerator{
 			labelCounter++;
 
 			this.printWriter.println("\t" + label1 + ":");
-			manageArithmeticExpressionAux(lhs, fst, "I");
-			manageArithmeticExpressionAux(rhs, fst, "I");
+			manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+			manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 			this.printWriter.println("\tif_icmpge " + label2);
-			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
 		}
@@ -829,9 +829,9 @@ public class JasminGenerator{
 			labelCounter++;
 
 			this.printWriter.println("\t" + label1 + ":");
-			manageArithmeticExpressionAux(rhs, fst, "Z");
+			manageArithmeticExpressionAux(rhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifne " + label2);
-			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
 		}
@@ -847,11 +847,11 @@ public class JasminGenerator{
 			labelCounter++;
 
 			this.printWriter.println("\t" + label1 + ":");
-			manageArithmeticExpressionAux(lhs, fst, "Z");
+			manageArithmeticExpressionAux(lhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label2);
-			manageArithmeticExpressionAux(rhs, fst, "Z");
+			manageArithmeticExpressionAux(rhs, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label2);
-			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
 		}
@@ -865,9 +865,9 @@ public class JasminGenerator{
 			labelCounter++;
 
 			this.printWriter.println("\t" + label1 + ":");
-			manageCALL_FUNCTION(call_function, fst, "Z");
+			manageCALL_FUNCTION(call_function, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label2);
-			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
 		}
@@ -881,9 +881,9 @@ public class JasminGenerator{
 			labelCounter++;
 
 			this.printWriter.println("\t" + label1 + ":");
-			manageArithmeticExpressionAux(ident, fst, "Z");
+			manageArithmeticExpressionAux(ident, fst, "Z", num_parameters);
 			this.printWriter.println("\tifeq " + label2);
-			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst);
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
 		}
@@ -893,7 +893,7 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for CALL_ARGUMENTS nodes
 	 */
-	private void manageCALL_ARGUMENTS(SimpleNode node, FunctionSymbolTable fst){
+	private void manageCALL_ARGUMENTS(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		for(int i = 0; i < node.jjtGetNumChildren(); i++){
 
@@ -918,20 +918,20 @@ public class JasminGenerator{
 				String type = "V";
 				if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
 					
-					Set<String> params = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().keySet();
+					Set<String> params = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().keySet();
 					
 					Object[] temp = params.toArray();
 					
 					if(params.size() != 0){
 						String correspondingParam = (String) temp[i];
-						type = this.symbolTable.getFunctions().get(((SimpleNode) child.jjtGetChild(1)).getName()).getParameters().get(correspondingParam).getTypeDescriptor();
+						type = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().get(correspondingParam).getTypeDescriptor();
 					}
 				}
-				manageCALL_FUNCTION(child, fst, type);
+				manageCALL_FUNCTION(child, fst, type, num_parameters);
 			}
 			else{
 
-				manageArithmeticExpression(child, fst);
+				manageArithmeticExpression(child, fst, num_parameters);
 			}
 		}
 	}
@@ -939,23 +939,23 @@ public class JasminGenerator{
 	/*
 	 * Manages the code generation for FUNCTION nodes
 	 */
-	private void manageFUNCTION(SimpleNode node){
+	private void manageFUNCTION(SimpleNode node, int num_parameters){
 
 		String invokeStr = "\tinvokevirtual ";
 		invokeStr += this.symbolTable.getClassName() + "/" + node.getName();
-		invokeStr += getParametersInformation(this.symbolTable.getFunctions().get(node.getName()));
-		invokeStr += this.symbolTable.getFunctions().get(node.getName()).getReturnSymbol().getTypeDescriptor();
+		invokeStr += getParametersInformation(this.symbolTable.getFunction(node.getName(), num_parameters));
+		invokeStr += this.symbolTable.getFunction(node.getName(), num_parameters).getReturnSymbol().getTypeDescriptor();
 		this.printWriter.println(invokeStr);
 	}
 
-	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst) {
-		manageArithmeticExpressionAux(node, fst, "");
+	private void manageArithmeticExpression(SimpleNode node, FunctionSymbolTable fst, int num_parameters) {
+		manageArithmeticExpressionAux(node, fst, "", num_parameters);
 	}
 
 	/*
 	 * Manages the code generation for Arithmetic Expressions
 	 */
-	private void manageArithmeticExpressionAux(SimpleNode node, FunctionSymbolTable fst, String arithmeticType){
+	private void manageArithmeticExpressionAux(SimpleNode node, FunctionSymbolTable fst, String arithmeticType, int num_parameters){
 
 		if(node.jjtGetNumChildren() == 2){
 
@@ -964,26 +964,26 @@ public class JasminGenerator{
 
 			if(node instanceof ASTADD){
 
-				manageArithmeticExpressionAux(lhs, fst, "I");
-				manageArithmeticExpressionAux(rhs, fst, "I");
+				manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+				manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 				this.printWriter.println("\tiadd");
 			}
 			else if(node instanceof ASTSUB){
 
-				manageArithmeticExpressionAux(lhs, fst, "I");
-				manageArithmeticExpressionAux(rhs, fst, "I");
+				manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+				manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 				this.printWriter.println("\tisub");
 			}
 			else if(node instanceof ASTDIV){
 
-				manageArithmeticExpressionAux(lhs, fst, "I");
-				manageArithmeticExpressionAux(rhs, fst, "I");
+				manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+				manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 				this.printWriter.println("\tidiv");
 			}
 			else if(node instanceof ASTMUL){
 
-				manageArithmeticExpressionAux(lhs, fst, "I");
-				manageArithmeticExpressionAux(rhs, fst, "I");
+				manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+				manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 				this.printWriter.println("\timul");
 			}
 			else if(node instanceof ASTAND){
@@ -993,9 +993,9 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpressionAux(lhs, fst, "Z");
+				manageArithmeticExpressionAux(lhs, fst, "Z", num_parameters);
 				this.printWriter.println("\tifeq " + label1);
-				manageArithmeticExpressionAux(rhs, fst, "Z");
+				manageArithmeticExpressionAux(rhs, fst, "Z", num_parameters);
 				this.printWriter.println("\tifeq " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -1010,8 +1010,8 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpressionAux(lhs, fst, "I");
-				manageArithmeticExpressionAux(rhs, fst, "I");
+				manageArithmeticExpressionAux(lhs, fst, "I", num_parameters);
+				manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 				this.printWriter.println("\tif_icmpge " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -1020,7 +1020,7 @@ public class JasminGenerator{
 				this.printWriter.println("\t" + label2 + ":");
 			}
 			else if(node instanceof ASTACCESS_ARRAY){
-				manageACCESS_ARRAY(node, fst);
+				manageACCESS_ARRAY(node, fst, num_parameters);
 			}
 		}
 		else if(node.jjtGetNumChildren() == 1){
@@ -1037,7 +1037,7 @@ public class JasminGenerator{
 				String label2 = "label_" + Integer.toString(labelCounter);
 				labelCounter++;
 
-				manageArithmeticExpressionAux(lhs, fst, "Z");
+				manageArithmeticExpressionAux(lhs, fst, "Z", num_parameters);
 				this.printWriter.println("\tifne " + label1);
 				this.printWriter.println("\ticonst_1");
 				this.printWriter.println("\tgoto " + label2);
@@ -1070,12 +1070,12 @@ public class JasminGenerator{
 			}
 			else if(node instanceof ASTCALL_FUNCTION){
 
-				manageCALL_FUNCTION(node, fst, arithmeticType);
+				manageCALL_FUNCTION(node, fst, arithmeticType, num_parameters);
 			}
 		}
 	}
 
-	private void manageACCESS_ARRAY(SimpleNode node, FunctionSymbolTable fst){
+	private void manageACCESS_ARRAY(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 		SimpleNode ident = (SimpleNode) node.jjtGetChild(0);
 		String identName = ident.getName();
 
@@ -1083,13 +1083,13 @@ public class JasminGenerator{
 
 			this.printWriter.println("\taload_0");
 			writeGetfield(ident);
-			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I");
+			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I", num_parameters);
 			this.printWriter.println("\tiaload");
 		}
 		else{
 
 			writeIDENTIFIER(ident, fst);
-			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I");
+			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I", num_parameters);
 			this.printWriter.println("\tiaload");
 		}
 	}
