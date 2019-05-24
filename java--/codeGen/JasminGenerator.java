@@ -457,8 +457,7 @@ public class JasminGenerator{
 
 			SimpleNode size = ((SimpleNode) rhs.jjtGetChild(0));
 
-			int value = Integer.parseInt(size.getValueInt());
-			writeINT(value);
+			manageArithmeticExpressionAux(size, fst, "I", num_parameters);
 			this.printWriter.println("\tnewarray int");
 			this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
 		}
@@ -888,6 +887,15 @@ public class JasminGenerator{
 			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
 			this.printWriter.println("\tgoto " + label1);
 			this.printWriter.println("\t" + label2 + ":");
+		}
+		else if(condition.jjtGetChild(0) instanceof ASTTRUE){
+
+			String label1 = "label_" + Integer.toString(labelCounter);
+			labelCounter++;
+
+			this.printWriter.println("\t" + label1 + ":");
+			manageMethodBody((SimpleNode) while_body.jjtGetChild(0), fst, num_parameters);
+			this.printWriter.println("\tgoto " + label1);
 		}
 	}
 
