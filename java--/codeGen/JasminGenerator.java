@@ -205,9 +205,21 @@ public class JasminGenerator{
 				manageCALL_FUNCTION((SimpleNode) body.jjtGetChild(i), fst, "V", num_parameters);
 				SimpleNode lhs = (SimpleNode) body.jjtGetChild(i).jjtGetChild(0);
 				String rhs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(1)).getName();
+				int numberArgs = ((SimpleNode) body.jjtGetChild(i).jjtGetChild(2)).jjtGetNumChildren();
+
 				if(lhs instanceof ASTTHIS || lhs instanceof ASTNEW_CLASS) {
-					if(this.symbolTable.getFunction(rhs, num_parameters).getReturnSymbol().getTypeDescriptor() != "V") {
+
+					if(this.symbolTable.getFunction(rhs, numberArgs).getReturnSymbol().getTypeDescriptor() != "V") {
 						this.printWriter.println("\tpop\n");
+					}
+				}
+				else if(lhs instanceof ASTIDENTIFIER){
+
+					String lhsName = lhs.getName();
+					if(isGlobal(lhsName) || isLocal(lhsName, fst)){
+
+						if(this.symbolTable.getFunction(rhs, numberArgs).getReturnSymbol().getTypeDescriptor() != "V")
+							this.printWriter.println("\tpop\n");
 					}
 				}
 			}
@@ -216,6 +228,7 @@ public class JasminGenerator{
 				manageIF_ELSE((SimpleNode) body.jjtGetChild(i), fst, num_parameters);
 			} 
 			else if(body.jjtGetChild(i) instanceof ASTNEW_CLASS){
+
 				manageNEW_CLASS((SimpleNode) body.jjtGetChild(i), fst, true);
 			}
 			else if(body.jjtGetChild(i) instanceof ASTWHILE){
