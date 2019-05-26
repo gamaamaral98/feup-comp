@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class jmm{
+    private static final boolean DEBUG = false;
 
     private static int optRN = -1;
     private static boolean optO = false;
@@ -34,14 +35,22 @@ public class jmm{
 
     public jmm(Parser parser) throws ParseException, IOException{
         SimpleNode node = parser.Program();
-        System.out.println("\n---- TREE ----");
-        node.dump("");
+        if(DEBUG) {
+            System.out.println("\n---- TREE ----");
+            node.dump("");
+            System.out.println("\n---- SEMANTIC ERRORS ----");
+        }
 
-        System.out.println("\n---- SEMANTIC ERRORS ----");
         createSymbolTables(node);
+        
+        if(DEBUG){
+            System.out.println("\n---- SYMBOL TABLES ----");
+            printSymbolTables();
+        }
 
-        System.out.println("\n---- SYMBOL TABLES ----");
-        printSymbolTables();
+        if(number_errors > 0) {
+            System.exit(number_errors);
+        }
 
         JasminGenerator jasminGenerator = new JasminGenerator(symbolTables, node);
     }
@@ -441,7 +450,7 @@ public class jmm{
                     semanticError("Incompatible return types", function_name, line);
                 }
                 else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name, num_parameters)){
-                    semanticError("Variable might not have been initialized", name, line);
+                    semanticWarning("Variable might not have been initialized", name, line);
                 }
             } else {
                 semanticError("Cannot find symbol", name, line);
@@ -576,7 +585,7 @@ public class jmm{
                     semanticError("Incompatible types: cannot be converted to " + symbol.getTypeString(), function_name, line);
                 }
                 else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name, num_parameters)){
-                    semanticError("Variable might not have been initialized", name, line);
+                    semanticWarning("Variable might not have been initialized", name, line);
                 }
 
             } else {
@@ -845,7 +854,7 @@ public class jmm{
                 semanticError("Bad operand type", variable_name, line);
             }
             else if(!this.symbolTables.hasVariableBeenInitialized(function_name, variable_name, num_parameters)){
-                semanticError("Variable might not have been initialized", variable_name, line);
+                semanticWarning("Variable might not have been initialized", variable_name, line);
             }
         } else {
             semanticError("Cannot find symbol", variable_name, line);
@@ -944,6 +953,10 @@ public class jmm{
 
     private void semanticError(String error, String name, int line_number){
         System.out.println("> " + ++number_errors + "º Semantic Error (line "+ line_number + "): " + error + " -> "+ name);
+    }
+
+    private void semanticWarning(String warning, String name, int line_number){
+        // System.out.println("> Semantic Warning (line "+ line_number + "): " + warning + " -> "+ name);
     }
 
     private static void openFile(String filename){
