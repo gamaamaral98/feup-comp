@@ -251,10 +251,10 @@ public class JasminGenerator{
 			writeIDENTIFIER(ret, fst);
 
 			String type;
-			if(isGlobal(ret.getName()))
-				type = getGlobalType(ret);
-			else
+			if(isLocal(ret.getName(), fst))
 				type = getLocalType(ret, fst);
+			else
+				type = getGlobalType(ret);
 
 			if(type.equals("int") || type.equals("boolean"))
 				this.printWriter.println("\tireturn\n");
@@ -305,21 +305,21 @@ public class JasminGenerator{
 
 		String name = ((SimpleNode) node.jjtGetChild(0)).getName();
 
-		if(!isLocal(name, fst))
-			manageGlobalASSIGN(node, fst, num_parameters);
-		else
+		if(isLocal(name, fst))
 			manageParamLocalASSIGN(node, fst, num_parameters);
+		else
+			manageGlobalASSIGN(node, fst, num_parameters);
 	}
 
 	private void manageASSIGN_ARRAY(SimpleNode node, FunctionSymbolTable fst, int num_parameters){
 
 		String name = ((SimpleNode) node.jjtGetChild(0).jjtGetChild(0)).getName();
 
-		if(!isLocal(name, fst)){
-			manageGlobalASSIGN_ARRAY(node, fst, num_parameters);
+		if(isLocal(name, fst)){
+			manageParamLocalASSIGN_ARRAY(node, fst, num_parameters);			
 		}
 		else{
-			manageParamLocalASSIGN_ARRAY(node, fst, num_parameters);
+			manageGlobalASSIGN_ARRAY(node, fst, num_parameters);
 		}		
 	}
 
@@ -395,16 +395,14 @@ public class JasminGenerator{
 			SimpleNode ident = (SimpleNode) rhs.jjtGetChild(0);
 			String identName = ident.getName();
 
-			if(isGlobal(identName)){
-
-				this.printWriter.println("\taload_0");
-				writeGetfield(ident);
+			if(isLocal(identName, fst)){
+				writeIDENTIFIER(ident, fst);
 				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			else{
-
-				writeIDENTIFIER(ident, fst);
+				this.printWriter.println("\taload_0");
+				writeGetfield(ident);
 				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
@@ -479,16 +477,14 @@ public class JasminGenerator{
 			SimpleNode ident = (SimpleNode) rhs.jjtGetChild(0);
 			String identName = ident.getName();
 
-			if(isGlobal(identName)){
-
-				this.printWriter.println("\taload_0");
-				writeGetfield(ident);
+			if(isLocal(identName, fst)){
+				writeIDENTIFIER(ident, fst);
 				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
 			else{
-
-				writeIDENTIFIER(ident, fst);
+				this.printWriter.println("\taload_0");
+				writeGetfield(ident);
 				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
@@ -520,15 +516,7 @@ public class JasminGenerator{
 		else if(rhs instanceof ASTIDENTIFIER){
 
 			String rhsName = rhs.getName(); 
-			if(isGlobal(rhsName)){
-
-				this.printWriter.println("\taload_0");
-
-				writeGetfield(rhs);
-				writePutfield(lhs);
-			}
-			else{
-
+			if(isLocal(rhsName, fst)){
 				int index2 = getNodeIndex(rhsName, fst);
 
 				String type = getLocalType(rhs, fst);
@@ -537,6 +525,12 @@ public class JasminGenerator{
 				else
 					this.printWriter.println("\taload " +  Integer.toString(index2));
 
+				writePutfield(lhs);
+			}
+			else{
+				this.printWriter.println("\taload_0");
+
+				writeGetfield(rhs);
 				writePutfield(lhs);
 			}
 		}
@@ -571,15 +565,13 @@ public class JasminGenerator{
 			SimpleNode child = (SimpleNode) rhs.jjtGetChild(0);
 
 			String childName = child.getName(); 
-			if(isGlobal(childName)){
-
-				this.printWriter.println("\taload_0");
-				writeGetfield(child);
-			}
-			else{
-
+			if(isLocal(childName, fst)){
 				int index2 = getNodeIndex(childName, fst);
 				this.printWriter.println("\taload " +  Integer.toString(index2));
+			}
+			else{
+				this.printWriter.println("\taload_0");
+				writeGetfield(child);
 			}
 
 			manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
@@ -640,10 +632,10 @@ public class JasminGenerator{
 			}
 			else if(child instanceof ASTIDENTIFIER){
 				String type = child.getName();
-				if(isGlobal(child.getName()))
-					type = getGlobalDescriptor(child);
-				else
+				if(isLocal(child.getName(), fst))
 					type = getLocalDescriptor(child, fst);
+				else
+					type = getGlobalDescriptor(child);
 				ret += type;
 				if(!(type.equals("I") || type.equals("Z") || type.equals("[I")))
 					ret += ";";
@@ -653,6 +645,9 @@ public class JasminGenerator{
 			}
 			else if(child instanceof ASTNEW_CLASS){
 				ret += this.symbolTable.getClassName() + ";";
+			}
+			else if(child instanceof ASTINT_ARRAY){
+				ret += "[I";
 			}
 		}
 		return ret;
@@ -939,17 +934,6 @@ public class JasminGenerator{
 			else if(child instanceof ASTCALL_FUNCTION){
 
 				String type = "V";
-				// if(this.symbolTable.getFunctions().containsKey(((SimpleNode) child.jjtGetChild(1)).getName())) {
-					
-				// 	Set<String> params = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().keySet();
-					
-				// 	Object[] temp = params.toArray();
-					
-				// 	if(params.size() != 0){
-				// 		String correspondingParam = (String) temp[i];
-				// 		type = this.symbolTable.getFunction(((SimpleNode) child.jjtGetChild(1)).getName(), num_parameters).getParameters().get(correspondingParam).getTypeDescriptor();
-				// 	}
-				// }
 				manageCALL_FUNCTION(child, fst, type, num_parameters);
 			}
 			else{
@@ -1103,16 +1087,14 @@ public class JasminGenerator{
 		SimpleNode ident = (SimpleNode) node.jjtGetChild(0);
 		String identName = ident.getName();
 
-		if(isGlobal(identName)){
-
-			this.printWriter.println("\taload_0");
-			writeGetfield(ident);
+		if(isLocal(identName, fst)){
+			writeIDENTIFIER(ident, fst);
 			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I", num_parameters);
 			this.printWriter.println("\tiaload");
 		}
 		else{
-
-			writeIDENTIFIER(ident, fst);
+			this.printWriter.println("\taload_0");
+			writeGetfield(ident);
 			manageArithmeticExpressionAux((SimpleNode) node.jjtGetChild(1), fst, "I", num_parameters);
 			this.printWriter.println("\tiaload");
 		}
@@ -1163,14 +1145,7 @@ public class JasminGenerator{
 	private boolean writeIDENTIFIER(SimpleNode node, FunctionSymbolTable fst){
 
 		String nodeName = node.getName();
-		if(isGlobal(nodeName)){
-
-			this.printWriter.println("\taload_0");
-			writeGetfield(node);
-			return true;
-		}
-		else if(isLocal(nodeName, fst)){
-
+		if(isLocal(nodeName, fst)){
 			int index = getNodeIndex(nodeName, fst);
 			String type = getLocalType(node, fst);
 			if(type.equals("int") || type.equals("boolean")){
@@ -1181,8 +1156,12 @@ public class JasminGenerator{
 			}
 			return true;
 		}
+		else if(isGlobal(nodeName)){
+			this.printWriter.println("\taload_0");
+			writeGetfield(node);
+			return true;
+		}
 		else{
-
 			return false;
 		}
 	}
