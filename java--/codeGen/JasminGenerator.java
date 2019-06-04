@@ -73,7 +73,7 @@ public class JasminGenerator{
 		map.forEach((key, value) -> {
 
 			String str = ".field ";
-			str += key + " ";
+			str += "'" + key + "' ";
 			str += value.getTypeDescriptor();
 
 			this.printWriter.println(str);

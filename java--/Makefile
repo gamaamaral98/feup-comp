@@ -17,7 +17,7 @@ JASMIN_DIR := jasmin
 JASMIN_JAR := $(JASMIN_DIR)/jasmin.jar
 
 TEST_DIR := test
-TEST_FILE := FindMaximum.jmm  #test file
+TEST_FILE := Life.jmm  #test file
 
 all:
 	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java codeGen/*.java $(SRC).java
