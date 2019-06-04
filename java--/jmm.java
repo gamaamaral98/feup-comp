@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class jmm{
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static int optRN = -1;
     private static boolean optO = false;
@@ -484,7 +484,7 @@ public class jmm{
                     semanticError("Incompatible return types", function_name, line);
                 }
                 else if(!this.symbolTables.hasVariableBeenInitialized(function_name, name, num_parameters)){
-                    semanticError("Variable might not have been initialized", name, line);
+                    semanticWarning("Variable might not have been initialized", name, line);
                 }
 
             } else {
@@ -956,7 +956,7 @@ public class jmm{
     }
 
     private void semanticWarning(String warning, String name, int line_number){
-        // System.out.println("> Semantic Warning (line "+ line_number + "): " + warning + " -> "+ name);
+        System.out.println("> Semantic Warning (line "+ line_number + "): " + warning + " -> "+ name);
     }
 
     private static void openFile(String filename){
