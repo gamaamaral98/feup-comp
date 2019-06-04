@@ -36,7 +36,7 @@ mkdir:
 	@mkdir -p parser/ bin/
 
 clean:
-	@rm -f bin/* $(SRC).jj *.class
+	@rm -f bin/* $(SRC).jj *.class $(JASMIN_DIR)/*.j
 
 run:
 	java -cp ${JAVAC_DIR} ${SRC} ${TEST_DIR}/${TEST_FILE}
