@@ -39,7 +39,6 @@ public class JasminGenerator{
 	private void createFile(){
 
 		try{
-
 			File file = new File("jasmin/" + this.symbolTable.getClassName() +  ".j");
 
 			if(!file.exists())
@@ -163,7 +162,6 @@ public class JasminGenerator{
 			str += fst.getReturnSymbol().getTypeDescriptor();
 			String type = fst.getReturnSymbol().getTypeString();
 			if(!(type == "int" || type == "boolean" || type == "int[]")){
-				
 				str += ";";
 			}
 		}
@@ -339,9 +337,7 @@ public class JasminGenerator{
 		manageArithmeticExpressionAux(lhs_type, fst, "I", num_parameters);
 
 		if(rhs instanceof ASTLENGTH){
-
-			writeIDENTIFIER((SimpleNode) rhs.jjtGetChild(0), fst);
-			this.printWriter.println("\tarraylength");
+			manageLENGTH(rhs, fst);
 		}
 		else{
 
@@ -409,9 +405,7 @@ public class JasminGenerator{
 			this.printWriter.println("\tiastore " + "\n");
 		}
 		else if(rhs instanceof ASTLENGTH){
-
-			writeIDENTIFIER((SimpleNode) rhs.jjtGetChild(0), fst);
-			this.printWriter.println("\tarraylength");
+			manageLENGTH(rhs, fst);
 			this.printWriter.println("\tiastore " + "\n");
 		}
 	}
@@ -450,7 +444,10 @@ public class JasminGenerator{
 		else if(rhs instanceof ASTCALL_FUNCTION){
 			String type = getLocalDescriptor(lhs, fst);
 			manageCALL_FUNCTION(rhs, fst, type, num_parameters);
-			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
+			if(type.equals("[I"))
+				this.printWriter.println("\tastore " + Integer.toString(index) + "\n");
+			else
+				this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 		else if(rhs instanceof ASTNEW_CLASS){
 			manageNEW_CLASS(rhs, fst, false);
@@ -623,7 +620,8 @@ public class JasminGenerator{
 			SimpleNode child = (SimpleNode) node.jjtGetChild(i);
 
 			if(child instanceof ASTINT || child instanceof ASTADD || child instanceof ASTSUB
-			|| child instanceof ASTDIV || child instanceof ASTMUL || child instanceof ASTACCESS_ARRAY){
+			|| child instanceof ASTDIV || child instanceof ASTMUL || child instanceof ASTACCESS_ARRAY
+			|| child instanceof ASTLENGTH){
 				ret += "I";
 			}
 			else if(child instanceof ASTTRUE || child instanceof ASTFALSE
@@ -1055,9 +1053,7 @@ public class JasminGenerator{
 			}
 
 			else if(node instanceof ASTLENGTH){
-
-				writeIDENTIFIER((SimpleNode) node.jjtGetChild(0), fst);
-				this.printWriter.println("\tarraylength");
+				manageLENGTH(node, fst);
 			}
 		}
 		else {
@@ -1100,6 +1096,13 @@ public class JasminGenerator{
 		}
 	}
 
+	/*
+	 * Manages the code generation for LENGTH's
+	 */
+	private void manageLENGTH(SimpleNode node, FunctionSymbolTable fst) {
+		writeIDENTIFIER((SimpleNode) node.jjtGetChild(0), fst);
+		this.printWriter.println("\tarraylength");
+	}
 
 	/*
 	 * Manages the code generation for the NEW_CLASS's
