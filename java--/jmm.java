@@ -692,6 +692,8 @@ public class jmm{
             handleINT(function_name, expression.jjtGetChild(1), line, num_parameters);
         } else if(expression instanceof ASTCALL_FUNCTION){
             handleCalledFunction(function_name, expression, Symbol.SymbolType.INT, line, num_parameters);
+        } else if(expression instanceof ASTLENGTH) {
+            
         } else if(!(expression instanceof ASTINT)){
             semanticError("Incompatible types: cannot be converted to int", function_name, line);
         }
