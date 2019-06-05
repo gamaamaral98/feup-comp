@@ -17,7 +17,7 @@ JASMIN_DIR := jasmin
 JASMIN_JAR := $(JASMIN_DIR)/jasmin.jar
 
 TEST_DIR := test
-TEST_FILE := Test.java  #test file
+TEST_FILE := Test.jmm  #test file
 
 all:
 	javac $(JAVAC_FLAGS) parser/*.java symbol/*.java codeGen/*.java $(SRC).java

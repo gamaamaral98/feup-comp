@@ -1,0 +1,17 @@
+class Test {
+    public static void main(String[] args) {
+        int[] a;
+        int i;
+    
+        a = new int[10];
+        i = 0;
+    
+        while(i < a.length) {
+            io.println(i);
+            i = i + 1;
+        }
+
+        return;
+    }
+
+}
