@@ -58,7 +58,10 @@ public class JasminGenerator{
 	private void createFileHeader(){
 
 		this.printWriter.println(".class public " + symbolTable.getClassName());
-		this.printWriter.println(".super java/lang/Object\n");
+		if(symbolTable.itExtends()) 
+			this.printWriter.println(".super " + symbolTable.getExtendedClassName());
+		else
+			this.printWriter.println(".super java/lang/Object\n");
 	}
 
 	/*
@@ -86,7 +89,10 @@ public class JasminGenerator{
 
 		this.printWriter.println("\n.method public <init>()V");
 		this.printWriter.println("\taload_0");
-		this.printWriter.println("\tinvokenonvirtual java/lang/Object/<init>()V");
+		if(symbolTable.itExtends()) 
+			this.printWriter.println("\tinvokenonvirtual " + symbolTable.getExtendedClassName() + "/<init>()V");
+		else
+			this.printWriter.println("\tinvokenonvirtual java/lang/Object/<init>()V");
 		this.printWriter.println("\treturn");
 		this.printWriter.println(".end method\n");
 	}
@@ -215,9 +221,10 @@ public class JasminGenerator{
 
 					String lhsName = lhs.getName();
 					if(isGlobal(lhsName) || isLocal(lhsName, fst)){
-
-						if(this.symbolTable.getFunction(rhs, numberArgs).getReturnSymbol().getTypeDescriptor() != "V")
-							this.printWriter.println("\tpop\n");
+						try {
+							if(this.symbolTable.getFunction(rhs, numberArgs).getReturnSymbol().getTypeDescriptor() != "V")
+								this.printWriter.println("\tpop\n");
+						} catch (Exception e) {}
 					}
 				}
 			}
@@ -340,7 +347,6 @@ public class JasminGenerator{
 			manageLENGTH(rhs, fst);
 		}
 		else{
-
 			manageArithmeticExpressionAux(rhs, fst, "I", num_parameters);
 		}
 		this.printWriter.println("\tiastore\n");
@@ -377,8 +383,7 @@ public class JasminGenerator{
 			this.printWriter.println("\tiastore " + "\n");
 		}
 		else if(rhs instanceof ASTCALL_FUNCTION){
-			String type = getLocalDescriptor(lhs_1, fst);
-			manageCALL_FUNCTION(rhs, fst, type, num_parameters);
+			manageCALL_FUNCTION(rhs, fst, "I", num_parameters);
 			this.printWriter.println("\tiastore" + "\n");
 		}
 		else if(rhs instanceof ASTADD || rhs instanceof ASTSUB || 
@@ -485,6 +490,9 @@ public class JasminGenerator{
 				manageArithmeticExpressionAux((SimpleNode) rhs.jjtGetChild(1), fst, "I", num_parameters);
 				this.printWriter.println("\tiaload");
 			}
+			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
+		} else if(rhs instanceof ASTLENGTH){
+			manageLENGTH(rhs, fst);
 			this.printWriter.println("\tistore " + Integer.toString(index) + "\n");
 		}
 	}
@@ -606,7 +614,13 @@ public class JasminGenerator{
 		manageCALL_ARGUMENTS((SimpleNode) node.jjtGetChild(2), fst, num_parameters);
 
 		if(flag)
-			manageFUNCTION((SimpleNode) node.jjtGetChild(1), ((SimpleNode) node.jjtGetChild(2)).jjtGetNumChildren());
+			if(this.symbolTable.getFunction(((SimpleNode) node.jjtGetChild(1)).getName(), ((SimpleNode) node.jjtGetChild(2)).jjtGetNumChildren()) != null)
+				manageFUNCTION((SimpleNode) node.jjtGetChild(1), ((SimpleNode) node.jjtGetChild(2)).jjtGetNumChildren());
+			else {
+				this.printWriter.print("\tinvokevirtual " + symbolTable.getExtendedClassName());
+				this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());
+				this.printWriter.println("(" + getCALL_ARGUMENTS_Descriptor((SimpleNode) node.jjtGetChild(2), fst, num_parameters) + ")" + staticRet);	
+			}
 		else{
 			this.printWriter.print("\tinvokestatic " + child.getName());
 			this.printWriter.print("/" + ((SimpleNode) node.jjtGetChild(1)).getName());

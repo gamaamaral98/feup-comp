@@ -139,7 +139,7 @@ public class ClassSymbolTable {
         if(global_variables.containsKey(atr)){
             return false;
         }
-        Symbol s = new Symbol(atr, type, indentifier_name);
+        Symbol s = new Symbol(atr, type, indentifier_name == extendedClassName ? className : extendedClassName);
         global_variables.put(atr, s);
         return true;
     }
@@ -149,6 +149,7 @@ public class ClassSymbolTable {
     }
 
     public FunctionSymbolTable getFunction(String functionName, int num_parameters){
+        if(!functions.containsKey(functionName)) return null;
         for(int i = 0; i < functions.get(functionName).size(); i++){
             if(functions.get(functionName).get(i).getNum_parameters() == num_parameters){
                 return functions.get(functionName).get(i);
@@ -233,5 +234,9 @@ public class ClassSymbolTable {
 
     public String getExtendedClassName() {
         return extendedClassName;
+    }
+
+    public boolean itExtends() {
+        return !extendedClassName.equals("");
     }
 }
